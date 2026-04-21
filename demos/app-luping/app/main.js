@@ -12,7 +12,7 @@ let screenRecorderWindow = null;
 
 function createAboutWindow() {
     console.log('Creating About window...');
-    
+
     if (aboutWindow) {
         console.log('About window already exists, focusing...');
         aboutWindow.focus();
@@ -33,7 +33,7 @@ function createAboutWindow() {
     console.log('Loading README from:', readmePath);
     aboutWindow.loadFile(readmePath);
 
-    aboutWindow.on('closed', function() {
+    aboutWindow.on('closed', function () {
         console.log('About window closed');
         aboutWindow = null;
     });
@@ -41,7 +41,7 @@ function createAboutWindow() {
 
 function createChildWindow() {
     console.log('Creating Child window...');
-    
+
     if (childWindow) {
         console.log('Child window already exists, focusing...');
         childWindow.focus();
@@ -61,7 +61,7 @@ function createChildWindow() {
 
     childWindow.loadFile(path.join(__dirname, 'child.html'));
 
-    childWindow.on('closed', function() {
+    childWindow.on('closed', function () {
         console.log('Child window closed');
         childWindow = null;
     });
@@ -70,13 +70,13 @@ function createChildWindow() {
 function createFloatWindow() {
     console.log('Creating Float window...');
     console.log('mainWindow:', mainWindow ? 'exists' : 'null');
-    
+
     if (floatWindow && !floatWindow.isDestroyed()) {
         console.log('Float window already exists, focusing...');
         floatWindow.focus();
         return;
     }
-    
+
     floatWindow = null;
 
     try {
@@ -94,16 +94,16 @@ function createFloatWindow() {
         console.log('Float window created, loading float.html...');
         floatWindow.loadFile(path.join(__dirname, 'float.html'));
 
-        floatWindow.on('closed', function() {
+        floatWindow.on('closed', function () {
             console.log('Float window closed');
             floatWindow = null;
         });
-        
-        floatWindow.webContents.on('did-finish-load', function() {
+
+        floatWindow.webContents.on('did-finish-load', function () {
             console.log('Float window content loaded');
         });
-        
-        floatWindow.webContents.on('did-fail-load', function(event, errorCode, errorDescription) {
+
+        floatWindow.webContents.on('did-fail-load', function (event, errorCode, errorDescription) {
             console.error('Float window failed to load:', errorCode, errorDescription);
         });
     } catch (error) {
@@ -113,13 +113,13 @@ function createFloatWindow() {
 
 function createSnakeWindow() {
     console.log('Creating Snake Game window...');
-    
+
     if (snakeWindow && !snakeWindow.isDestroyed()) {
         console.log('Snake window already exists, focusing...');
         snakeWindow.focus();
         return;
     }
-    
+
     snakeWindow = null;
 
     try {
@@ -138,16 +138,16 @@ function createSnakeWindow() {
         console.log('Snake window created, loading snake.html...');
         snakeWindow.loadFile(path.join(__dirname, 'snake.html'));
 
-        snakeWindow.on('closed', function() {
+        snakeWindow.on('closed', function () {
             console.log('Snake window closed');
             snakeWindow = null;
         });
-        
-        snakeWindow.webContents.on('did-finish-load', function() {
+
+        snakeWindow.webContents.on('did-finish-load', function () {
             console.log('Snake window content loaded');
         });
-        
-        snakeWindow.webContents.on('did-fail-load', function(event, errorCode, errorDescription) {
+
+        snakeWindow.webContents.on('did-fail-load', function (event, errorCode, errorDescription) {
             console.error('Snake window failed to load:', errorCode, errorDescription);
         });
     } catch (error) {
@@ -159,13 +159,13 @@ function createSnakeWindow() {
 // 屏幕录制窗口创建函数
 function createScreenRecorderWindow() {
     console.log('Creating Screen Recorder window...');
-    
+
     if (screenRecorderWindow && !screenRecorderWindow.isDestroyed()) {
         console.log('Screen Recorder window already exists, focusing...');
         screenRecorderWindow.focus();
         return;
     }
-    
+
     screenRecorderWindow = null;
 
     try {
@@ -184,16 +184,16 @@ function createScreenRecorderWindow() {
         console.log('Screen Recorder window created, loading screen-recorder.html...');
         screenRecorderWindow.loadFile(path.join(__dirname, 'screen-recorder.html'));
 
-        screenRecorderWindow.on('closed', function() {
+        screenRecorderWindow.on('closed', function () {
             console.log('Screen Recorder window closed');
             screenRecorderWindow = null;
         });
-        
-        screenRecorderWindow.webContents.on('did-finish-load', function() {
+
+        screenRecorderWindow.webContents.on('did-finish-load', function () {
             console.log('Screen Recorder window content loaded');
         });
-        
-        screenRecorderWindow.webContents.on('did-fail-load', function(event, errorCode, errorDescription) {
+
+        screenRecorderWindow.webContents.on('did-fail-load', function (event, errorCode, errorDescription) {
             console.error('Screen Recorder window failed to load:', errorCode, errorDescription);
         });
     } catch (error) {
@@ -210,7 +210,7 @@ function createMenu() {
                 {
                     label: 'New Window',
                     accelerator: 'CmdOrCtrl+N',
-                    click: function() {
+                    click: function () {
                         const newWindow = new BrowserWindow({
                             width: 1200,
                             height: 800,
@@ -225,7 +225,7 @@ function createMenu() {
                 {
                     label: 'Open Child Window',
                     accelerator: 'CmdOrCtrl+Shift+N',
-                    click: function() {
+                    click: function () {
                         console.log('Open Child Window menu clicked');
                         createChildWindow();
                     }
@@ -236,7 +236,7 @@ function createMenu() {
                 {
                     label: 'About',
                     accelerator: 'CmdOrCtrl+I',
-                    click: function() {
+                    click: function () {
                         console.log('About menu clicked');
                         createAboutWindow();
                     }
@@ -247,7 +247,7 @@ function createMenu() {
                 {
                     label: 'Quit',
                     accelerator: process.platform === 'darwin' ? 'Cmd+Q' : 'Ctrl+Q',
-                    click: function() {
+                    click: function () {
                         app.quit();
                     }
                 }
@@ -271,7 +271,7 @@ function createMenu() {
                 {
                     label: 'Reload',
                     accelerator: 'CmdOrCtrl+R',
-                    click: function(item, focusedWindow) {
+                    click: function (item, focusedWindow) {
                         if (focusedWindow) {
                             focusedWindow.reload();
                         }
@@ -280,7 +280,7 @@ function createMenu() {
                 {
                     label: 'Toggle Developer Tools',
                     accelerator: process.platform === 'darwin' ? 'Alt+Command+I' : 'Ctrl+Shift+I',
-                    click: function(item, focusedWindow) {
+                    click: function (item, focusedWindow) {
                         if (focusedWindow) {
                             focusedWindow.webContents.toggleDevTools();
                         }
@@ -306,7 +306,7 @@ function createMenu() {
             submenu: [
                 {
                     label: 'Learn More',
-                    click: function() {
+                    click: function () {
                         shell.openExternal('https://www.harmonyos.com');
                     }
                 }
@@ -326,7 +326,7 @@ function createMenu() {
                 { label: 'Hide Others', accelerator: 'Command+Shift+H', role: 'hideothers' },
                 { label: 'Show All', role: 'unhide' },
                 { type: 'separator' },
-                { label: 'Quit', accelerator: 'Command+Q', click: function() { app.quit(); } }
+                { label: 'Quit', accelerator: 'Command+Q', click: function () { app.quit(); } }
             ]
         });
     }
@@ -345,24 +345,24 @@ function createWindow() {
             contextIsolation: false
         }
     });
-    mainWindow.setWindowButtonVisibility(true);
-    
+    // mainWindow.setWindowButtonVisibility(true);
+
     console.log('Loading main page from:', path.join(__dirname, 'index.html'));
     mainWindow.loadFile(path.join(__dirname, 'index.html'));
-    
+
     createMenu();
 }
 
 app.whenReady().then(createWindow);
 
-ipcMain.on('open-child', function() {
+ipcMain.on('open-child', function () {
     console.log('IPC: open-child received');
     if (!childWindow) {
         createChildWindow();
     }
 });
 
-ipcMain.on('open-float', function() {
+ipcMain.on('open-float', function () {
     console.log('IPC: open-float received');
     console.log('mainWindow exists:', !!mainWindow);
     if (!mainWindow) {
@@ -372,7 +372,7 @@ ipcMain.on('open-float', function() {
     createFloatWindow();
 });
 
-ipcMain.on('open-snake', function() {
+ipcMain.on('open-snake', function () {
     console.log('IPC: open-snake received');
     console.log('mainWindow exists:', !!mainWindow);
     if (!mainWindow) {
@@ -382,7 +382,7 @@ ipcMain.on('open-snake', function() {
     createSnakeWindow();
 });
 
-ipcMain.handle('get-app-info', function() {
+ipcMain.handle('get-app-info', function () {
     console.log('IPC: get-app-info received');
     return {
         name: app.getName(),
@@ -390,26 +390,26 @@ ipcMain.handle('get-app-info', function() {
     };
 });
 
-app.on('window-all-closed', function() {
+app.on('window-all-closed', function () {
     if (process.platform !== 'darwin') {
         app.quit();
     }
 });
 
-app.on('activate', function() {
+app.on('activate', function () {
     if (BrowserWindow.getAllWindows().length === 0) {
         createWindow();
     }
 });
 
 // 文件选择器功能
-ipcMain.on('open-file-picker', function() {
+ipcMain.on('open-file-picker', function () {
     console.log('IPC: open-file-picker received');
     if (!mainWindow) {
         console.error('mainWindow is not created yet');
         return;
     }
-    
+
     // 打开文件选择对话框
     dialog.showOpenDialog(mainWindow, {
         properties: ['openFile'],
@@ -420,7 +420,7 @@ ipcMain.on('open-file-picker', function() {
         if (!result.canceled && result.filePaths.length > 0) {
             const filePath = result.filePaths[0];
             console.log('Selected file:', filePath);
-            
+
             // 发送文件路径给渲染进程
             if (mainWindow) {
                 mainWindow.webContents.send('file-selected', filePath);
@@ -432,14 +432,14 @@ ipcMain.on('open-file-picker', function() {
 });
 
 // 复制到剪贴板功能
-ipcMain.on('copy-to-clipboard', function(event, text) {
+ipcMain.on('copy-to-clipboard', function (event, text) {
     console.log('IPC: copy-to-clipboard received');
     clipboard.writeText(text);
     console.log('Text copied to clipboard:', text);
 });
 
 // 读取剪贴板功能
-ipcMain.handle('read-clipboard', function() {
+ipcMain.handle('read-clipboard', function () {
     console.log('IPC: read-clipboard received');
     const content = clipboard.readText();
     console.log('Clipboard content:', content);
@@ -448,7 +448,7 @@ ipcMain.handle('read-clipboard', function() {
 
 //created by AI
 // 屏幕录制窗口IPC处理
-ipcMain.on('open-screen-recorder', function() {
+ipcMain.on('open-screen-recorder', function () {
     console.log('IPC: open-screen-recorder received');
     console.log('mainWindow exists:', !!mainWindow);
     if (!mainWindow) {
@@ -459,7 +459,7 @@ ipcMain.on('open-screen-recorder', function() {
 });
 
 // 获取屏幕源
-ipcMain.handle('get-sources', async function() {
+ipcMain.handle('get-sources', async function () {
     console.log('IPC: get-sources received');
     try {
         const { desktopCapturer } = require('electron');
@@ -468,7 +468,7 @@ ipcMain.handle('get-sources', async function() {
             thumbnailSize: { width: 320, height: 180 }
         });
         console.log('Screen sources found:', sources.length);
-        
+
         const sourcesWithThumbnails = sources.map(source => {
             console.log('Source:', source.name, 'has thumbnail:', !!source.thumbnail);
             return {
@@ -477,7 +477,7 @@ ipcMain.handle('get-sources', async function() {
                 thumbnail: source.thumbnail ? source.thumbnail.toDataURL() : ''
             };
         });
-        
+
         console.log('Sources with thumbnails:', sourcesWithThumbnails);
         return sourcesWithThumbnails;
     } catch (error) {
@@ -487,9 +487,9 @@ ipcMain.handle('get-sources', async function() {
 });
 
 // 保存视频文件对话框
-ipcMain.handle('save-video', async function(event, options) {
+ipcMain.handle('save-video', async function (event, options) {
     console.log('IPC: save-video received');
-    
+
     const result = await dialog.showSaveDialog(mainWindow, {
         title: '保存录制视频',
         defaultPath: options.defaultName,
@@ -498,16 +498,16 @@ ipcMain.handle('save-video', async function(event, options) {
             { name: 'All Files', extensions: ['*'] }
         ]
     });
-    
+
     return result;
 });
 
 // 写入视频文件
-ipcMain.handle('write-video-file', async function(event, options) {
+ipcMain.handle('write-video-file', async function (event, options) {
     console.log('IPC: write-video-file received');
     console.log('File path:', options.filePath);
     console.log('Buffer size:', options.buffer.byteLength);
-    
+
     try {
         const buffer = Buffer.from(options.buffer);
         await fs.promises.writeFile(options.filePath, buffer);

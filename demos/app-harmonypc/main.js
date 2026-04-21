@@ -73,7 +73,7 @@ function createWindow() {
             contextIsolation: false
         }
     });
-    // mainWindow.setWindowButtonVisibility(true);
+    // // mainWindow.setWindowButtonVisibility(true);
 
     // Load the system info page
     const indexPath = path.join(__dirname, 'system-info.html');

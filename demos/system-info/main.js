@@ -72,7 +72,7 @@ function createWindow() {
             contextIsolation: false
         }
     });
-    // mainWindow.setWindowButtonVisibility(true);
+    // // mainWindow.setWindowButtonVisibility(true);
 
     // Load the system info page
     const indexPath = path.join(__dirname, 'system-info.html');
@@ -114,35 +114,35 @@ function createHelpWindow() {
 
 }
 
-  /**
-   * 创建日历窗口
-   */
-  function createCalendarWindow() {
-      // 如果日历窗口已存在，则聚焦它
-      if (calendarWindow) {
-          calendarWindow.focus();
-          return;
-      }
+/**
+ * 创建日历窗口
+ */
+function createCalendarWindow() {
+    // 如果日历窗口已存在，则聚焦它
+    if (calendarWindow) {
+        calendarWindow.focus();
+        return;
+    }
 
-      calendarWindow = new BrowserWindow({
-          width: 1000,
-          height: 800,
-          title: '日历 - 系统信息查看器',
-          webPreferences: {
-              nodeIntegration: true,
-              contextIsolation: false
-          },
-          parent: mainWindow ? mainWindow : null,
-          modal: false
-      });
+    calendarWindow = new BrowserWindow({
+        width: 1000,
+        height: 800,
+        title: '日历 - 系统信息查看器',
+        webPreferences: {
+            nodeIntegration: true,
+            contextIsolation: false
+        },
+        parent: mainWindow ? mainWindow : null,
+        modal: false
+    });
 
-      const calendarPath = path.join(__dirname, 'calendar.html');
-      calendarWindow.loadFile(calendarPath);
+    const calendarPath = path.join(__dirname, 'calendar.html');
+    calendarWindow.loadFile(calendarPath);
 
-      calendarWindow.on('closed', () => {
-          calendarWindow = null;
-      });
-  }
+    calendarWindow.on('closed', () => {
+        calendarWindow = null;
+    });
+}
 
 
 /**
@@ -513,10 +513,10 @@ function formatUptime(seconds) {
 }
 
 
-  // IPC handler for opening calendar window
-  ipcMain.on('open-calendar', () => {
-      createCalendarWindow();
-  });
+// IPC handler for opening calendar window
+ipcMain.on('open-calendar', () => {
+    createCalendarWindow();
+});
 
 app.whenReady().then(() => {
     const mode = isDevelopment() ? '开发' : '生产';

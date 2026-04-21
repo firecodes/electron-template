@@ -75,7 +75,7 @@ let zaobaoWindow = null;
 
 function createAboutWindow() {
     console.log('Creating About window...');
-    
+
     if (aboutWindow) {
         console.log('About window already exists, focusing...');
         aboutWindow.focus();
@@ -96,7 +96,7 @@ function createAboutWindow() {
     console.log('Loading README from:', readmePath);
     aboutWindow.loadFile(readmePath);
 
-    aboutWindow.on('closed', function() {
+    aboutWindow.on('closed', function () {
         console.log('About window closed');
         aboutWindow = null;
     });
@@ -104,7 +104,7 @@ function createAboutWindow() {
 
 function createChildWindow() {
     console.log('Creating Child window...');
-    
+
     if (childWindow) {
         console.log('Child window already exists, focusing...');
         childWindow.focus();
@@ -124,7 +124,7 @@ function createChildWindow() {
 
     childWindow.loadFile(path.join(__dirname, 'child.html'));
 
-    childWindow.on('closed', function() {
+    childWindow.on('closed', function () {
         console.log('Child window closed');
         childWindow = null;
     });
@@ -133,13 +133,13 @@ function createChildWindow() {
 function createFloatWindow() {
     console.log('Creating Float window...');
     console.log('mainWindow:', mainWindow ? 'exists' : 'null');
-    
+
     if (floatWindow && !floatWindow.isDestroyed()) {
         console.log('Float window already exists, focusing...');
         floatWindow.focus();
         return;
     }
-    
+
     floatWindow = null;
 
     try {
@@ -157,16 +157,16 @@ function createFloatWindow() {
         console.log('Float window created, loading float.html...');
         floatWindow.loadFile(path.join(__dirname, 'float.html'));
 
-        floatWindow.on('closed', function() {
+        floatWindow.on('closed', function () {
             console.log('Float window closed');
             floatWindow = null;
         });
-        
-        floatWindow.webContents.on('did-finish-load', function() {
+
+        floatWindow.webContents.on('did-finish-load', function () {
             console.log('Float window content loaded');
         });
-        
-        floatWindow.webContents.on('did-fail-load', function(event, errorCode, errorDescription) {
+
+        floatWindow.webContents.on('did-fail-load', function (event, errorCode, errorDescription) {
             console.error('Float window failed to load:', errorCode, errorDescription);
         });
     } catch (error) {
@@ -176,13 +176,13 @@ function createFloatWindow() {
 
 function createSnakeWindow() {
     console.log('Creating Snake Game window...');
-    
+
     if (snakeWindow && !snakeWindow.isDestroyed()) {
         console.log('Snake window already exists, focusing...');
         snakeWindow.focus();
         return;
     }
-    
+
     snakeWindow = null;
 
     try {
@@ -201,16 +201,16 @@ function createSnakeWindow() {
         console.log('Snake window created, loading snake.html...');
         snakeWindow.loadFile(path.join(__dirname, 'snake.html'));
 
-        snakeWindow.on('closed', function() {
+        snakeWindow.on('closed', function () {
             console.log('Snake window closed');
             snakeWindow = null;
         });
-        
-        snakeWindow.webContents.on('did-finish-load', function() {
+
+        snakeWindow.webContents.on('did-finish-load', function () {
             console.log('Snake window content loaded');
         });
-        
-        snakeWindow.webContents.on('did-fail-load', function(event, errorCode, errorDescription) {
+
+        snakeWindow.webContents.on('did-fail-load', function (event, errorCode, errorDescription) {
             console.error('Snake window failed to load:', errorCode, errorDescription);
         });
     } catch (error) {
@@ -222,13 +222,13 @@ function createSnakeWindow() {
 // 摄像头测试窗口创建函数
 function createCameraWindow() {
     console.log('Creating Camera window...');
-    
+
     if (cameraWindow && !cameraWindow.isDestroyed()) {
         console.log('Camera window already exists, focusing...');
         cameraWindow.focus();
         return;
     }
-    
+
     cameraWindow = null;
 
     try {
@@ -247,16 +247,16 @@ function createCameraWindow() {
         console.log('Camera window created, loading camera.html...');
         cameraWindow.loadFile(path.join(__dirname, 'camera.html'));
 
-        cameraWindow.on('closed', function() {
+        cameraWindow.on('closed', function () {
             console.log('Camera window closed');
             cameraWindow = null;
         });
-        
-        cameraWindow.webContents.on('did-finish-load', function() {
+
+        cameraWindow.webContents.on('did-finish-load', function () {
             console.log('Camera window content loaded');
         });
-        
-        cameraWindow.webContents.on('did-fail-load', function(event, errorCode, errorDescription) {
+
+        cameraWindow.webContents.on('did-fail-load', function (event, errorCode, errorDescription) {
             console.error('Camera window failed to load:', errorCode, errorDescription);
         });
     } catch (error) {
@@ -269,13 +269,13 @@ function createCameraWindow() {
 // 图片尺寸调节窗口创建函数
 function createImageResizerWindow() {
     console.log('Creating Image Resizer window...');
-    
+
     if (imageResizerWindow && !imageResizerWindow.isDestroyed()) {
         console.log('Image Resizer window already exists, focusing...');
         imageResizerWindow.focus();
         return;
     }
-    
+
     imageResizerWindow = null;
 
     try {
@@ -294,16 +294,16 @@ function createImageResizerWindow() {
         console.log('Image Resizer window created, loading image-resizer.html...');
         imageResizerWindow.loadFile(path.join(__dirname, 'image-resizer.html'));
 
-        imageResizerWindow.on('closed', function() {
+        imageResizerWindow.on('closed', function () {
             console.log('Image Resizer window closed');
             imageResizerWindow = null;
         });
-        
-        imageResizerWindow.webContents.on('did-finish-load', function() {
+
+        imageResizerWindow.webContents.on('did-finish-load', function () {
             console.log('Image Resizer window content loaded');
         });
-        
-        imageResizerWindow.webContents.on('did-fail-load', function(event, errorCode, errorDescription) {
+
+        imageResizerWindow.webContents.on('did-fail-load', function (event, errorCode, errorDescription) {
             console.error('Image Resizer window failed to load:', errorCode, errorDescription);
         });
     } catch (error) {
@@ -316,13 +316,13 @@ function createImageResizerWindow() {
 // 系统通知窗口创建函数
 function createNotificationWindow() {
     console.log('Creating Notification window...');
-    
+
     if (notificationWindow && !notificationWindow.isDestroyed()) {
         console.log('Notification window already exists, focusing...');
         notificationWindow.focus();
         return;
     }
-    
+
     notificationWindow = null;
 
     try {
@@ -341,16 +341,16 @@ function createNotificationWindow() {
         console.log('Notification window created, loading notification.html...');
         notificationWindow.loadFile(path.join(__dirname, 'notification.html'));
 
-        notificationWindow.on('closed', function() {
+        notificationWindow.on('closed', function () {
             console.log('Notification window closed');
             notificationWindow = null;
         });
-        
-        notificationWindow.webContents.on('did-finish-load', function() {
+
+        notificationWindow.webContents.on('did-finish-load', function () {
             console.log('Notification window content loaded');
         });
-        
-        notificationWindow.webContents.on('did-fail-load', function(event, errorCode, errorDescription) {
+
+        notificationWindow.webContents.on('did-fail-load', function (event, errorCode, errorDescription) {
             console.error('Notification window failed to load:', errorCode, errorDescription);
         });
     } catch (error) {
@@ -363,13 +363,13 @@ function createNotificationWindow() {
 // 屏幕录制窗口创建函数
 function createScreenRecorderWindow() {
     console.log('Creating Screen Recorder window...');
-    
+
     if (screenRecorderWindow && !screenRecorderWindow.isDestroyed()) {
         console.log('Screen Recorder window already exists, focusing...');
         screenRecorderWindow.focus();
         return;
     }
-    
+
     screenRecorderWindow = null;
 
     try {
@@ -388,16 +388,16 @@ function createScreenRecorderWindow() {
         console.log('Screen Recorder window created, loading screen-recorder.html...');
         screenRecorderWindow.loadFile(path.join(__dirname, 'screen-recorder.html'));
 
-        screenRecorderWindow.on('closed', function() {
+        screenRecorderWindow.on('closed', function () {
             console.log('Screen Recorder window closed');
             screenRecorderWindow = null;
         });
-        
-        screenRecorderWindow.webContents.on('did-finish-load', function() {
+
+        screenRecorderWindow.webContents.on('did-finish-load', function () {
             console.log('Screen Recorder window content loaded');
         });
-        
-        screenRecorderWindow.webContents.on('did-fail-load', function(event, errorCode, errorDescription) {
+
+        screenRecorderWindow.webContents.on('did-fail-load', function (event, errorCode, errorDescription) {
             console.error('Screen Recorder window failed to load:', errorCode, errorDescription);
         });
     } catch (error) {
@@ -410,13 +410,13 @@ function createScreenRecorderWindow() {
 // 硬件信息窗口创建函数
 function createDeviceInfoWindow() {
     console.log('Creating Device Info window...');
-    
+
     if (deviceInfoWindow && !deviceInfoWindow.isDestroyed()) {
         console.log('Device Info window already exists, focusing...');
         deviceInfoWindow.focus();
         return;
     }
-    
+
     deviceInfoWindow = null;
 
     try {
@@ -435,16 +435,16 @@ function createDeviceInfoWindow() {
         console.log('Device Info window created, loading device-info.html...');
         deviceInfoWindow.loadFile(path.join(__dirname, 'device-info.html'));
 
-        deviceInfoWindow.on('closed', function() {
+        deviceInfoWindow.on('closed', function () {
             console.log('Device Info window closed');
             deviceInfoWindow = null;
         });
-        
-        deviceInfoWindow.webContents.on('did-finish-load', function() {
+
+        deviceInfoWindow.webContents.on('did-finish-load', function () {
             console.log('Device Info window content loaded');
         });
-        
-        deviceInfoWindow.webContents.on('did-fail-load', function(event, errorCode, errorDescription) {
+
+        deviceInfoWindow.webContents.on('did-fail-load', function (event, errorCode, errorDescription) {
             console.error('Device Info window failed to load:', errorCode, errorDescription);
         });
     } catch (error) {
@@ -461,7 +461,7 @@ function createMenu() {
                 {
                     label: 'New Window',
                     accelerator: 'CmdOrCtrl+N',
-                    click: function() {
+                    click: function () {
                         const newWindow = new BrowserWindow({
                             width: 1200,
                             height: 800,
@@ -476,7 +476,7 @@ function createMenu() {
                 {
                     label: 'Open Child Window',
                     accelerator: 'CmdOrCtrl+Shift+N',
-                    click: function() {
+                    click: function () {
                         console.log('Open Child Window menu clicked');
                         createChildWindow();
                     }
@@ -487,7 +487,7 @@ function createMenu() {
                 {
                     label: 'About',
                     accelerator: 'CmdOrCtrl+I',
-                    click: function() {
+                    click: function () {
                         console.log('About menu clicked');
                         createAboutWindow();
                     }
@@ -498,7 +498,7 @@ function createMenu() {
                 {
                     label: 'Quit',
                     accelerator: process.platform === 'darwin' ? 'Cmd+Q' : 'Ctrl+Q',
-                    click: function() {
+                    click: function () {
                         app.quit();
                     }
                 }
@@ -522,7 +522,7 @@ function createMenu() {
                 {
                     label: 'Reload',
                     accelerator: 'CmdOrCtrl+R',
-                    click: function(item, focusedWindow) {
+                    click: function (item, focusedWindow) {
                         if (focusedWindow) {
                             focusedWindow.reload();
                         }
@@ -531,7 +531,7 @@ function createMenu() {
                 {
                     label: 'Toggle Developer Tools',
                     accelerator: process.platform === 'darwin' ? 'Alt+Command+I' : 'Ctrl+Shift+I',
-                    click: function(item, focusedWindow) {
+                    click: function (item, focusedWindow) {
                         if (focusedWindow) {
                             focusedWindow.webContents.toggleDevTools();
                         }
@@ -557,7 +557,7 @@ function createMenu() {
             submenu: [
                 {
                     label: 'Learn More',
-                    click: function() {
+                    click: function () {
                         shell.openExternal('https://www.harmonyos.com');
                     }
                 }
@@ -577,7 +577,7 @@ function createMenu() {
                 { label: 'Hide Others', accelerator: 'Command+Shift+H', role: 'hideothers' },
                 { label: 'Show All', role: 'unhide' },
                 { type: 'separator' },
-                { label: 'Quit', accelerator: 'Command+Q', click: function() { app.quit(); } }
+                { label: 'Quit', accelerator: 'Command+Q', click: function () { app.quit(); } }
             ]
         });
     }
@@ -596,24 +596,24 @@ function createWindow() {
             contextIsolation: false
         }
     });
-    mainWindow.setWindowButtonVisibility(true);
-    
+    // mainWindow.setWindowButtonVisibility(true);
+
     console.log('Loading main page from:', path.join(__dirname, 'index.html'));
     mainWindow.loadFile(path.join(__dirname, 'index.html'));
-    
+
     createMenu();
 }
 
 app.whenReady().then(createWindow);
 
-ipcMain.on('open-child', function() {
+ipcMain.on('open-child', function () {
     console.log('IPC: open-child received');
     if (!childWindow) {
         createChildWindow();
     }
 });
 
-ipcMain.on('open-float', function() {
+ipcMain.on('open-float', function () {
     console.log('IPC: open-float received');
     console.log('mainWindow exists:', !!mainWindow);
     if (!mainWindow) {
@@ -623,7 +623,7 @@ ipcMain.on('open-float', function() {
     createFloatWindow();
 });
 
-ipcMain.on('open-snake', function() {
+ipcMain.on('open-snake', function () {
     console.log('IPC: open-snake received');
     console.log('mainWindow exists:', !!mainWindow);
     if (!mainWindow) {
@@ -633,7 +633,7 @@ ipcMain.on('open-snake', function() {
     createSnakeWindow();
 });
 
-ipcMain.handle('get-app-info', function() {
+ipcMain.handle('get-app-info', function () {
     console.log('IPC: get-app-info received');
     return {
         name: app.getName(),
@@ -641,26 +641,26 @@ ipcMain.handle('get-app-info', function() {
     };
 });
 
-app.on('window-all-closed', function() {
+app.on('window-all-closed', function () {
     if (process.platform !== 'darwin') {
         app.quit();
     }
 });
 
-app.on('activate', function() {
+app.on('activate', function () {
     if (BrowserWindow.getAllWindows().length === 0) {
         createWindow();
     }
 });
 
 // 文件选择器功能
-ipcMain.on('open-file-picker', function() {
+ipcMain.on('open-file-picker', function () {
     console.log('IPC: open-file-picker received');
     if (!mainWindow) {
         console.error('mainWindow is not created yet');
         return;
     }
-    
+
     // 打开文件选择对话框
     dialog.showOpenDialog(mainWindow, {
         properties: ['openFile'],
@@ -671,7 +671,7 @@ ipcMain.on('open-file-picker', function() {
         if (!result.canceled && result.filePaths.length > 0) {
             const filePath = result.filePaths[0];
             console.log('Selected file:', filePath);
-            
+
             // 发送文件路径给渲染进程
             if (mainWindow) {
                 mainWindow.webContents.send('file-selected', filePath);
@@ -683,14 +683,14 @@ ipcMain.on('open-file-picker', function() {
 });
 
 // 复制到剪贴板功能
-ipcMain.on('copy-to-clipboard', function(event, text) {
+ipcMain.on('copy-to-clipboard', function (event, text) {
     console.log('IPC: copy-to-clipboard received');
     clipboard.writeText(text);
     console.log('Text copied to clipboard:', text);
 });
 
 // 读取剪贴板功能
-ipcMain.handle('read-clipboard', function() {
+ipcMain.handle('read-clipboard', function () {
     console.log('IPC: read-clipboard received');
     const content = clipboard.readText();
     console.log('Clipboard content:', content);
@@ -699,7 +699,7 @@ ipcMain.handle('read-clipboard', function() {
 
 //created by AI
 // 图片尺寸调节窗口IPC处理
-ipcMain.on('open-image-resizer', function() {
+ipcMain.on('open-image-resizer', function () {
     console.log('IPC: open-image-resizer received');
     console.log('mainWindow exists:', !!mainWindow);
     if (!mainWindow) {
@@ -710,9 +710,9 @@ ipcMain.on('open-image-resizer', function() {
 });
 
 // 打开图片文件选择对话框
-ipcMain.handle('select-image-file', async function() {
+ipcMain.handle('select-image-file', async function () {
     console.log('IPC: select-image-file received');
-    
+
     const result = await dialog.showOpenDialog(mainWindow, {
         title: '选择图片文件',
         properties: ['openFile'],
@@ -721,14 +721,14 @@ ipcMain.handle('select-image-file', async function() {
             { name: 'All Files', extensions: ['*'] }
         ]
     });
-    
+
     return result;
 });
 
 // 保存调整后的图片
-ipcMain.handle('save-resized-image', async function(event, options) {
+ipcMain.handle('save-resized-image', async function (event, options) {
     console.log('IPC: save-resized-image received');
-    
+
     const result = await dialog.showSaveDialog(mainWindow, {
         title: '保存调整后的图片',
         defaultPath: options.defaultName,
@@ -738,15 +738,15 @@ ipcMain.handle('save-resized-image', async function(event, options) {
             { name: 'All Files', extensions: ['*'] }
         ]
     });
-    
+
     return result;
 });
 
 // 写入图片文件
-ipcMain.handle('write-image-file', async function(event, options) {
+ipcMain.handle('write-image-file', async function (event, options) {
     console.log('IPC: write-image-file received');
     console.log('File path:', options.filePath);
-    
+
     try {
         // 将 base64 数据转换为 Buffer
         const base64Data = options.dataUrl.replace(/^data:image\/\w+;base64,/, '');
@@ -763,7 +763,7 @@ ipcMain.handle('write-image-file', async function(event, options) {
 
 //created by AI
 // 系统通知窗口IPC处理
-ipcMain.on('open-notification', function() {
+ipcMain.on('open-notification', function () {
     console.log('IPC: open-notification received');
     console.log('mainWindow exists:', !!mainWindow);
     if (!mainWindow) {
@@ -774,24 +774,24 @@ ipcMain.on('open-notification', function() {
 });
 
 // 显示系统通知
-ipcMain.handle('show-system-notification', async function(event, options) {
+ipcMain.handle('show-system-notification', async function (event, options) {
     console.log('IPC: show-system-notification received', options);
     try {
         const { Notification } = require('electron');
-        
+
         // 检查是否支持通知
         if (!Notification.isSupported()) {
             console.error('Notifications are not supported on this system');
             return { success: false, error: '当前系统不支持通知功能' };
         }
-        
+
         // 创建并显示通知
         const notification = new Notification({
             title: options.title || '系统通知',
             body: options.body || '',
             icon: path.join(__dirname, 'icon.png')
         });
-        
+
         notification.show();
         console.log('Notification shown successfully');
         return { success: true };
@@ -804,7 +804,7 @@ ipcMain.handle('show-system-notification', async function(event, options) {
 
 //created by AI
 // 屏幕录制窗口IPC处理
-ipcMain.on('open-screen-recorder', function() {
+ipcMain.on('open-screen-recorder', function () {
     console.log('IPC: open-screen-recorder received');
     console.log('mainWindow exists:', !!mainWindow);
     if (!mainWindow) {
@@ -816,7 +816,7 @@ ipcMain.on('open-screen-recorder', function() {
 
 //created by AI
 // 硬件信息窗口IPC处理
-ipcMain.on('open-device-info', function() {
+ipcMain.on('open-device-info', function () {
     console.log('IPC: open-device-info received');
     console.log('mainWindow exists:', !!mainWindow);
     if (!mainWindow) {
@@ -827,7 +827,7 @@ ipcMain.on('open-device-info', function() {
 });
 
 // 获取设备信息
-ipcMain.handle('get-device-info', async function() {
+ipcMain.handle('get-device-info', async function () {
     console.log('IPC: get-device-info received');
     try {
         // 获取基础系统信息
@@ -837,19 +837,19 @@ ipcMain.handle('get-device-info', async function() {
             deviceType: 'pc',
             osVersion: os.release() || '未知',
             manufacturer: 'Electron App',
-            
+
             // 存储信息
             totalMemory: os.totalmem() || 0,
             freeMemory: os.freemem() || 0,
             diskInfo: '未知',
-            
+
             // 系统信息
             platform: os.platform() || '未知',
             arch: os.arch() || '未知',
             cpuCount: os.cpus() ? os.cpus().length : 0,
             hostname: os.hostname() || '未知'
         };
-        
+
         // 尝试获取硬盘信息
         try {
             const { execSync } = require('child_process');
@@ -879,7 +879,7 @@ ipcMain.handle('get-device-info', async function() {
             console.log('Disk info check failed:', e.message);
             deviceInfo.diskInfo = '无法获取硬盘信息';
         }
-        
+
         console.log('Device info collected:', deviceInfo);
         return { success: true, data: deviceInfo };
     } catch (error) {
@@ -890,7 +890,7 @@ ipcMain.handle('get-device-info', async function() {
 //created by AI//
 
 // 获取屏幕源
-ipcMain.handle('get-sources', async function() {
+ipcMain.handle('get-sources', async function () {
     console.log('IPC: get-sources received');
     try {
         const { desktopCapturer } = require('electron');
@@ -899,7 +899,7 @@ ipcMain.handle('get-sources', async function() {
             thumbnailSize: { width: 320, height: 180 }
         });
         console.log('Screen sources found:', sources.length);
-        
+
         const sourcesWithThumbnails = sources.map(source => {
             console.log('Source:', source.name, 'has thumbnail:', !!source.thumbnail);
             return {
@@ -908,7 +908,7 @@ ipcMain.handle('get-sources', async function() {
                 thumbnail: source.thumbnail ? source.thumbnail.toDataURL() : ''
             };
         });
-        
+
         console.log('Sources with thumbnails:', sourcesWithThumbnails);
         return sourcesWithThumbnails;
     } catch (error) {
@@ -918,9 +918,9 @@ ipcMain.handle('get-sources', async function() {
 });
 
 // 保存视频文件对话框
-ipcMain.handle('save-video', async function(event, options) {
+ipcMain.handle('save-video', async function (event, options) {
     console.log('IPC: save-video received');
-    
+
     const result = await dialog.showSaveDialog(mainWindow, {
         title: '保存录制视频',
         defaultPath: options.defaultName,
@@ -929,16 +929,16 @@ ipcMain.handle('save-video', async function(event, options) {
             { name: 'All Files', extensions: ['*'] }
         ]
     });
-    
+
     return result;
 });
 
 // 写入视频文件
-ipcMain.handle('write-video-file', async function(event, options) {
+ipcMain.handle('write-video-file', async function (event, options) {
     console.log('IPC: write-video-file received');
     console.log('File path:', options.filePath);
     console.log('Buffer size:', options.buffer.byteLength);
-    
+
     try {
         const buffer = Buffer.from(options.buffer);
         await fs.promises.writeFile(options.filePath, buffer);
@@ -1057,13 +1057,13 @@ async function getIPAddresses() {
 // 创建IP地址窗口
 function createIPWindow() {
     console.log('Creating IP Address window...');
-    
+
     if (ipWindow && !ipWindow.isDestroyed()) {
         console.log('IP window already exists, focusing...');
         ipWindow.focus();
         return;
     }
-    
+
     ipWindow = null;
 
     try {
@@ -1082,16 +1082,16 @@ function createIPWindow() {
         console.log('IP window created, loading ip.html...');
         ipWindow.loadFile(path.join(__dirname, 'ip.html'));
 
-        ipWindow.on('closed', function() {
+        ipWindow.on('closed', function () {
             console.log('IP window closed');
             ipWindow = null;
         });
-        
-        ipWindow.webContents.on('did-finish-load', function() {
+
+        ipWindow.webContents.on('did-finish-load', function () {
             console.log('IP window content loaded');
         });
-        
-        ipWindow.webContents.on('did-fail-load', function(event, errorCode, errorDescription) {
+
+        ipWindow.webContents.on('did-fail-load', function (event, errorCode, errorDescription) {
             console.error('IP window failed to load:', errorCode, errorDescription);
         });
     } catch (error) {
@@ -1100,7 +1100,7 @@ function createIPWindow() {
 }
 
 // IP地址窗口IPC处理
-ipcMain.on('open-ip-window', function() {
+ipcMain.on('open-ip-window', function () {
     console.log('IPC: open-ip-window received');
     console.log('mainWindow exists:', !!mainWindow);
     if (!mainWindow) {
@@ -1111,7 +1111,7 @@ ipcMain.on('open-ip-window', function() {
 });
 
 // 获取IP地址IPC处理
-ipcMain.handle('get-ip-addresses', async function() {
+ipcMain.handle('get-ip-addresses', async function () {
     console.log('IPC: get-ip-addresses received');
     return await getIPAddresses();
 });
@@ -1119,7 +1119,7 @@ ipcMain.handle('get-ip-addresses', async function() {
 
 //created by AI
 // 摄像头窗口IPC处理
-ipcMain.on('open-camera', function() {
+ipcMain.on('open-camera', function () {
     console.log('IPC: open-camera received');
     console.log('mainWindow exists:', !!mainWindow);
     if (!mainWindow) {
@@ -1130,10 +1130,10 @@ ipcMain.on('open-camera', function() {
 });
 
 // 保存摄像头媒体文件对话框
-ipcMain.handle('save-camera-media', async function(event, options) {
+ipcMain.handle('save-camera-media', async function (event, options) {
     console.log('IPC: save-camera-media received');
-    
-    const filters = options.type === 'image' 
+
+    const filters = options.type === 'image'
         ? [
             { name: 'PNG Image', extensions: ['png'] },
             { name: 'JPEG Image', extensions: ['jpg', 'jpeg'] },
@@ -1143,22 +1143,22 @@ ipcMain.handle('save-camera-media', async function(event, options) {
             { name: 'WebM Video', extensions: ['webm'] },
             { name: 'All Files', extensions: ['*'] }
         ];
-    
+
     const result = await dialog.showSaveDialog(mainWindow, {
         title: options.type === 'image' ? '保存照片' : '保存视频',
         defaultPath: options.defaultName,
         filters: filters
     });
-    
+
     return result;
 });
 
 // 写入摄像头媒体文件
-ipcMain.handle('write-camera-file', async function(event, options) {
+ipcMain.handle('write-camera-file', async function (event, options) {
     console.log('IPC: write-camera-file received');
     console.log('File path:', options.filePath);
     console.log('Buffer size:', options.buffer.byteLength);
-    
+
     try {
         const buffer = Buffer.from(options.buffer);
         await fs.promises.writeFile(options.filePath, buffer);
@@ -1173,16 +1173,16 @@ ipcMain.handle('write-camera-file', async function(event, options) {
 
 //created by AI
 // 摄像头权限请求 - 使用 systemPreferences.requestSystemPermission
-ipcMain.handle('request-camera-permission', async function() {
+ipcMain.handle('request-camera-permission', async function () {
     console.log('IPC: request-camera-permission received');
     try {
         // 请求权限
         var result = await systemPreferences.requestSystemPermission('camera');
         console.log('Camera permission request result:', result, 'type:', typeof result);
-        
+
         // result 可能是布尔值 true/false，也可能是字符串 'granted'/'denied' 等
         var granted = result === true || result === 'granted';
-        
+
         return {
             granted: granted,
             status: result
@@ -1198,7 +1198,7 @@ ipcMain.handle('request-camera-permission', async function() {
 });
 
 // 打开应用权限设置页面
-ipcMain.handle('open-permission-settings', async function() {
+ipcMain.handle('open-permission-settings', async function () {
     console.log('IPC: open-permission-settings received');
     try {
         systemPreferences.openApplicationInfoEntry();
@@ -1214,13 +1214,13 @@ ipcMain.handle('open-permission-settings', async function() {
 // OCR识别窗口创建函数
 function createOCRWindow() {
     console.log('Creating OCR window...');
-    
+
     if (ocrWindow && !ocrWindow.isDestroyed()) {
         console.log('OCR window already exists, focusing...');
         ocrWindow.focus();
         return;
     }
-    
+
     ocrWindow = null;
 
     try {
@@ -1240,16 +1240,16 @@ function createOCRWindow() {
         console.log('OCR window created, loading ocr.html...');
         ocrWindow.loadFile(path.join(__dirname, 'ocr.html'));
 
-        ocrWindow.on('closed', function() {
+        ocrWindow.on('closed', function () {
             console.log('OCR window closed');
             ocrWindow = null;
         });
-        
-        ocrWindow.webContents.on('did-finish-load', function() {
+
+        ocrWindow.webContents.on('did-finish-load', function () {
             console.log('OCR window content loaded');
         });
-        
-        ocrWindow.webContents.on('did-fail-load', function(event, errorCode, errorDescription) {
+
+        ocrWindow.webContents.on('did-fail-load', function (event, errorCode, errorDescription) {
             console.error('OCR window failed to load:', errorCode, errorDescription);
         });
     } catch (error) {
@@ -1258,7 +1258,7 @@ function createOCRWindow() {
 }
 
 // OCR窗口IPC处理
-ipcMain.on('open-ocr', function() {
+ipcMain.on('open-ocr', function () {
     console.log('IPC: open-ocr received');
     console.log('mainWindow exists:', !!mainWindow);
     if (!mainWindow) {
@@ -1269,9 +1269,9 @@ ipcMain.on('open-ocr', function() {
 });
 
 // 保存OCR识别结果
-ipcMain.handle('save-ocr-result', async function(event, options) {
+ipcMain.handle('save-ocr-result', async function (event, options) {
     console.log('IPC: save-ocr-result received');
-    
+
     const result = await dialog.showSaveDialog(mainWindow, {
         title: '保存识别结果',
         defaultPath: options.defaultName,
@@ -1280,7 +1280,7 @@ ipcMain.handle('save-ocr-result', async function(event, options) {
             { name: 'All Files', extensions: ['*'] }
         ]
     });
-    
+
     if (!result.canceled && result.filePath) {
         try {
             await fs.promises.writeFile(result.filePath, options.content, 'utf-8');
@@ -1291,7 +1291,7 @@ ipcMain.handle('save-ocr-result', async function(event, options) {
             return { success: false, error: error.message };
         }
     }
-    
+
     return result;
 });
 //created by AI//
@@ -1300,13 +1300,13 @@ ipcMain.handle('save-ocr-result', async function(event, options) {
 // web文件下载窗口创建函数
 function createWebDownloadWindow() {
     console.log('Creating Web Download window...');
-    
+
     if (webDownloadWindow && !webDownloadWindow.isDestroyed()) {
         console.log('Web Download window already exists, focusing...');
         webDownloadWindow.focus();
         return;
     }
-    
+
     webDownloadWindow = null;
 
     try {
@@ -1329,7 +1329,7 @@ function createWebDownloadWindow() {
 
         // 获取session并配置安全选项
         const session = webDownloadWindow.webContents.session;
-        
+
         // 禁用证书验证（针对某些HTTPS网站可能有用）
         session.setCertificateVerifyProc((request, callback) => {
             callback(0); // 0表示信任证书
@@ -1349,7 +1349,7 @@ function createWebDownloadWindow() {
         webDownloadWindow.webContents.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36');
 
         console.log('Web Download window created, loading CSRC website...');
-        
+
         // 添加更多事件监听器用于调试
         webDownloadWindow.webContents.on('did-start-loading', () => {
             console.log('开始加载网页...');
@@ -1380,7 +1380,7 @@ function createWebDownloadWindow() {
                 validatedURL: validatedURL,
                 isMainFrame: isMainFrame
             });
-            
+
             // 显示错误信息给用户
             dialog.showMessageBox(webDownloadWindow, {
                 type: 'error',
@@ -1391,7 +1391,7 @@ function createWebDownloadWindow() {
 
         webDownloadWindow.webContents.on('did-finish-load', () => {
             console.log('网页完全加载完成');
-            
+
             // 尝试执行一些JavaScript来确保页面正常显示
             webDownloadWindow.webContents.executeJavaScript(`
                 console.log('页面加载完成，当前URL:', window.location.href);
@@ -1415,7 +1415,7 @@ function createWebDownloadWindow() {
                 filename: item.getFilename(),
                 size: item.getTotalBytes()
             });
-            
+
             // 弹出保存对话框让用户选择路径
             dialog.showSaveDialog(webDownloadWindow, {
                 title: '保存文件',
@@ -1429,14 +1429,14 @@ function createWebDownloadWindow() {
                     console.log('用户选择的保存路径:', result.filePath);
                     // 设置下载路径
                     item.setSavePath(result.filePath);
-                    
+
                     // 监听下载进度
                     item.on('updated', (e, state) => {
                         if (state === 'progressing') {
                             console.log('下载进度:', Math.round((item.getReceivedBytes() / item.getTotalBytes()) * 100) + '%');
                         }
                     });
-                    
+
                     // 监听下载完成
                     item.on('done', (e, state) => {
                         if (state === 'completed') {
@@ -1466,7 +1466,7 @@ function createWebDownloadWindow() {
         // 打开开发者工具以便调试
         webDownloadWindow.webContents.openDevTools();
 
-        webDownloadWindow.on('closed', function() {
+        webDownloadWindow.on('closed', function () {
             console.log('Web Download window closed');
             webDownloadWindow = null;
         });
@@ -1481,7 +1481,7 @@ function createWebDownloadWindow() {
 }
 
 // web文件下载窗口IPC处理
-ipcMain.on('open-web-download', function() {
+ipcMain.on('open-web-download', function () {
     console.log('IPC: open-web-download received');
     console.log('mainWindow exists:', !!mainWindow);
     if (!mainWindow) {
@@ -1492,9 +1492,9 @@ ipcMain.on('open-web-download', function() {
 });
 
 // 处理文件下载请求
-ipcMain.on('download-file', async function(event, options) {
+ipcMain.on('download-file', async function (event, options) {
     console.log('IPC: download-file received', options);
-    
+
     try {
         // 弹出保存对话框
         const result = await dialog.showSaveDialog(webDownloadWindow, {
@@ -1505,19 +1505,19 @@ ipcMain.on('download-file', async function(event, options) {
                 { name: 'All Files', extensions: ['*'] }
             ]
         });
-        
+
         if (!result.canceled && result.filePath) {
             console.log('用户选择保存路径:', result.filePath);
-            
+
             // 下载文件
             const fileUrl = options.url;
             const filePath = result.filePath;
-            
+
             // 使用http/https模块下载文件
             const protocol = fileUrl.startsWith('https') ? https : http;
-            
+
             const file = fs.createWriteStream(filePath);
-            
+
             protocol.get(fileUrl, (response) => {
                 // 处理重定向
                 if (response.statusCode === 301 || response.statusCode === 302) {
@@ -1528,16 +1528,16 @@ ipcMain.on('download-file', async function(event, options) {
                         file.on('finish', () => {
                             file.close();
                             console.log('文件下载完成:', filePath);
-                            event.reply('download-complete', { 
-                                success: true, 
-                                filePath: filePath 
+                            event.reply('download-complete', {
+                                success: true,
+                                filePath: filePath
                             });
                         });
                     }).on('error', (err) => {
                         console.error('下载失败:', err);
-                        event.reply('download-complete', { 
-                            success: false, 
-                            error: err.message 
+                        event.reply('download-complete', {
+                            success: false,
+                            error: err.message
                         });
                     });
                 } else {
@@ -1545,17 +1545,17 @@ ipcMain.on('download-file', async function(event, options) {
                     file.on('finish', () => {
                         file.close();
                         console.log('文件下载完成:', filePath);
-                        event.reply('download-complete', { 
-                            success: true, 
-                            filePath: filePath 
+                        event.reply('download-complete', {
+                            success: true,
+                            filePath: filePath
                         });
                     });
                 }
             }).on('error', (err) => {
                 console.error('下载失败:', err);
-                event.reply('download-complete', { 
-                    success: false, 
-                    error: err.message 
+                event.reply('download-complete', {
+                    success: false,
+                    error: err.message
                 });
             });
         } else {
@@ -1563,9 +1563,9 @@ ipcMain.on('download-file', async function(event, options) {
         }
     } catch (error) {
         console.error('下载处理失败:', error);
-        event.reply('download-complete', { 
-            success: false, 
-            error: error.message 
+        event.reply('download-complete', {
+            success: false,
+            error: error.message
         });
     }
 });
@@ -1575,13 +1575,13 @@ ipcMain.on('download-file', async function(event, options) {
 // 文件预览窗口创建函数
 function createFilePreviewWindow() {
     console.log('Creating File Preview window...');
-    
+
     if (filePreviewWindow && !filePreviewWindow.isDestroyed()) {
         console.log('File Preview window already exists, focusing...');
         filePreviewWindow.focus();
         return;
     }
-    
+
     filePreviewWindow = null;
 
     try {
@@ -1601,16 +1601,16 @@ function createFilePreviewWindow() {
         console.log('File Preview window created, loading file-preview.html...');
         filePreviewWindow.loadFile(path.join(__dirname, 'file-preview.html'));
 
-        filePreviewWindow.on('closed', function() {
+        filePreviewWindow.on('closed', function () {
             console.log('File Preview window closed');
             filePreviewWindow = null;
         });
-        
-        filePreviewWindow.webContents.on('did-finish-load', function() {
+
+        filePreviewWindow.webContents.on('did-finish-load', function () {
             console.log('File Preview window content loaded');
         });
-        
-        filePreviewWindow.webContents.on('did-fail-load', function(event, errorCode, errorDescription) {
+
+        filePreviewWindow.webContents.on('did-fail-load', function (event, errorCode, errorDescription) {
             console.error('File Preview window failed to load:', errorCode, errorDescription);
         });
     } catch (error) {
@@ -1619,7 +1619,7 @@ function createFilePreviewWindow() {
 }
 
 // 文件预览窗口IPC处理
-ipcMain.on('open-upload-file', function() {
+ipcMain.on('open-upload-file', function () {
     console.log('IPC: open-upload-file received');
     console.log('mainWindow exists:', !!mainWindow);
     if (!mainWindow) {
@@ -1630,9 +1630,9 @@ ipcMain.on('open-upload-file', function() {
 });
 
 // 选择文件对话框
-ipcMain.handle('select-preview-file', async function(event) {
+ipcMain.handle('select-preview-file', async function (event) {
     console.log('IPC: select-preview-file received');
-    
+
     const result = await dialog.showOpenDialog(mainWindow, {
         title: '选择要预览的文件',
         properties: ['openFile'],
@@ -1641,24 +1641,24 @@ ipcMain.handle('select-preview-file', async function(event) {
             { name: 'All Files', extensions: ['*'] }
         ]
     });
-    
+
     if (result.canceled || !result.filePaths || result.filePaths.length === 0) {
         return { canceled: true };
     }
-    
+
     const filePath = result.filePaths[0];
     const fileName = path.basename(filePath);
     const ext = path.extname(filePath).toLowerCase();
     const stats = fs.statSync(filePath);
     const sizeKB = (stats.size / 1024).toFixed(2);
-    
+
     console.log('选择的文件:', filePath, '大小:', sizeKB, 'KB');
-    
+
     try {
         if (ext === '.txt') {
             // 读取TXT文件内容
             const content = fs.readFileSync(filePath, 'utf-8');
-            
+
             return {
                 canceled: false,
                 fileName: fileName,
@@ -1687,13 +1687,13 @@ ipcMain.handle('select-preview-file', async function(event) {
 // 打印预览窗口创建函数
 function createPrintPreviewWindow() {
     console.log('Creating Print Preview window...');
-    
+
     if (printPreviewWindow && !printPreviewWindow.isDestroyed()) {
         console.log('Print Preview window already exists, focusing...');
         printPreviewWindow.focus();
         return;
     }
-    
+
     printPreviewWindow = null;
 
     try {
@@ -1713,16 +1713,16 @@ function createPrintPreviewWindow() {
         console.log('Print Preview window created, loading print-preview.html...');
         printPreviewWindow.loadFile(path.join(__dirname, 'print-preview.html'));
 
-        printPreviewWindow.on('closed', function() {
+        printPreviewWindow.on('closed', function () {
             console.log('Print Preview window closed');
             printPreviewWindow = null;
         });
-        
-        printPreviewWindow.webContents.on('did-finish-load', function() {
+
+        printPreviewWindow.webContents.on('did-finish-load', function () {
             console.log('Print Preview window content loaded');
         });
-        
-        printPreviewWindow.webContents.on('did-fail-load', function(event, errorCode, errorDescription) {
+
+        printPreviewWindow.webContents.on('did-fail-load', function (event, errorCode, errorDescription) {
             console.error('Print Preview window failed to load:', errorCode, errorDescription);
         });
     } catch (error) {
@@ -1734,13 +1734,13 @@ function createPrintPreviewWindow() {
 // 图片编辑窗口创建函数
 function createImageEditorWindow() {
     console.log('Creating Image Editor window...');
-    
+
     if (imageEditorWindow && !imageEditorWindow.isDestroyed()) {
         console.log('Image Editor window already exists, focusing...');
         imageEditorWindow.focus();
         return;
     }
-    
+
     imageEditorWindow = null;
 
     try {
@@ -1759,16 +1759,16 @@ function createImageEditorWindow() {
         console.log('Image Editor window created, loading image-editor.html...');
         imageEditorWindow.loadFile(path.join(__dirname, 'image-editor.html'));
 
-        imageEditorWindow.on('closed', function() {
+        imageEditorWindow.on('closed', function () {
             console.log('Image Editor window closed');
             imageEditorWindow = null;
         });
-        
-        imageEditorWindow.webContents.on('did-finish-load', function() {
+
+        imageEditorWindow.webContents.on('did-finish-load', function () {
             console.log('Image Editor window content loaded');
         });
-        
-        imageEditorWindow.webContents.on('did-fail-load', function(event, errorCode, errorDescription) {
+
+        imageEditorWindow.webContents.on('did-fail-load', function (event, errorCode, errorDescription) {
             console.error('Image Editor window failed to load:', errorCode, errorDescription);
         });
     } catch (error) {
@@ -1781,13 +1781,13 @@ function createImageEditorWindow() {
 // lodash三方库调用窗口创建函数
 function createLodashWindow() {
     console.log('Creating Lodash window...');
-    
+
     if (lodashWindow && !lodashWindow.isDestroyed()) {
         console.log('Lodash window already exists, focusing...');
         lodashWindow.focus();
         return;
     }
-    
+
     lodashWindow = null;
 
     try {
@@ -1806,16 +1806,16 @@ function createLodashWindow() {
         console.log('Lodash window created, loading lodash.html...');
         lodashWindow.loadFile(path.join(__dirname, 'lodash.html'));
 
-        lodashWindow.on('closed', function() {
+        lodashWindow.on('closed', function () {
             console.log('Lodash window closed');
             lodashWindow = null;
         });
-        
-        lodashWindow.webContents.on('did-finish-load', function() {
+
+        lodashWindow.webContents.on('did-finish-load', function () {
             console.log('Lodash window content loaded');
         });
-        
-        lodashWindow.webContents.on('did-fail-load', function(event, errorCode, errorDescription) {
+
+        lodashWindow.webContents.on('did-fail-load', function (event, errorCode, errorDescription) {
             console.error('Lodash window failed to load:', errorCode, errorDescription);
         });
     } catch (error) {
@@ -1828,13 +1828,13 @@ function createLodashWindow() {
 // axios三方库调用窗口创建函数
 function createAxiosWindow() {
     console.log('Creating Axios window...');
-    
+
     if (axiosWindow && !axiosWindow.isDestroyed()) {
         console.log('Axios window already exists, focusing...');
         axiosWindow.focus();
         return;
     }
-    
+
     axiosWindow = null;
 
     try {
@@ -1853,16 +1853,16 @@ function createAxiosWindow() {
         console.log('Axios window created, loading axios.html...');
         axiosWindow.loadFile(path.join(__dirname, 'axios.html'));
 
-        axiosWindow.on('closed', function() {
+        axiosWindow.on('closed', function () {
             console.log('Axios window closed');
             axiosWindow = null;
         });
-        
-        axiosWindow.webContents.on('did-finish-load', function() {
+
+        axiosWindow.webContents.on('did-finish-load', function () {
             console.log('Axios window content loaded');
         });
-        
-        axiosWindow.webContents.on('did-fail-load', function(event, errorCode, errorDescription) {
+
+        axiosWindow.webContents.on('did-fail-load', function (event, errorCode, errorDescription) {
             console.error('Axios window failed to load:', errorCode, errorDescription);
         });
     } catch (error) {
@@ -1873,13 +1873,13 @@ function createAxiosWindow() {
 // moment三方库调用窗口创建函数
 function createMomentWindow() {
     console.log('Creating Moment window...');
-    
+
     if (momentWindow && !momentWindow.isDestroyed()) {
         console.log('Moment window already exists, focusing...');
         momentWindow.focus();
         return;
     }
-    
+
     momentWindow = null;
 
     try {
@@ -1898,16 +1898,16 @@ function createMomentWindow() {
         console.log('Moment window created, loading moment.html...');
         momentWindow.loadFile(path.join(__dirname, 'moment.html'));
 
-        momentWindow.on('closed', function() {
+        momentWindow.on('closed', function () {
             console.log('Moment window closed');
             momentWindow = null;
         });
-        
-        momentWindow.webContents.on('did-finish-load', function() {
+
+        momentWindow.webContents.on('did-finish-load', function () {
             console.log('Moment window content loaded');
         });
-        
-        momentWindow.webContents.on('did-fail-load', function(event, errorCode, errorDescription) {
+
+        momentWindow.webContents.on('did-fail-load', function (event, errorCode, errorDescription) {
             console.error('Moment window failed to load:', errorCode, errorDescription);
         });
     } catch (error) {
@@ -1919,13 +1919,13 @@ function createMomentWindow() {
 // express三方库调用窗口创建函数
 function createExpressWindow() {
     console.log('Creating Express window...');
-    
+
     if (expressWindow && !expressWindow.isDestroyed()) {
         console.log('Express window already exists, focusing...');
         expressWindow.focus();
         return;
     }
-    
+
     expressWindow = null;
 
     try {
@@ -1944,16 +1944,16 @@ function createExpressWindow() {
         console.log('Express window created, loading express.html...');
         expressWindow.loadFile(path.join(__dirname, 'express.html'));
 
-        expressWindow.on('closed', function() {
+        expressWindow.on('closed', function () {
             console.log('Express window closed');
             expressWindow = null;
         });
-        
-        expressWindow.webContents.on('did-finish-load', function() {
+
+        expressWindow.webContents.on('did-finish-load', function () {
             console.log('Express window content loaded');
         });
-        
-        expressWindow.webContents.on('did-fail-load', function(event, errorCode, errorDescription) {
+
+        expressWindow.webContents.on('did-fail-load', function (event, errorCode, errorDescription) {
             console.error('Express window failed to load:', errorCode, errorDescription);
         });
     } catch (error) {
@@ -1964,7 +1964,7 @@ function createExpressWindow() {
 //created by AI//
 
 // 打印预览窗口IPC处理
-ipcMain.on('open-print-preview', function() {
+ipcMain.on('open-print-preview', function () {
     console.log('IPC: open-print-preview received');
     console.log('mainWindow exists:', !!mainWindow);
     if (!mainWindow) {
@@ -1976,7 +1976,7 @@ ipcMain.on('open-print-preview', function() {
 
 //created by AI
 // 图片编辑窗口IPC处理
-ipcMain.on('open-image-editor', function() {
+ipcMain.on('open-image-editor', function () {
     console.log('IPC: open-image-editor received');
     console.log('mainWindow exists:', !!mainWindow);
     if (!mainWindow) {
@@ -1989,7 +1989,7 @@ ipcMain.on('open-image-editor', function() {
 
 //created by AI
 // lodash三方库调用窗口IPC处理
-ipcMain.on('open-lodash', function() {
+ipcMain.on('open-lodash', function () {
     console.log('IPC: open-lodash received');
     console.log('mainWindow exists:', !!mainWindow);
     if (!mainWindow) {
@@ -2002,7 +2002,7 @@ ipcMain.on('open-lodash', function() {
 
 //created by AI
 // axios三方库调用窗口IPC处理
-ipcMain.on('open-axios', function() {
+ipcMain.on('open-axios', function () {
     console.log('IPC: open-axios received');
     console.log('mainWindow exists:', !!mainWindow);
     if (!mainWindow) {
@@ -2013,7 +2013,7 @@ ipcMain.on('open-axios', function() {
 });
 
 // moment三方库调用窗口IPC处理
-ipcMain.on('open-moment', function() {
+ipcMain.on('open-moment', function () {
     console.log('IPC: open-moment received');
     console.log('mainWindow exists:', !!mainWindow);
     if (!mainWindow) {
@@ -2025,7 +2025,7 @@ ipcMain.on('open-moment', function() {
 
 //created by AI
 // express三方库调用窗口IPC处理
-ipcMain.on('open-express', function() {
+ipcMain.on('open-express', function () {
     console.log('IPC: open-express received');
     console.log('mainWindow exists:', !!mainWindow);
     if (!mainWindow) {
@@ -2038,9 +2038,9 @@ ipcMain.on('open-express', function() {
 //created by AI//
 
 // 选择打印文件对话框
-ipcMain.handle('select-print-file', async function(event) {
+ipcMain.handle('select-print-file', async function (event) {
     console.log('IPC: select-print-file received');
-    
+
     const result = await dialog.showOpenDialog(mainWindow, {
         title: '选择要打印的文件',
         properties: ['openFile'],
@@ -2049,23 +2049,23 @@ ipcMain.handle('select-print-file', async function(event) {
             { name: 'All Files', extensions: ['*'] }
         ]
     });
-    
+
     if (result.canceled || !result.filePaths || result.filePaths.length === 0) {
         return { canceled: true };
     }
-    
+
     const filePath = result.filePaths[0];
     const fileName = path.basename(filePath);
     const ext = path.extname(filePath).toLowerCase();
     const stats = fs.statSync(filePath);
     const sizeKB = (stats.size / 1024).toFixed(2);
-    
+
     console.log('选择的打印文件:', filePath, '大小:', sizeKB, 'KB');
-    
+
     try {
         if (ext === '.txt') {
             const content = fs.readFileSync(filePath, 'utf-8');
-            
+
             return {
                 canceled: false,
                 fileName: fileName,
@@ -2090,24 +2090,24 @@ ipcMain.handle('select-print-file', async function(event) {
 });
 
 // 打印文档IPC处理
-ipcMain.on('print-document', function(event) {
+ipcMain.on('print-document', function (event) {
     console.log('IPC: print-document received');
-    
+
     const window = BrowserWindow.fromWebContents(event.sender);
     if (!window) {
         console.error('无法获取窗口对象');
         return;
     }
-    
+
     console.log('准备调用打印 API');
-    
+
     try {
         // 优先使用浏览器原生打印
         window.webContents.executeJavaScript('window.print()').then(() => {
             console.log('打印对话框已打开');
         }).catch(err => {
             console.error('浏览器打印失败:', err);
-            
+
             // 降级到Electron打印API
             if (window.webContents && typeof window.webContents.print === 'function') {
                 window.webContents.print({
@@ -2132,13 +2132,13 @@ ipcMain.on('print-document', function(event) {
 // 每日早报窗口创建函数
 function createZaobaoWindow() {
     console.log('Creating Zaobao window...');
-    
+
     if (zaobaoWindow && !zaobaoWindow.isDestroyed()) {
         console.log('Zaobao window already exists, focusing...');
         zaobaoWindow.focus();
         return;
     }
-    
+
     zaobaoWindow = null;
 
     try {
@@ -2157,16 +2157,16 @@ function createZaobaoWindow() {
         console.log('Zaobao window created, loading zaobao.html...');
         zaobaoWindow.loadFile(path.join(__dirname, 'zaobao.html'));
 
-        zaobaoWindow.on('closed', function() {
+        zaobaoWindow.on('closed', function () {
             console.log('Zaobao window closed');
             zaobaoWindow = null;
         });
-        
-        zaobaoWindow.webContents.on('did-finish-load', function() {
+
+        zaobaoWindow.webContents.on('did-finish-load', function () {
             console.log('Zaobao window content loaded');
         });
-        
-        zaobaoWindow.webContents.on('did-fail-load', function(event, errorCode, errorDescription) {
+
+        zaobaoWindow.webContents.on('did-fail-load', function (event, errorCode, errorDescription) {
             console.error('Zaobao window failed to load:', errorCode, errorDescription);
         });
     } catch (error) {
@@ -2175,7 +2175,7 @@ function createZaobaoWindow() {
 }
 
 // 每日早报窗口IPC处理
-ipcMain.on('open-zaobao', function() {
+ipcMain.on('open-zaobao', function () {
     console.log('IPC: open-zaobao received');
     console.log('mainWindow exists:', !!mainWindow);
     if (!mainWindow) {
@@ -2248,7 +2248,7 @@ async function fetchZaobaoData() {
 }
 
 // 获取早报数据IPC处理
-ipcMain.handle('fetch-zaobao', async function() {
+ipcMain.handle('fetch-zaobao', async function () {
     console.log('IPC: fetch-zaobao received');
     return await fetchZaobaoData();
 });
