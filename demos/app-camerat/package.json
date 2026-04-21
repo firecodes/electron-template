@@ -12,5 +12,8 @@
     "splash"
   ],
   "author": "Harmony PC",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^34.0.0"
+  }
 }

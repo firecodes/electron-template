@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Winston日志管理</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: #f5f5f5;
+            padding: 20px;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        .panel {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .panel h2 {
+            color: #4a90e2;
+            margin-bottom: 15px;
+            font-size: 18px;
+            border-bottom: 2px solid #4a90e2;
+            padding-bottom: 10px;
+        }
+        
+        .log-controls {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        label {
+            font-weight: 500;
+            color: #555;
+            font-size: 14px;
+        }
+        
+        select, input, textarea {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+        
+        button {
+            padding: 10px 20px;
+            background: #4a90e2;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: background 0.3s;
+        }
+        
+        button:hover {
+            background: #357abd;
+        }
+        
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .log-display {
+            grid-column: span 2;
+            background: #1e1e1e;
+            color: #d4d4d4;
+            border-radius: 8px;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .log-entry {
+            padding: 5px 0;
+            border-bottom: 1px solid #333;
+        }
+        
+        .log-entry.error {
+            color: #f48771;
+        }
+        
+        .log-entry.warn {
+            color: #cca700;
+        }
+        
+        .log-entry.info {
+            color: #75beff;
+        }
+        
+        .log-entry.debug {
+            color: #b180d7;
+        }
+        
+        .log-entry.verbose {
+            color: #808080;
+        }
+        
+        .log-timestamp {
+            color: #6a9955;
+        }
+        
+        .log-level {
+            font-weight: bold;
+            margin: 0 10px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .stat-card {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 28px;
+            font-weight: bold;
+            color: #4a90e2;
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        .file-info {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 15px;
+        }
+        
+        .file-info h3 {
+            font-size: 14px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .file-path {
+            font-family: monospace;
+            background: white;
+            padding: 8px;
+            border-radius: 3px;
+            font-size: 12px;
+            word-break: break-all;
+        }
+        
+        .transport-list {
+            list-style: none;
+            margin-top: 15px;
+        }
+        
+        .transport-list li {
+            padding: 10px;
+            background: #f8f9fa;
+            margin-bottom: 5px;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .transport-status {
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .transport-status.active {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .transport-status.inactive {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .clear-btn {
+            background: #dc3545;
+        }
+        
+        .clear-btn:hover {
+            background: #c82333;
+        }
+        
+        .full-width {
+            grid-column: span 2;
+        }
+    </style>
+</head>
+<body>
+    <h1>Winston 日志管理系统</h1>
+    
+    <div class="container">
+        <div class="panel">
+            <h2>日志记录</h2>
+            <div class="log-controls">
+                <div class="control-group">
+                    <label for="logLevel">日志级别:</label>
+                    <select id="logLevel">
+                        <option value="error">Error - 错误</option>
+                        <option value="warn">Warn - 警告</option>
+                        <option value="info" selected>Info - 信息</option>
+                        <option value="http">HTTP - HTTP请求</option>
+                        <option value="verbose">Verbose - 详细</option>
+                        <option value="debug">Debug - 调试</option>
+                        <option value="silly">Silly - 愚蠢</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label for="logModule">日志模块:</label>
+                    <select id="logModule">
+                        <option value="app">Application</option>
+                        <option value="server">Server</option>
+                        <option value="database">Database</option>
+                        <option value="api">API</option>
+                        <option value="auth">Authentication</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="control-group">
+                <label for="logMessage">日志消息:</label>
+                <textarea id="logMessage" placeholder="输入日志消息..."></textarea>
+            </div>
+            
+            <div class="button-group">
+                <button id="logBtn">记录日志</button>
+                <button id="logMultipleBtn">批量记录</button>
+            </div>
+            
+            <div class="file-info">
+                <h3>日志文件路径:</h3>
+                <div class="file-path" id="logFilePath">./logs/application.log</div>
+            </div>
+        </div>
+        
+        <div class="panel">
+            <h2>日志传输配置</h2>
+            <ul class="transport-list">
+                <li>
+                    <span>控制台输出 (Console)</span>
+                    <span class="transport-status active">已启用</span>
+                </li>
+                <li>
+                    <span>文件存储 (File)</span>
+                    <span class="transport-status active">已启用</span>
+                </li>
+                <li>
+                    <span>错误日志文件 (Error File)</span>
+                    <span class="transport-status active">已启用</span>
+                </li>
+                <li>
+                    <span>JSON格式日志 (JSON)</span>
+                    <span class="transport-status inactive">未启用</span>
+                </li>
+                <li>
+                    <span>数据库存储 (Database)</span>
+                    <span class="transport-status inactive">未启用</span>
+                </li>
+            </ul>
+            
+            <div class="button-group">
+                <button id="readLogsBtn">读取日志文件</button>
+                <button id="clearLogsBtn" class="clear-btn">清空日志</button>
+            </div>
+        </div>
+        
+        <div class="panel full-width">
+            <h2>日志统计</h2>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number" id="totalLogs">0</div>
+                    <div class="stat-label">总日志数</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="errorLogs">0</div>
+                    <div class="stat-label">错误日志</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="warnLogs">0</div>
+                    <div class="stat-label">警告日志</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="infoLogs">0</div>
+                    <div class="stat-label">信息日志</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="panel full-width">
+            <h2>日志输出</h2>
+            <div class="log-display" id="logDisplay">
+                <div class="log-entry info">
+                    <span class="log-timestamp">[2026-04-09 19:00:00]</span>
+                    <span class="log-level">[INFO]</span>
+                    <span>Winston日志系统已初始化</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        //created by AI
+        // Winston日志管理系统实现
+        // 作者: Trae AI
+        // 日期: 2026-04-09
+        // 功能: 日志记录、文件存储、日志级别管理、日志统计
+        
+        const winston = require('winston');
+        const path = require('path');
+        const fs = require('fs');
+        
+        // 日志统计
+        let logStats = {
+            total: 0,
+            error: 0,
+            warn: 0,
+            info: 0,
+            debug: 0,
+            verbose: 0
+        };
+        
+        // 创建Winston日志记录器
+        const logger = winston.createLogger({
+            level: 'silly',
+            format: winston.format.combine(
+                winston.format.timestamp({
+                    format: 'YYYY-MM-DD HH:mm:ss'
+                }),
+                winston.format.printf(({ level, message, timestamp, module }) => {
+                    return `[${timestamp}] [${level.toUpperCase()}] [${module || 'app'}] ${message}`;
+                })
+            ),
+            transports: [
+                // 控制台输出
+                new winston.transports.Console({
+                    format: winston.format.combine(
+                        winston.format.colorize(),
+                        winston.format.printf(({ level, message, timestamp, module }) => {
+                            return `[${timestamp}] [${level}] [${module || 'app'}] ${message}`;
+                        })
+                    )
+                }),
+                // 所有日志文件
+                new winston.transports.File({ 
+                    filename: path.join(__dirname, 'logs', 'application.log'),
+                    level: 'info'
+                }),
+                // 错误日志文件
+                new winston.transports.File({ 
+                    filename: path.join(__dirname, 'logs', 'error.log'),
+                    level: 'error'
+                })
+            ]
+        });
+        
+        // 确保日志目录存在
+        const logsDir = path.join(__dirname, 'logs');
+        if (!fs.existsSync(logsDir)) {
+            fs.mkdirSync(logsDir, { recursive: true });
+        }
+        
+        // 初始化
+        function init() {
+            bindEvents();
+            addLogEntry('info', 'Winston日志系统已启动');
+            logger.info('Winston日志系统已启动', { module: 'app' });
+        }
+        
+        // 绑定事件
+        function bindEvents() {
+            document.getElementById('logBtn').addEventListener('click', logMessage);
+            document.getElementById('logMultipleBtn').addEventListener('click', logMultiple);
+            document.getElementById('readLogsBtn').addEventListener('click', readLogs);
+            document.getElementById('clearLogsBtn').addEventListener('click', clearLogs);
+        }
+        
+        // 记录日志
+        function logMessage() {
+            const level = document.getElementById('logLevel').value;
+            const module = document.getElementById('logModule').value;
+            const message = document.getElementById('logMessage').value.trim();
+            
+            if (!message) {
+                alert('请输入日志消息');
+                return;
+            }
+            
+            // 使用Winston记录日志
+            logger.log({
+                level: level,
+                message: message,
+                module: module
+            });
+            
+            // 更新UI
+            addLogEntry(level, `[${module}] ${message}`);
+            updateStats(level);
+            
+            // 清空输入
+            document.getElementById('logMessage').value = '';
+        }
+        
+        // 批量记录日志
+        function logMultiple() {
+            const levels = ['error', 'warn', 'info', 'debug'];
+            const modules = ['app', 'server', 'database', 'api'];
+            const messages = [
+                '系统启动完成',
+                '数据库连接成功',
+                '用户登录成功',
+                'API请求处理完成',
+                '缓存更新完成'
+            ];
+            
+            for (let i = 0; i < 10; i++) {
+                const level = levels[Math.floor(Math.random() * levels.length)];
+                const module = modules[Math.floor(Math.random() * modules.length)];
+                const message = messages[Math.floor(Math.random() * messages.length)];
+                
+                logger.log({
+                    level: level,
+                    message: message,
+                    module: module
+                });
+                
+                addLogEntry(level, `[${module}] ${message}`);
+                updateStats(level);
+            }
+        }
+        
+        // 添加日志条目到显示区域
+        function addLogEntry(level, message) {
+            const logDisplay = document.getElementById('logDisplay');
+            const timestamp = new Date().toISOString().replace('T', ' ').substring(0, 19);
+            
+            const entry = document.createElement('div');
+            entry.className = `log-entry ${level}`;
+            entry.innerHTML = `
+                <span class="log-timestamp">[${timestamp}]</span>
+                <span class="log-level">[${level.toUpperCase()}]</span>
+                <span>${message}</span>
+            `;
+            
+            logDisplay.appendChild(entry);
+            logDisplay.scrollTop = logDisplay.scrollHeight;
+        }
+        
+        // 更新统计
+        function updateStats(level) {
+            logStats.total++;
+            if (logStats[level] !== undefined) {
+                logStats[level]++;
+            }
+            
+            document.getElementById('totalLogs').textContent = logStats.total;
+            document.getElementById('errorLogs').textContent = logStats.error;
+            document.getElementById('warnLogs').textContent = logStats.warn;
+            document.getElementById('infoLogs').textContent = logStats.info;
+        }
+        
+        // 读取日志文件
+        function readLogs() {
+            try {
+                const logsDir = path.join(__dirname, 'logs');
+                const logFile = path.join(logsDir, 'application.log');
+                const errorLogFile = path.join(logsDir, 'error.log');
+                
+                addLogEntry('info', '正在读取日志文件...');
+                addLogEntry('info', '日志目录: ' + logsDir);
+                addLogEntry('info', '应用日志: ' + logFile);
+                addLogEntry('info', '错误日志: ' + errorLogFile);
+                
+                if (!fs.existsSync(logsDir)) {
+                    addLogEntry('error', '日志目录不存在: ' + logsDir);
+                    addLogEntry('info', '正在创建日志目录...');
+                    fs.mkdirSync(logsDir, { recursive: true });
+                    addLogEntry('info', '日志目录已创建');
+                    return;
+                }
+                
+                if (!fs.existsSync(logFile)) {
+                    addLogEntry('warn', '应用日志文件不存在，可能尚未写入任何日志');
+                    addLogEntry('info', '提示: Winston File Transport 的日志级别为 info，只有 info/warn/error 级别的日志才会写入文件');
+                    return;
+                }
+                
+                const content = fs.readFileSync(logFile, 'utf8');
+                
+                if (!content.trim()) {
+                    addLogEntry('warn', '日志文件为空，尚未写入任何日志记录');
+                    addLogEntry('info', '提示: 请先使用"记录日志"或"批量记录"按钮写入日志，且级别需为 info 及以上');
+                    return;
+                }
+                
+                const lines = content.split('\n').filter(line => line.trim());
+                addLogEntry('info', '成功读取到 ' + lines.length + ' 条日志记录');
+                
+                const lastLogs = lines.slice(-10);
+                addLogEntry('info', '--- 显示最后 ' + lastLogs.length + ' 条日志 ---');
+                lastLogs.forEach(line => {
+                    addLogEntry('info', line);
+                });
+                addLogEntry('info', '--- 日志读取完成 ---');
+                
+                if (fs.existsSync(errorLogFile)) {
+                    const errorContent = fs.readFileSync(errorLogFile, 'utf8');
+                    if (errorContent.trim()) {
+                        const errorLines = errorContent.split('\n').filter(line => line.trim());
+                        addLogEntry('info', '错误日志文件包含 ' + errorLines.length + ' 条记录');
+                    }
+                }
+            } catch (err) {
+                addLogEntry('error', '读取日志文件失败: ' + err.message);
+                console.error('readLogs error:', err);
+            }
+        }
+        
+        // 清空日志
+        function clearLogs() {
+            if (!confirm('确定要清空所有日志吗？')) {
+                return;
+            }
+            
+            // 清空显示
+            document.getElementById('logDisplay').innerHTML = '';
+            
+            // 清空统计
+            logStats = { total: 0, error: 0, warn: 0, info: 0, debug: 0, verbose: 0 };
+            updateStats('total');
+            
+            // 清空日志文件
+            const logFile = path.join(__dirname, 'logs', 'application.log');
+            if (fs.existsSync(logFile)) {
+                fs.writeFileSync(logFile, '');
+            }
+            
+            addLogEntry('info', '日志已清空');
+            logger.info('日志已清空', { module: 'app' });
+        }
+        
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', init);
+        //created by AI//
+    </script>
+</body>
+</html>
