@@ -30,6 +30,8 @@ logs/
 *.temp
 .cache/
 
+package-lock.json
+
 # HarmonyOS specific
 .preview/
 .hvigor/
