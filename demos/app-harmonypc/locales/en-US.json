@@ -1,0 +1,38 @@
+{
+  "app": {
+    "name": "HarmonyOS Electron",
+    "version": "Version",
+    "description": "Electron Framework for HarmonyOS Platform"
+  },
+  "menu": {
+    "file": "File",
+    "edit": "Edit",
+    "view": "View",
+    "help": "Help"
+  },
+  "system": {
+    "title": "System Information",
+    "cpu": "CPU",
+    "memory": "Memory",
+    "os": "Operating System",
+    "network": "Network"
+  },
+  "button": {
+    "ok": "OK",
+    "cancel": "Cancel",
+    "save": "Save",
+    "export": "Export",
+    "close": "Close"
+  },
+  "message": {
+    "loading": "Loading...",
+    "success": "Success",
+    "error": "Error",
+    "confirm": "Confirm"
+  },
+  "settings": {
+    "language": "Language",
+    "theme": "Theme",
+    "general": "General"
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "app": {
+    "name": "HarmonyOS Electron",
+    "version": "版本",
+    "description": "HarmonyOS 平台的 Electron 框架"
+  },
+  "menu": {
+    "file": "文件",
+    "edit": "编辑",
+    "view": "查看",
+    "help": "帮助"
+  },
+  "system": {
+    "title": "系统信息",
+    "cpu": "CPU",
+    "memory": "内存",
+    "os": "操作系统",
+    "network": "网络"
+  },
+  "button": {
+    "ok": "确定",
+    "cancel": "取消",
+    "save": "保存",
+    "export": "导出",
+    "close": "关闭"
+  },
+  "message": {
+    "loading": "加载中...",
+    "success": "操作成功",
+    "error": "操作失败",
+    "confirm": "确认"
+  },
+  "settings": {
+    "language": "语言",
+    "theme": "主题",
+    "general": "通用"
+  }
+}
