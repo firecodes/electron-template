@@ -109,6 +109,7 @@ function createHelpWindow() {
     const helpPath = path.join(__dirname, 'help.html');
     helpWindow.loadFile(helpPath);
 
+    // mainWindow.loadURL('https://cn.bing.com');
     helpWindow.on('closed', () => {
         helpWindow = null;
     });

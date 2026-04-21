@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8" />
+  <title>主窗口</title>
+  <style>
+    body { font-family: sans-serif; text-align: center; margin-top: 100px; }
+    button { padding: 10px 20px; font-size: 16px; cursor: pointer; margin: 10px; }
+    .hidden { display: none; }
+    .file-path { margin: 20px; padding: 10px; background: #f0f0f0; border-radius: 5px; word-break: break-all; }
+    .clipboard-content { margin: 20px; padding: 10px; background: #e8f5e9; border-radius: 5px; word-break: break-all; }
+  </style>
+</head>
+<body>
+  <h1>欢迎使用 Electron 应用</h1>
+  <p id="info"></p>
+  <div>
+    <button id="open">打开子窗口</button>
+    <button id="openCamera">摄像头调用测试</button>
+    <button id="openScreenRecorder">屏幕录制</button>
+    <button id="openFloat">打开悬浮窗</button>
+    <button id="openSnake">贪食蛇游戏</button>
+    <button id="fileClipboardTest">选文件和剪切板测试</button>
+  </div>
+  
+  <div id="fileClipboardSection" class="hidden">
+    <h2>文件选择和剪贴板测试</h2>
+    <div>
+      <button id="filePicker">选择文件</button>
+      <button id="readClipboard">读取剪贴板</button>
+    </div>
+    <div id="filePathDisplay" class="hidden">
+      <p><strong>选择的文件路径：</strong></p>
+      <div id="filePath" class="file-path"></div>
+      <button id="copyPath">复制路径</button>
+    </div>
+    <div id="clipboardDisplay" class="hidden">
+      <p><strong>剪贴板内容：</strong></p>
+      <div id="clipboardContent" class="clipboard-content"></div>
+    </div>
+  </div>
+
+  <script src="renderer.js"></script>
+</body>
+</html>
