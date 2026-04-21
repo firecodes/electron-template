@@ -1,0 +1,1139 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Async异步工具库 - 功能遍历</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background-color: #4CAF50;
+            color: white;
+            padding: 20px 0;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            text-align: center;
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .nav-tabs {
+            display: flex;
+            list-style: none;
+            background-color: white;
+            border-radius: 5px;
+            padding: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            overflow-x: auto;
+        }
+
+        .nav-tabs li {
+            margin-right: 10px;
+        }
+
+        .nav-tabs li a {
+            display: block;
+            padding: 10px 20px;
+            text-decoration: none;
+            color: #555;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .nav-tabs li a.active {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .tab-content {
+            background-color: white;
+            padding: 30px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .tab-pane {
+            display: none;
+        }
+
+        .tab-pane.active {
+            display: block;
+        }
+
+        h2 {
+            color: #4CAF50;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #4CAF50;
+        }
+
+        h3 {
+            color: #555;
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+
+        .function-demo {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #e0e0e0;
+            border-radius: 5px;
+            background-color: #fafafa;
+        }
+
+        .demo-description {
+            margin-bottom: 15px;
+            font-style: italic;
+            color: #666;
+        }
+
+        .demo-params {
+            margin-bottom: 15px;
+            padding: 10px;
+            background-color: #e8f5e9;
+            border-radius: 5px;
+        }
+
+        .demo-params label {
+            display: inline-block;
+            width: 150px;
+            margin-right: 10px;
+            font-weight: bold;
+        }
+
+        .demo-params input {
+            padding: 5px 10px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            margin-right: 20px;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            margin-right: 10px;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        button.secondary {
+            background-color: #2196F3;
+        }
+
+        button.secondary:hover {
+            background-color: #1976D2;
+        }
+
+        .result-container {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f5f5f5;
+            border-radius: 5px;
+            border-left: 4px solid #4CAF50;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .result-header {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #4CAF50;
+        }
+
+        .result {
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .timing-info {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #fff3e0;
+            border-radius: 5px;
+            font-size: 14px;
+            color: #f57c00;
+        }
+
+        .code-example {
+            background-color: #282c34;
+            color: #abb2bf;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            margin: 15px 0;
+            overflow-x: auto;
+        }
+
+        .code-keyword {
+            color: #c678dd;
+        }
+
+        .code-function {
+            color: #61afef;
+        }
+
+        .code-string {
+            color: #98c379;
+        }
+
+        .code-number {
+            color: #d19a66;
+        }
+
+        .code-comment {
+            color: #5c6370;
+            font-style: italic;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .tab-content {
+                padding: 15px;
+            }
+
+            .nav-tabs {
+                flex-direction: column;
+            }
+
+            .nav-tabs li {
+                margin-right: 0;
+                margin-bottom: 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Async异步工具库</h1>
+            <p class="subtitle">功能全面的异步流程控制工具</p>
+        </div>
+    </header>
+
+    <div class="container">
+        <ul class="nav-tabs">
+            <li><a href="#parallel" class="active">并行控制</a></li>
+            <li><a href="#series">串行控制</a></li>
+            <li><a href="#collection">集合操作</a></li>
+            <li><a href="#flow">流程控制</a></li>
+        </ul>
+
+        <div class="tab-content">
+            <!-- 并行控制 -->
+            <div id="parallel" class="tab-pane active">
+                <h2>并行控制</h2>
+                <p>并行执行多个异步任务，提高执行效率</p>
+
+                <div class="function-demo">
+                    <h3>parallel - 并行执行任务数组</h3>
+                    <p class="demo-description">同时执行多个任务，所有任务完成后返回结果数组</p>
+                    <div class="code-example">
+<pre>async.parallel([
+  function(callback) {
+    setTimeout(function() {
+      callback(null, <span class="code-string">'任务1'</span>);
+    }, <span class="code-number">1000</span>);
+  },
+  function(callback) {
+    setTimeout(function() {
+      callback(null, <span class="code-string">'任务2'</span>);
+    }, <span class="code-number">500</span>);
+  }
+], function(err, results) {
+  <span class="code-comment">// results = ['任务1', '任务2']</span>
+});</pre>
+                    </div>
+                    <div class="demo-params">
+                        <label>任务数量:</label>
+                        <input type="number" id="parallelCount" value="5" min="1" max="20">
+                        <label>最大延迟(ms):</label>
+                        <input type="number" id="parallelMaxDelay" value="2000" min="100" max="5000">
+                    </div>
+                    <button onclick="runParallelDemo()">执行parallel演示</button>
+                    <button class="secondary" onclick="clearResult('parallelResult')">清空结果</button>
+                    <div class="result-container">
+                        <div class="result-header">执行结果:</div>
+                        <div id="parallelResult" class="result"></div>
+                    </div>
+                </div>
+
+                <div class="function-demo">
+                    <h3>parallelLimit - 限制并发数的并行执行</h3>
+                    <p class="demo-description">并行执行任务，但限制同时运行的任务数量</p>
+                    <div class="code-example">
+<pre>async.parallelLimit([
+  function(callback) {
+    setTimeout(function() {
+      callback(null, <span class="code-string">'任务1'</span>);
+    }, <span class="code-number">1000</span>);
+  },
+  function(callback) {
+    setTimeout(function() {
+      callback(null, <span class="code-string">'任务2'</span>);
+    }, <span class="code-number">500</span>);
+  },
+  function(callback) {
+    setTimeout(function() {
+      callback(null, <span class="code-string">'任务3'</span>);
+    }, <span class="code-number">800</span>);
+  }
+], <span class="code-number">2</span>, function(err, results) {
+  <span class="code-comment">// 最多同时执行2个任务</span>
+});</pre>
+                    </div>
+                    <div class="demo-params">
+                        <label>任务数量:</label>
+                        <input type="number" id="parallelLimitCount" value="8" min="1" max="20">
+                        <label>并发限制:</label>
+                        <input type="number" id="parallelLimit" value="3" min="1" max="10">
+                        <label>最大延迟(ms):</label>
+                        <input type="number" id="parallelLimitMaxDelay" value="2000" min="100" max="5000">
+                    </div>
+                    <button onclick="runParallelLimitDemo()">执行parallelLimit演示</button>
+                    <button class="secondary" onclick="clearResult('parallelLimitResult')">清空结果</button>
+                    <div class="result-container">
+                        <div class="result-header">执行结果:</div>
+                        <div id="parallelLimitResult" class="result"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 串行控制 -->
+            <div id="series" class="tab-pane">
+                <h2>串行控制</h2>
+                <p>按顺序执行异步任务，前一个任务完成后再执行下一个</p>
+
+                <div class="function-demo">
+                    <h3>series - 串行执行任务数组</h3>
+                    <p class="demo-description">依次执行多个任务，每个任务完成后执行下一个</p>
+                    <div class="code-example">
+<pre>async.series([
+  function(callback) {
+    setTimeout(function() {
+      callback(null, <span class="code-string">'任务1'</span>);
+    }, <span class="code-number">1000</span>);
+  },
+  function(callback) {
+    setTimeout(function() {
+      callback(null, <span class="code-string">'任务2'</span>);
+    }, <span class="code-number">500</span>);
+  }
+], function(err, results) {
+  <span class="code-comment">// results = ['任务1', '任务2']</span>
+});</pre>
+                    </div>
+                    <div class="demo-params">
+                        <label>任务数量:</label>
+                        <input type="number" id="seriesCount" value="5" min="1" max="20">
+                        <label>最大延迟(ms):</label>
+                        <input type="number" id="seriesMaxDelay" value="1000" min="100" max="3000">
+                    </div>
+                    <button onclick="runSeriesDemo()">执行series演示</button>
+                    <button class="secondary" onclick="clearResult('seriesResult')">清空结果</button>
+                    <div class="result-container">
+                        <div class="result-header">执行结果:</div>
+                        <div id="seriesResult" class="result"></div>
+                    </div>
+                </div>
+
+                <div class="function-demo">
+                    <h3>waterfall - 瀑布流执行</h3>
+                    <p class="demo-description">串行执行任务，前一个任务的结果作为后一个任务的参数</p>
+                    <div class="code-example">
+<pre>async.waterfall([
+  function(callback) {
+    callback(null, <span class="code-number">10</span>);
+  },
+  function(num, callback) {
+    callback(null, num + <span class="code-number">5</span>);
+  },
+  function(num, callback) {
+    callback(null, num * <span class="code-number">2</span>);
+  }
+], function(err, result) {
+  <span class="code-comment">// result = (10 + 5) * 2 = 30</span>
+});</pre>
+                    </div>
+                    <div class="demo-params">
+                        <label>初始值:</label>
+                        <input type="number" id="waterfallInitial" value="10" min="1" max="100">
+                    </div>
+                    <button onclick="runWaterfallDemo()">执行waterfall演示</button>
+                    <button class="secondary" onclick="clearResult('waterfallResult')">清空结果</button>
+                    <div class="result-container">
+                        <div class="result-header">执行结果:</div>
+                        <div id="waterfallResult" class="result"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 集合操作 -->
+            <div id="collection" class="tab-pane">
+                <h2>集合操作</h2>
+                <p>对集合进行异步操作，如遍历、映射、过滤、归约等</p>
+
+                <div class="function-demo">
+                    <h3>each - 遍历集合</h3>
+                    <p class="demo-description">遍历集合中的每个元素并执行异步操作</p>
+                    <div class="code-example">
+<pre>async.each([<span class="code-number">1</span>, <span class="code-number">2</span>, <span class="code-number">3</span>], function(item, callback) {
+  setTimeout(function() {
+    <span class="code-comment">// 处理每个元素</span>
+    callback();
+  }, <span class="code-number">500</span>);
+}, function(err) {
+  <span class="code-comment">// 所有元素处理完成</span>
+});</pre>
+                    </div>
+                    <div class="demo-params">
+                        <label>数组元素:</label>
+                        <input type="text" id="eachArray" value="1,2,3,4,5" placeholder="逗号分隔的数字">
+                    </div>
+                    <button onclick="runEachDemo()">执行each演示</button>
+                    <button class="secondary" onclick="clearResult('eachResult')">清空结果</button>
+                    <div class="result-container">
+                        <div class="result-header">执行结果:</div>
+                        <div id="eachResult" class="result"></div>
+                    </div>
+                </div>
+
+                <div class="function-demo">
+                    <h3>map - 映射集合</h3>
+                    <p class="demo-description">遍历集合并对每个元素执行异步操作，返回结果数组</p>
+                    <div class="code-example">
+<pre>async.map([<span class="code-number">1</span>, <span class="code-number">2</span>, <span class="code-number">3</span>], function(item, callback) {
+  setTimeout(function() {
+    callback(null, item * <span class="code-number">2</span>);
+  }, <span class="code-number">500</span>);
+}, function(err, results) {
+  <span class="code-comment">// results = [2, 4, 6]</span>
+});</pre>
+                    </div>
+                    <div class="demo-params">
+                        <label>数组元素:</label>
+                        <input type="text" id="mapArray" value="1,2,3,4,5" placeholder="逗号分隔的数字">
+                    </div>
+                    <button onclick="runMapDemo()">执行map演示</button>
+                    <button class="secondary" onclick="clearResult('mapResult')">清空结果</button>
+                    <div class="result-container">
+                        <div class="result-header">执行结果:</div>
+                        <div id="mapResult" class="result"></div>
+                    </div>
+                </div>
+
+                <div class="function-demo">
+                    <h3>filter - 过滤集合</h3>
+                    <p class="demo-description">遍历集合并对每个元素执行异步过滤操作，返回符合条件的元素数组</p>
+                    <div class="code-example">
+<pre>async.filter([<span class="code-number">1</span>, <span class="code-number">2</span>, <span class="code-number">3</span>, <span class="code-number">4</span>], function(item, callback) {
+  setTimeout(function() {
+    callback(null, item % <span class="code-number">2</span> === <span class="code-number">0</span>);
+  }, <span class="code-number">500</span>);
+}, function(err, results) {
+  <span class="code-comment">// results = [2, 4]</span>
+});</pre>
+                    </div>
+                    <div class="demo-params">
+                        <label>数组元素:</label>
+                        <input type="text" id="filterArray" value="1,2,3,4,5,6,7,8,9,10" placeholder="逗号分隔的数字">
+                    </div>
+                    <button onclick="runFilterDemo()">执行filter演示</button>
+                    <button class="secondary" onclick="clearResult('filterResult')">清空结果</button>
+                    <div class="result-container">
+                        <div class="result-header">执行结果:</div>
+                        <div id="filterResult" class="result"></div>
+                    </div>
+                </div>
+
+                <div class="function-demo">
+                    <h3>reduce - 归约集合</h3>
+                    <p class="demo-description">遍历集合并对每个元素执行异步归约操作，返回最终结果</p>
+                    <div class="code-example">
+<pre>async.reduce([<span class="code-number">1</span>, <span class="code-number">2</span>, <span class="code-number">3</span>], <span class="code-number">0</span>, function(memo, item, callback) {
+  setTimeout(function() {
+    callback(null, memo + item);
+  }, <span class="code-number">500</span>);
+}, function(err, result) {
+  <span class="code-comment">// result = 0 + 1 + 2 + 3 = 6</span>
+});</pre>
+                    </div>
+                    <div class="demo-params">
+                        <label>数组元素:</label>
+                        <input type="text" id="reduceArray" value="1,2,3,4,5" placeholder="逗号分隔的数字">
+                        <label>初始值:</label>
+                        <input type="number" id="reduceInitial" value="0" min="0" max="100">
+                    </div>
+                    <button onclick="runReduceDemo()">执行reduce演示</button>
+                    <button class="secondary" onclick="clearResult('reduceResult')">清空结果</button>
+                    <div class="result-container">
+                        <div class="result-header">执行结果:</div>
+                        <div id="reduceResult" class="result"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 流程控制 -->
+            <div id="flow" class="tab-pane">
+                <h2>流程控制</h2>
+                <p>控制异步流程的执行，如重试、超时、自动执行、队列等</p>
+
+                <div class="function-demo">
+                    <h3>retry - 重试机制</h3>
+                    <p class="demo-description">自动重试失败的异步操作</p>
+                    <div class="code-example">
+<pre>async.retry(<span class="code-number">3</span>, function(callback) {
+  <span class="code-comment">// 可能失败的操作</span>
+  if (Math.random() > <span class="code-number">0.5</span>) {
+    callback(new Error(<span class="code-string">'随机失败'</span>));
+  } else {
+    callback(null, <span class="code-string">'成功'</span>);
+  }
+}, function(err, result) {
+  <span class="code-comment">// 最多重试3次</span>
+});</pre>
+                    </div>
+                    <div class="demo-params">
+                        <label>重试次数:</label>
+                        <input type="number" id="retryCount" value="3" min="1" max="10">
+                    </div>
+                    <button onclick="runRetryDemo()">执行retry演示</button>
+                    <button class="secondary" onclick="clearResult('retryResult')">清空结果</button>
+                    <div class="result-container">
+                        <div class="result-header">执行结果:</div>
+                        <div id="retryResult" class="result"></div>
+                    </div>
+                </div>
+
+                <div class="function-demo">
+                    <h3>timeout - 超时控制</h3>
+                    <p class="demo-description">为异步操作设置超时时间</p>
+                    <div class="code-example">
+<pre>async.timeout(function(callback) {
+  setTimeout(function() {
+    callback(null, <span class="code-string">'完成'</span>);
+  }, <span class="code-number">2000</span>);
+}, <span class="code-number">1000</span>, function(err, result) {
+  <span class="code-comment">// 1秒后超时</span>
+});</pre>
+                    </div>
+                    <div class="demo-params">
+                        <label>操作延迟(ms):</label>
+                        <input type="number" id="timeoutOperationDelay" value="2000" min="500" max="5000">
+                        <label>超时时间(ms):</label>
+                        <input type="number" id="timeoutDuration" value="1500" min="500" max="5000">
+                    </div>
+                    <button onclick="runTimeoutDemo()">执行timeout演示</button>
+                    <button class="secondary" onclick="clearResult('timeoutResult')">清空结果</button>
+                    <div class="result-container">
+                        <div class="result-header">执行结果:</div>
+                        <div id="timeoutResult" class="result"></div>
+                    </div>
+                </div>
+
+                <div class="function-demo">
+                    <h3>auto - 自动执行依赖任务</h3>
+                    <p class="demo-description">根据任务依赖关系自动执行异步任务</p>
+                    <div class="code-example">
+<pre>async.auto({
+  task1: function(callback) {
+    callback(null, <span class="code-string">'任务1结果'</span>);
+  },
+  task2: function(callback) {
+    callback(null, <span class="code-string">'任务2结果'</span>);
+  },
+  task3: [<span class="code-string">'task1'</span>, <span class="code-string">'task2'</span>, function(results, callback) {
+    callback(null, results.task1 + <span class="code-string">' + '</span> + results.task2);
+  }]
+}, function(err, results) {
+  <span class="code-comment">// results = { task1: '任务1结果', task2: '任务2结果', task3: '任务1结果 + 任务2结果' }</span>
+});</pre>
+                    </div>
+                    <button onclick="runAutoDemo()">执行auto演示</button>
+                    <button class="secondary" onclick="clearResult('autoResult')">清空结果</button>
+                    <div class="result-container">
+                        <div class="result-header">执行结果:</div>
+                        <div id="autoResult" class="result"></div>
+                    </div>
+                </div>
+
+                <div class="function-demo">
+                    <h3>queue - 任务队列</h3>
+                    <p class="demo-description">创建可控制并发数的任务队列</p>
+                    <div class="code-example">
+<pre>const q = async.queue(function(task, callback) {
+  setTimeout(function() {
+    callback(null, task.name + <span class="code-string">' 完成'</span>);
+  }, task.delay);
+}, <span class="code-number">2</span>); <span class="code-comment">// 最多2个并发任务</span>
+
+q.push({name: <span class="code-string">'任务1'</span>, delay: <span class="code-number">1000</span>});
+q.push({name: <span class="code-string">'任务2'</span>, delay: <span class="code-number">500</span>});
+q.push({name: <span class="code-string">'任务3'</span>, delay: <span class="code-number">800</span>});</pre>
+                    </div>
+                    <div class="demo-params">
+                        <label>任务数量:</label>
+                        <input type="number" id="queueCount" value="8" min="1" max="20">
+                        <label>并发限制:</label>
+                        <input type="number" id="queueConcurrency" value="2" min="1" max="10">
+                        <label>最大延迟(ms):</label>
+                        <input type="number" id="queueMaxDelay" value="1000" min="100" max="3000">
+                    </div>
+                    <button onclick="runQueueDemo()">执行queue演示</button>
+                    <button class="secondary" onclick="clearResult('queueResult')">清空结果</button>
+                    <div class="result-container">
+                        <div class="result-header">执行结果:</div>
+                        <div id="queueResult" class="result"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 引入async库
+        const async = require('async');
+
+        // 标签页切换功能
+        document.addEventListener('DOMContentLoaded', function() {
+            const tabs = document.querySelectorAll('.nav-tabs li a');
+            const tabPanes = document.querySelectorAll('.tab-pane');
+
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    // 移除所有active类
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tabPanes.forEach(pane => pane.classList.remove('active'));
+                    
+                    // 添加当前active类
+                    this.classList.add('active');
+                    const targetId = this.getAttribute('href');
+                    document.querySelector(targetId).classList.add('active');
+                });
+            });
+        });
+
+        // 辅助函数
+        function appendResult(elementId, content) {
+            const element = document.getElementById(elementId);
+            element.innerHTML += content + '<br>';
+            element.scrollTop = element.scrollHeight;
+        }
+
+        function clearResult(elementId) {
+            document.getElementById(elementId).innerHTML = '';
+        }
+
+        function logTime(elementId, startTime, message) {
+            const endTime = Date.now();
+            const duration = endTime - startTime;
+            appendResult(elementId, `[${new Date().toLocaleTimeString()}] ${message} (耗时: ${duration}ms)`);
+        }
+
+        // 并行控制演示
+        function runParallelDemo() {
+            const count = parseInt(document.getElementById('parallelCount').value);
+            const maxDelay = parseInt(document.getElementById('parallelMaxDelay').value);
+            const resultId = 'parallelResult';
+            
+            clearResult(resultId);
+            appendResult(resultId, `开始执行parallel演示，共${count}个任务`);
+            
+            const startTime = Date.now();
+            const tasks = [];
+            
+            // 创建任务数组
+            for (let i = 0; i < count; i++) {
+                const taskIndex = i + 1;
+                const delay = Math.floor(Math.random() * maxDelay) + 100;
+                
+                tasks.push(function(callback) {
+                    setTimeout(function() {
+                        appendResult(resultId, `任务${taskIndex}完成 (延迟: ${delay}ms)`);
+                        callback(null, `任务${taskIndex}结果`);
+                    }, delay);
+                });
+            }
+            
+            // 执行并行任务
+            async.parallel(tasks, function(err, results) {
+                if (err) {
+                    appendResult(resultId, `错误: ${err.message}`);
+                    return;
+                }
+                
+                logTime(resultId, startTime, `所有任务完成！`);
+                appendResult(resultId, `最终结果: ${JSON.stringify(results)}`);
+            });
+        }
+
+        function runParallelLimitDemo() {
+            const count = parseInt(document.getElementById('parallelLimitCount').value);
+            const limit = parseInt(document.getElementById('parallelLimit').value);
+            const maxDelay = parseInt(document.getElementById('parallelLimitMaxDelay').value);
+            const resultId = 'parallelLimitResult';
+            
+            clearResult(resultId);
+            appendResult(resultId, `开始执行parallelLimit演示，共${count}个任务，并发限制: ${limit}`);
+            
+            const startTime = Date.now();
+            const tasks = [];
+            
+            // 创建任务数组
+            for (let i = 0; i < count; i++) {
+                const taskIndex = i + 1;
+                const delay = Math.floor(Math.random() * maxDelay) + 100;
+                
+                tasks.push(function(callback) {
+                    setTimeout(function() {
+                        appendResult(resultId, `任务${taskIndex}完成 (延迟: ${delay}ms)`);
+                        callback(null, `任务${taskIndex}结果`);
+                    }, delay);
+                });
+            }
+            
+            // 执行限制并发的并行任务
+            async.parallelLimit(tasks, limit, function(err, results) {
+                if (err) {
+                    appendResult(resultId, `错误: ${err.message}`);
+                    return;
+                }
+                
+                logTime(resultId, startTime, `所有任务完成！`);
+                appendResult(resultId, `最终结果: ${JSON.stringify(results)}`);
+            });
+        }
+
+        // 串行控制演示
+        function runSeriesDemo() {
+            const count = parseInt(document.getElementById('seriesCount').value);
+            const maxDelay = parseInt(document.getElementById('seriesMaxDelay').value);
+            const resultId = 'seriesResult';
+            
+            clearResult(resultId);
+            appendResult(resultId, `开始执行series演示，共${count}个任务`);
+            
+            const startTime = Date.now();
+            const tasks = [];
+            
+            // 创建任务数组
+            for (let i = 0; i < count; i++) {
+                const taskIndex = i + 1;
+                const delay = Math.floor(Math.random() * maxDelay) + 100;
+                
+                tasks.push(function(callback) {
+                    setTimeout(function() {
+                        appendResult(resultId, `任务${taskIndex}完成 (延迟: ${delay}ms)`);
+                        callback(null, `任务${taskIndex}结果`);
+                    }, delay);
+                });
+            }
+            
+            // 执行串行任务
+            async.series(tasks, function(err, results) {
+                if (err) {
+                    appendResult(resultId, `错误: ${err.message}`);
+                    return;
+                }
+                
+                logTime(resultId, startTime, `所有任务完成！`);
+                appendResult(resultId, `最终结果: ${JSON.stringify(results)}`);
+            });
+        }
+
+        function runWaterfallDemo() {
+            const initial = parseInt(document.getElementById('waterfallInitial').value);
+            const resultId = 'waterfallResult';
+            
+            clearResult(resultId);
+            appendResult(resultId, `开始执行waterfall演示，初始值: ${initial}`);
+            
+            const startTime = Date.now();
+            
+            // 定义瀑布流任务
+            const tasks = [
+                function(callback) {
+                    setTimeout(function() {
+                        const result = initial;
+                        appendResult(resultId, `步骤1: 初始值 = ${result}`);
+                        callback(null, result);
+                    }, 300);
+                },
+                function(num, callback) {
+                    setTimeout(function() {
+                        const result = num + 5;
+                        appendResult(resultId, `步骤2: ${num} + 5 = ${result}`);
+                        callback(null, result);
+                    }, 500);
+                },
+                function(num, callback) {
+                    setTimeout(function() {
+                        const result = num * 2;
+                        appendResult(resultId, `步骤3: ${num} * 2 = ${result}`);
+                        callback(null, result);
+                    }, 400);
+                },
+                function(num, callback) {
+                    setTimeout(function() {
+                        const result = num - 3;
+                        appendResult(resultId, `步骤4: ${num} - 3 = ${result}`);
+                        callback(null, result);
+                    }, 300);
+                },
+                function(num, callback) {
+                    setTimeout(function() {
+                        const result = num * num;
+                        appendResult(resultId, `步骤5: ${num} 的平方 = ${result}`);
+                        callback(null, result);
+                    }, 600);
+                }
+            ];
+            
+            // 执行瀑布流任务
+            async.waterfall(tasks, function(err, finalResult) {
+                if (err) {
+                    appendResult(resultId, `错误: ${err.message}`);
+                    return;
+                }
+                
+                logTime(resultId, startTime, `所有步骤完成！`);
+                appendResult(resultId, `最终结果: ${finalResult}`);
+            });
+        }
+
+        // 集合操作演示
+        function runEachDemo() {
+            const arrayStr = document.getElementById('eachArray').value;
+            const array = arrayStr.split(',').map(Number);
+            const resultId = 'eachResult';
+            
+            clearResult(resultId);
+            appendResult(resultId, `开始执行each演示，数组: [${array.join(', ')}]`);
+            
+            const startTime = Date.now();
+            
+            // 执行each操作
+            async.each(array, function(item, callback) {
+                setTimeout(function() {
+                    appendResult(resultId, `处理元素: ${item}`);
+                    callback();
+                }, 300);
+            }, function(err) {
+                if (err) {
+                    appendResult(resultId, `错误: ${err.message}`);
+                    return;
+                }
+                
+                logTime(resultId, startTime, `所有元素处理完成！`);
+            });
+        }
+
+        function runMapDemo() {
+            const arrayStr = document.getElementById('mapArray').value;
+            const array = arrayStr.split(',').map(Number);
+            const resultId = 'mapResult';
+            
+            clearResult(resultId);
+            appendResult(resultId, `开始执行map演示，数组: [${array.join(', ')}]`);
+            
+            const startTime = Date.now();
+            
+            // 执行map操作
+            async.map(array, function(item, callback) {
+                setTimeout(function() {
+                    const result = item * 2;
+                    appendResult(resultId, `${item} * 2 = ${result}`);
+                    callback(null, result);
+                }, 300);
+            }, function(err, results) {
+                if (err) {
+                    appendResult(resultId, `错误: ${err.message}`);
+                    return;
+                }
+                
+                logTime(resultId, startTime, `所有元素映射完成！`);
+                appendResult(resultId, `映射结果: [${results.join(', ')}]`);
+            });
+        }
+
+        function runFilterDemo() {
+            const arrayStr = document.getElementById('filterArray').value;
+            const array = arrayStr.split(',').map(Number);
+            const resultId = 'filterResult';
+            
+            clearResult(resultId);
+            appendResult(resultId, `开始执行filter演示，数组: [${array.join(', ')}]`);
+            appendResult(resultId, `过滤条件: 偶数`);
+            
+            const startTime = Date.now();
+            
+            // 执行filter操作
+            async.filter(array, function(item, callback) {
+                setTimeout(function() {
+                    const isEven = item % 2 === 0;
+                    appendResult(resultId, `${item} ${isEven ? '是' : '不是'}偶数`);
+                    callback(null, isEven);
+                }, 300);
+            }, function(err, results) {
+                if (err) {
+                    appendResult(resultId, `错误: ${err.message}`);
+                    return;
+                }
+                
+                logTime(resultId, startTime, `过滤完成！`);
+                appendResult(resultId, `过滤结果: [${results.join(', ')}]`);
+            });
+        }
+
+        function runReduceDemo() {
+            const arrayStr = document.getElementById('reduceArray').value;
+            const array = arrayStr.split(',').map(Number);
+            const initial = parseInt(document.getElementById('reduceInitial').value);
+            const resultId = 'reduceResult';
+            
+            clearResult(resultId);
+            appendResult(resultId, `开始执行reduce演示，数组: [${array.join(', ')}]`);
+            appendResult(resultId, `初始值: ${initial}`);
+            appendResult(resultId, `操作: 求和`);
+            
+            const startTime = Date.now();
+            
+            // 执行reduce操作
+            async.reduce(array, initial, function(memo, item, callback) {
+                setTimeout(function() {
+                    const result = memo + item;
+                    appendResult(resultId, `${memo} + ${item} = ${result}`);
+                    callback(null, result);
+                }, 300);
+            }, function(err, result) {
+                if (err) {
+                    appendResult(resultId, `错误: ${err.message}`);
+                    return;
+                }
+                
+                logTime(resultId, startTime, `归约完成！`);
+                appendResult(resultId, `最终结果: ${result}`);
+            });
+        }
+
+        // 流程控制演示
+        function runRetryDemo() {
+            const retryCount = parseInt(document.getElementById('retryCount').value);
+            const resultId = 'retryResult';
+            let attempt = 0;
+            
+            clearResult(resultId);
+            appendResult(resultId, `开始执行retry演示，最多重试${retryCount}次`);
+            
+            const startTime = Date.now();
+            
+            // 执行retry操作
+            async.retry(retryCount, function(callback) {
+                attempt++;
+                appendResult(resultId, `尝试 ${attempt}`);
+                
+                setTimeout(function() {
+                    if (Math.random() > 0.6) {
+                        appendResult(resultId, `尝试 ${attempt} 失败`);
+                        callback(new Error('随机失败'));
+                    } else {
+                        appendResult(resultId, `尝试 ${attempt} 成功`);
+                        callback(null, `成功结果`);
+                    }
+                }, 500);
+            }, function(err, result) {
+                if (err) {
+                    logTime(resultId, startTime, `所有尝试都失败了！`);
+                    appendResult(resultId, `错误: ${err.message}`);
+                    return;
+                }
+                
+                logTime(resultId, startTime, `操作成功完成！`);
+                appendResult(resultId, `最终结果: ${result}`);
+            });
+        }
+
+        function runTimeoutDemo() {
+            const operationDelay = parseInt(document.getElementById('timeoutOperationDelay').value);
+            const timeoutDuration = parseInt(document.getElementById('timeoutDuration').value);
+            const resultId = 'timeoutResult';
+            
+            clearResult(resultId);
+            appendResult(resultId, `开始执行timeout演示`);
+            appendResult(resultId, `操作延迟: ${operationDelay}ms`);
+            appendResult(resultId, `超时时间: ${timeoutDuration}ms`);
+            
+            const startTime = Date.now();
+            
+            // 创建带超时的函数
+            const timeoutFn = async.timeout(function(callback) {
+                setTimeout(function() {
+                    appendResult(resultId, `操作完成`);
+                    callback(null, `操作结果`);
+                }, operationDelay);
+            }, timeoutDuration);
+            
+            // 执行超时函数
+            timeoutFn(function(err, result) {
+                if (err) {
+                    if (err.code === 'ETIMEDOUT') {
+                        logTime(resultId, startTime, `操作超时！`);
+                        appendResult(resultId, `超时错误`);
+                    } else {
+                        appendResult(resultId, `其他错误: ${err.message}`);
+                    }
+                    return;
+                }
+                
+                logTime(resultId, startTime, `操作在超时前完成！`);
+                appendResult(resultId, `最终结果: ${result}`);
+            });
+        }
+
+        function runAutoDemo() {
+            const resultId = 'autoResult';
+            
+            clearResult(resultId);
+            appendResult(resultId, `开始执行auto演示`);
+            
+            const startTime = Date.now();
+            
+            // 定义依赖任务
+            const tasks = {
+                loadConfig: function(callback) {
+                    setTimeout(function() {
+                        const config = { timeout: 5000, maxRetries: 3 };
+                        appendResult(resultId, `加载配置完成: ${JSON.stringify(config)}`);
+                        callback(null, config);
+                    }, 400);
+                },
+                connectDatabase: function(callback) {
+                    setTimeout(function() {
+                        const db = { name: 'exampleDB', connected: true };
+                        appendResult(resultId, `数据库连接完成: ${db.name}`);
+                        callback(null, db);
+                    }, 600);
+                },
+                initializeApp: ['loadConfig', 'connectDatabase', function(results, callback) {
+                    setTimeout(function() {
+                        const app = { 
+                            initialized: true, 
+                            config: results.loadConfig, 
+                            database: results.connectDatabase 
+                        };
+                        appendResult(resultId, `应用初始化完成`);
+                        callback(null, app);
+                    }, 500);
+                }],
+                startServer: ['initializeApp', function(results, callback) {
+                    setTimeout(function() {
+                        const server = { running: true, port: 3000 };
+                        appendResult(resultId, `服务器启动完成，端口: ${server.port}`);
+                        callback(null, server);
+                    }, 700);
+                }]
+            };
+            
+            // 执行auto任务
+            async.auto(tasks, function(err, results) {
+                if (err) {
+                    appendResult(resultId, `错误: ${err.message}`);
+                    return;
+                }
+                
+                logTime(resultId, startTime, `所有任务完成！`);
+                appendResult(resultId, `最终结果:`);
+                appendResult(resultId, JSON.stringify(results, null, 2));
+            });
+        }
+
+        function runQueueDemo() {
+            const count = parseInt(document.getElementById('queueCount').value);
+            const concurrency = parseInt(document.getElementById('queueConcurrency').value);
+            const maxDelay = parseInt(document.getElementById('queueMaxDelay').value);
+            const resultId = 'queueResult';
+            
+            clearResult(resultId);
+            appendResult(resultId, `开始执行queue演示`);
+            appendResult(resultId, `任务数量: ${count}`);
+            appendResult(resultId, `并发限制: ${concurrency}`);
+            
+            const startTime = Date.now();
+            
+            // 创建任务队列
+            const q = async.queue(function(task, callback) {
+                setTimeout(function() {
+                    appendResult(resultId, `任务 ${task.name} 完成 (延迟: ${task.delay}ms)`);
+                    callback(null, `任务${task.name}结果`);
+                }, task.delay);
+            }, concurrency);
+            
+            // 添加任务完成事件
+            q.drain(function() {
+                logTime(resultId, startTime, `所有队列任务完成！`);
+            });
+            
+            // 添加任务到队列
+            for (let i = 0; i < count; i++) {
+                const task = {
+                    name: i + 1,
+                    delay: Math.floor(Math.random() * maxDelay) + 100
+                };
+                q.push(task, function(err, result) {
+                    if (err) {
+                        appendResult(resultId, `任务 ${task.name} 错误: ${err.message}`);
+                    }
+                });
+            }
+        }
+    </script>
+</body>
+</html>

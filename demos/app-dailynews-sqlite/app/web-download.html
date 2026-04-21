@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="Content-Security-Policy" content="default-src * 'unsafe-inline' 'unsafe-eval' data: blob:;">
+  <title>Web文件下载</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei', sans-serif;
+      background: #f5f5f5;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .toolbar {
+      background: #1a73e8;
+      color: white;
+      padding: 10px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .toolbar h1 {
+      font-size: 18px;
+      font-weight: 500;
+    }
+    
+    .toolbar-buttons {
+      display: flex;
+      gap: 10px;
+    }
+    
+    .toolbar button {
+      background: rgba(255,255,255,0.2);
+      border: 1px solid rgba(255,255,255,0.3);
+      color: white;
+      padding: 8px 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.2s;
+    }
+    
+    .toolbar button:hover {
+      background: rgba(255,255,255,0.3);
+    }
+    
+    .content-frame {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    #webview {
+      flex: 1;
+      width: 100%;
+      border: none;
+    }
+    
+    .loading {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+    }
+    
+    .loading-spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #1a73e8;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 10px;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    .status-bar {
+      background: #fff;
+      padding: 8px 20px;
+      border-top: 1px solid #ddd;
+      font-size: 12px;
+      color: #666;
+      display: flex;
+      justify-content: space-between;
+    }
+    
+    .error-message {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: white;
+      padding: 40px;
+      border-radius: 8px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+      text-align: center;
+      max-width: 400px;
+    }
+    
+    .error-message h2 {
+      color: #d32f2f;
+      margin-bottom: 15px;
+    }
+    
+    .error-message p {
+      color: #666;
+      margin-bottom: 20px;
+    }
+    
+    .error-message button {
+      background: #1a73e8;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <div class="toolbar">
+    <h1>下滑到网页下方可下载证监会年报pdf</h1>
+    <div class="toolbar-buttons">
+      <button id="refreshBtn">刷新</button>
+    </div>
+  </div>
+  
+  <div class="content-frame">
+    <div id="loading" class="loading">
+      <div class="loading-spinner"></div>
+      <p>正在加载网页...</p>
+    </div>
+    <webview id="webview" src="about:blank" style="width:100%; height:100%;" allowpopups></webview>
+  </div>
+  
+  <div class="status-bar">
+    <span id="statusText">准备加载...</span>
+    <span id="urlText"></span>
+  </div>
+
+  <script>
+    const { ipcRenderer } = require('electron');
+    
+    const webview = document.getElementById('webview');
+    const loading = document.getElementById('loading');
+    const statusText = document.getElementById('statusText');
+    const urlText = document.getElementById('urlText');
+    const refreshBtn = document.getElementById('refreshBtn');
+    
+    const targetUrl = 'https://www.csrc.gov.cn/csrc/c100024/common_list.shtml';
+    
+    // 加载网页
+    function loadPage() {
+      console.log('开始加载网页:', targetUrl);
+      statusText.textContent = '正在连接...';
+      webview.src = targetUrl;
+    }
+    
+    // 刷新按钮
+    refreshBtn.addEventListener('click', () => {
+      console.log('刷新页面');
+      webview.reload();
+    });
+    
+    // 监听webview事件
+    webview.addEventListener('did-start-loading', () => {
+      console.log('开始加载');
+      loading.style.display = 'block';
+      statusText.textContent = '正在加载...';
+    });
+    
+    webview.addEventListener('did-stop-loading', () => {
+      console.log('停止加载');
+      loading.style.display = 'none';
+      statusText.textContent = '加载完成';
+    });
+    
+    webview.addEventListener('did-finish-load', () => {
+      console.log('页面加载完成');
+      loading.style.display = 'none';
+      statusText.textContent = '页面已加载';
+      urlText.textContent = webview.getURL();
+    });
+    
+    webview.addEventListener('did-fail-load', (event) => {
+      console.error('页面加载失败:', event);
+      loading.style.display = 'none';
+      statusText.textContent = '加载失败: ' + event.errorDescription;
+      
+      // 显示错误信息
+      const errorDiv = document.createElement('div');
+      errorDiv.className = 'error-message';
+      errorDiv.innerHTML = `
+        <h2>网页加载失败</h2>
+        <p>错误代码: ${event.errorCode}</p>
+        <p>错误描述: ${event.errorDescription}</p>
+        <button onclick="loadPage()">重试</button>
+      `;
+      document.body.appendChild(errorDiv);
+    });
+    
+    webview.addEventListener('page-title-updated', (event) => {
+      console.log('页面标题:', event.title);
+      document.title = event.title + ' - Web文件下载';
+    });
+    
+    // 监听新窗口打开事件
+    webview.addEventListener('new-window', (event) => {
+      console.log('新窗口请求:', event.url);
+      // 在当前webview中打开
+      webview.src = event.url;
+    });
+    
+    // 监听下载事件
+    webview.addEventListener('will-navigate', (event) => {
+      console.log('导航到:', event.url);
+      urlText.textContent = event.url;
+      
+      // 检查是否是PDF文件
+      if (event.url.toLowerCase().endsWith('.pdf')) {
+        console.log('检测到PDF文件下载请求');
+        event.preventDefault();
+        
+        // 发送到主进程处理下载
+        ipcRenderer.send('download-file', {
+          url: event.url,
+          filename: event.url.split('/').pop()
+        });
+      }
+    });
+    
+    // 监听控制台消息
+    webview.addEventListener('console-message', (event) => {
+      console.log('Webview控制台:', event.message);
+    });
+    
+    // 监听IPC消息
+    ipcRenderer.on('download-complete', (event, result) => {
+      if (result.success) {
+        alert('文件下载成功！\n保存位置: ' + result.filePath);
+      } else {
+        alert('文件下载失败！\n错误: ' + result.error);
+      }
+    });
+    
+    // 页面加载完成后开始加载目标网页
+    window.addEventListener('load', () => {
+      console.log('页面加载完成，开始加载目标网页');
+      setTimeout(loadPage, 500);
+    });
+  </script>
+</body>
+</html>

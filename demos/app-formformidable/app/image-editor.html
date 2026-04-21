@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>图片编辑</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: sans-serif;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background-color: #f5f5f5;
+        }
+
+        .header {
+            background-color: #1a73e8;
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .header .controls {
+            display: flex;
+            gap: 10px;
+        }
+
+        .header button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            background-color: rgba(255, 255, 255, 0.2);
+            color: white;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.2s;
+        }
+
+        .header button:hover {
+            background-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .header button.primary {
+            background-color: white;
+            color: #1a73e8;
+            font-weight: 500;
+        }
+
+        .header button.primary:hover {
+            background-color: #f0f7ff;
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+        }
+
+        .toolbar {
+            width: 60px;
+            background-color: white;
+            border-right: 1px solid #e0e0e0;
+            padding: 15px 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .toolbar button {
+            width: 40px;
+            height: 40px;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            background-color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            transition: all 0.2s;
+        }
+
+        .toolbar button:hover {
+            background-color: #f0f7ff;
+            border-color: #1a73e8;
+        }
+
+        .toolbar button.active {
+            background-color: #e3f2fd;
+            border-color: #1a73e8;
+            color: #1a73e8;
+        }
+
+        .canvas-container {
+            flex: 1;
+            position: relative;
+            background-color: #fafafa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: auto;
+        }
+
+        #screenshotCanvas {
+            border: 1px solid #e0e0e0;
+            background-color: white;
+            cursor: crosshair;
+        }
+
+        .sidebar {
+            width: 250px;
+            background-color: white;
+            border-left: 1px solid #e0e0e0;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .sidebar section {
+            margin-bottom: 25px;
+        }
+
+        .sidebar h2 {
+            font-size: 14px;
+            font-weight: 600;
+            color: #666;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .color-picker {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .color-option {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: border-color 0.2s;
+        }
+
+        .color-option:hover {
+            border-color: #1a73e8;
+        }
+
+        .color-option.active {
+            border-color: #1a73e8;
+            box-shadow: 0 0 0 2px white, 0 0 0 4px #1a73e8;
+        }
+
+        .slider-container {
+            margin-bottom: 15px;
+        }
+
+        .slider-container label {
+            display: block;
+            font-size: 14px;
+            margin-bottom: 8px;
+            color: #333;
+        }
+
+        .slider-container input[type="range"] {
+            width: 100%;
+            margin-bottom: 5px;
+        }
+
+        .slider-container .value {
+            font-size: 12px;
+            color: #666;
+            text-align: right;
+        }
+
+        .status-bar {
+            background-color: white;
+            border-top: 1px solid #e0e0e0;
+            padding: 10px 20px;
+            font-size: 14px;
+            color: #666;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .tooltip {
+            position: absolute;
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            pointer-events: none;
+            z-index: 1000;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>图片编辑</h1>
+        <div class="controls">
+            <button id="captureScreen">截图</button>
+            <button id="openImage">打开图片</button>
+            <button id="saveImage" class="primary">保存</button>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="toolbar">
+            <button id="toolDraw" class="active" title="铅笔">✏️</button>
+            <button id="toolBrush" title="画笔">🖌️</button>
+            <button id="toolText" title="文本">📝</button>
+            <button id="toolShape" title="形状">🔲</button>
+            <button id="toolEraser" title="橡皮擦">🧽</button>
+            <button id="toolZoom" title="缩放">🔍</button>
+        </div>
+
+        <div class="canvas-container">
+            <canvas id="screenshotCanvas" width="800" height="600"></canvas>
+        </div>
+
+        <div class="sidebar">
+            <section>
+                <h2>画笔设置</h2>
+                <div class="slider-container">
+                    <label for="brushSize">画笔大小</label>
+                    <input type="range" id="brushSize" min="1" max="50" value="5">
+                    <div class="value" id="brushSizeValue">5px</div>
+                </div>
+                <div class="slider-container">
+                    <label for="brushOpacity">透明度</label>
+                    <input type="range" id="brushOpacity" min="1" max="100" value="100">
+                    <div class="value" id="brushOpacityValue">100%</div>
+                </div>
+            </section>
+
+            <section>
+                <h2>颜色选择</h2>
+                <div class="color-picker">
+                    <div class="color-option active" style="background-color: #000000"></div>
+                    <div class="color-option" style="background-color: #ff0000"></div>
+                    <div class="color-option" style="background-color: #00ff00"></div>
+                    <div class="color-option" style="background-color: #0000ff"></div>
+                    <div class="color-option" style="background-color: #ffff00"></div>
+                    <div class="color-option" style="background-color: #ff00ff"></div>
+                    <div class="color-option" style="background-color: #00ffff"></div>
+                    <div class="color-option" style="background-color: #ffffff"></div>
+                </div>
+            </section>
+
+            <section>
+                <h2>形状设置</h2>
+                <div class="slider-container">
+                    <label for="shapeSize">线条宽度</label>
+                    <input type="range" id="shapeSize" min="1" max="20" value="2">
+                    <div class="value" id="shapeSizeValue">2px</div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <div class="status-bar">
+        <div id="status">就绪</div>
+        <div id="coordinates">坐标: 0, 0</div>
+    </div>
+
+    <div class="tooltip" id="tooltip"></div>
+
+    <script>
+        const { ipcRenderer } = require('electron');
+        const fs = require('fs');
+        const path = require('path');
+
+        const canvas = document.getElementById('screenshotCanvas');
+        const ctx = canvas.getContext('2d');
+        const tooltip = document.getElementById('tooltip');
+        const status = document.getElementById('status');
+        const coordinates = document.getElementById('coordinates');
+
+        let isDrawing = false;
+        let startX, startY;
+        let currentTool = 'draw';
+        let currentColor = '#000000';
+        let brushSize = 5;
+        let brushOpacity = 1;
+        let shapeSize = 2;
+        
+        // 文本框相关变量
+        let textBoxes = [];
+        let selectedTextBox = null;
+        let isDragging = false;
+        let dragOffsetX, dragOffsetY;
+
+        // 初始化画布
+        function initCanvas() {
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+        }
+
+        // 截图功能
+        async function captureScreen() {
+            try {
+                status.textContent = '正在截图...';
+                const sources = await ipcRenderer.invoke('get-sources');
+                
+                if (sources && sources.length > 0) {
+                    // 选择第一个屏幕源
+                    const source = sources[0];
+                    
+                    // 创建图片对象加载截图
+                    const img = new Image();
+                    img.onload = function() {
+                        // 调整画布大小以匹配截图
+                        canvas.width = img.width;
+                        canvas.height = img.height;
+                        // 绘制截图到画布
+                        ctx.drawImage(img, 0, 0);
+                        // 保存背景图片
+                        backgroundImage = img;
+                        // 清空文本框
+                        textBoxes = [];
+                        selectedTextBox = null;
+                        status.textContent = '截图完成';
+                    };
+                    img.onerror = function() {
+                        status.textContent = '截图加载失败';
+                    };
+                    img.src = source.thumbnail;
+                } else {
+                    status.textContent = '未找到屏幕源';
+                }
+            } catch (error) {
+                console.error('截图失败:', error);
+                status.textContent = '截图失败';
+            }
+        }
+
+        // 打开图片
+        async function openImage() {
+            try {
+                const result = await ipcRenderer.invoke('select-image-file');
+                
+                if (!result.canceled && result.filePaths.length > 0) {
+                    const filePath = result.filePaths[0];
+                    status.textContent = '正在加载图片...';
+                    
+                    const img = new Image();
+                    img.onload = function() {
+                        canvas.width = img.width;
+                        canvas.height = img.height;
+                        ctx.drawImage(img, 0, 0);
+                        // 保存背景图片
+                        backgroundImage = img;
+                        // 清空文本框
+                        textBoxes = [];
+                        selectedTextBox = null;
+                        status.textContent = '图片加载完成';
+                    };
+                    img.onerror = function() {
+                        status.textContent = '图片加载失败';
+                    };
+                    img.src = `file://${filePath}`;
+                }
+            } catch (error) {
+                console.error('打开图片失败:', error);
+                status.textContent = '打开图片失败';
+            }
+        }
+
+        // 保存图片
+        async function saveImage() {
+            try {
+                status.textContent = '正在保存...';
+                
+                // 确保所有文本框都被渲染
+                renderTextBoxes();
+                
+                // 将画布转换为data URL
+                const dataUrl = canvas.toDataURL('image/png');
+                
+                // 弹出保存对话框
+                const result = await ipcRenderer.invoke('save-resized-image', {
+                    defaultName: 'edited-image.png'
+                });
+                
+                if (!result.canceled && result.filePath) {
+                    // 写入文件
+                    const saveResult = await ipcRenderer.invoke('write-image-file', {
+                        filePath: result.filePath,
+                        dataUrl: dataUrl
+                    });
+                    
+                    if (saveResult.success) {
+                        status.textContent = '保存成功';
+                    } else {
+                        status.textContent = '保存失败: ' + saveResult.error;
+                    }
+                } else {
+                    status.textContent = '保存取消';
+                }
+            } catch (error) {
+                console.error('保存图片失败:', error);
+                status.textContent = '保存图片失败';
+            }
+        }
+
+        // 工具选择
+        document.getElementById('toolDraw').addEventListener('click', function() {
+            setActiveTool('draw');
+        });
+
+        document.getElementById('toolBrush').addEventListener('click', function() {
+            setActiveTool('brush');
+        });
+
+        document.getElementById('toolText').addEventListener('click', function() {
+            setActiveTool('text');
+        });
+
+        document.getElementById('toolShape').addEventListener('click', function() {
+            setActiveTool('shape');
+        });
+
+        document.getElementById('toolEraser').addEventListener('click', function() {
+            setActiveTool('eraser');
+        });
+
+        document.getElementById('toolZoom').addEventListener('click', function() {
+            setActiveTool('zoom');
+        });
+
+        function setActiveTool(tool) {
+            currentTool = tool;
+            
+            // 更新工具按钮状态
+            document.querySelectorAll('.toolbar button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.getElementById('tool' + tool.charAt(0).toUpperCase() + tool.slice(1)).classList.add('active');
+        }
+
+        // 颜色选择
+        document.querySelectorAll('.color-option').forEach(option => {
+            option.addEventListener('click', function() {
+                document.querySelectorAll('.color-option').forEach(opt => {
+                    opt.classList.remove('active');
+                });
+                this.classList.add('active');
+                currentColor = this.style.backgroundColor;
+            });
+        });
+
+        // 画笔大小调整
+        document.getElementById('brushSize').addEventListener('input', function() {
+            brushSize = parseInt(this.value);
+            document.getElementById('brushSizeValue').textContent = brushSize + 'px';
+        });
+
+        // 画笔透明度调整
+        document.getElementById('brushOpacity').addEventListener('input', function() {
+            brushOpacity = parseInt(this.value) / 100;
+            document.getElementById('brushOpacityValue').textContent = this.value + '%';
+        });
+
+        // 形状线条宽度调整
+        document.getElementById('shapeSize').addEventListener('input', function() {
+            shapeSize = parseInt(this.value);
+            document.getElementById('shapeSizeValue').textContent = shapeSize + 'px';
+        });
+
+        // 画布事件
+        // 保存背景图片
+        let backgroundImage = null;
+
+        // 渲染所有文本框
+        function renderTextBoxes() {
+            // 重新绘制画布内容
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // 重新绘制背景图片
+            if (backgroundImage) {
+                ctx.drawImage(backgroundImage, 0, 0);
+            }
+            
+            // 绘制所有文本框
+            textBoxes.forEach(textBox => {
+                // 绘制文本框边框
+                ctx.strokeStyle = textBox.selected ? '#1a73e8' : '#000000';
+                ctx.lineWidth = 2;
+                ctx.strokeRect(textBox.x, textBox.y, textBox.width, textBox.height);
+                
+                // 绘制文本
+                ctx.fillStyle = currentColor;
+                ctx.font = '16px Arial';
+                ctx.textAlign = 'left';
+                ctx.textBaseline = 'top';
+                ctx.fillText(textBox.text, textBox.x + 5, textBox.y + 5);
+            });
+        }
+
+        // 检查鼠标是否在文本框内
+        function getTextBoxAt(x, y) {
+            return textBoxes.find(textBox => {
+                return x >= textBox.x && x <= textBox.x + textBox.width && 
+                       y >= textBox.y && y <= textBox.y + textBox.height;
+            });
+        }
+
+        canvas.addEventListener('mousedown', function(e) {
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            console.log('Mouse down at:', x, y, 'Tool:', currentTool);
+            
+            // 检查是否点击在文本框上
+            const clickedTextBox = getTextBoxAt(x, y);
+            
+            if (clickedTextBox) {
+                // 选中文本框
+                textBoxes.forEach(textBox => {
+                    textBox.selected = false;
+                });
+                clickedTextBox.selected = true;
+                selectedTextBox = clickedTextBox;
+                
+                // 开始拖动
+                isDragging = true;
+                dragOffsetX = x - clickedTextBox.x;
+                dragOffsetY = y - clickedTextBox.y;
+                
+                renderTextBoxes();
+                return;
+            }
+            
+            startX = x;
+            startY = y;
+            isDrawing = true;
+            
+            // 根据工具类型设置不同的光标
+            switch(currentTool) {
+                case 'draw':
+                    canvas.style.cursor = 'crosshair';
+                    // 每次绘制前都重新设置画笔属性
+                    ctx.strokeStyle = currentColor;
+                    ctx.lineWidth = brushSize;
+                    ctx.globalAlpha = brushOpacity;
+                    ctx.lineCap = 'round';
+                    ctx.lineJoin = 'round';
+                    ctx.globalCompositeOperation = 'source-over';
+                    
+                    ctx.beginPath();
+                    ctx.moveTo(startX, startY);
+                    break;
+                case 'brush':
+                    canvas.style.cursor = 'crosshair';
+                    // 画笔工具与铅笔工具类似，只是可能有不同的效果
+                    ctx.strokeStyle = currentColor;
+                    ctx.lineWidth = brushSize;
+                    ctx.globalAlpha = brushOpacity;
+                    ctx.lineCap = 'round';
+                    ctx.lineJoin = 'round';
+                    ctx.globalCompositeOperation = 'source-over';
+                    
+                    ctx.beginPath();
+                    ctx.moveTo(startX, startY);
+                    break;
+                case 'text':
+                    canvas.style.cursor = 'text';
+                    // 创建新文本框
+                    const text = prompt('请输入文本:');
+                    if (text) {
+                        // 计算文本宽度，动态调整文本框大小
+                        ctx.font = '16px Arial';
+                        const textWidth = ctx.measureText(text).width;
+                        const textBoxWidth = Math.max(textWidth + 20, 100);
+                        const textBoxHeight = 40;
+                        
+                        const textBox = {
+                            x: x,
+                            y: y,
+                            width: textBoxWidth,
+                            height: textBoxHeight,
+                            text: text,
+                            selected: true
+                        };
+                        
+                        // 取消其他文本框的选中状态
+                        textBoxes.forEach(tb => {
+                            tb.selected = false;
+                        });
+                        
+                        textBoxes.push(textBox);
+                        selectedTextBox = textBox;
+                        renderTextBoxes();
+                    }
+                    break;
+                case 'shape':
+                    canvas.style.cursor = 'crosshair';
+                    break;
+                case 'eraser':
+                    canvas.style.cursor = 'crosshair';
+                    // 每次绘制前都重新设置画笔属性
+                    ctx.strokeStyle = '#ffffff';
+                    ctx.lineWidth = brushSize;
+                    ctx.globalAlpha = brushOpacity;
+                    ctx.lineCap = 'round';
+                    ctx.lineJoin = 'round';
+                    ctx.globalCompositeOperation = 'destination-out';
+                    
+                    ctx.beginPath();
+                    ctx.moveTo(startX, startY);
+                    break;
+                case 'zoom':
+                    canvas.style.cursor = 'zoom-in';
+                    break;
+            }
+        });
+
+        canvas.addEventListener('mousemove', function(e) {
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            coordinates.textContent = `坐标: ${Math.round(x)}, ${Math.round(y)}`;
+            
+            // 处理文本框拖动
+            if (isDragging && selectedTextBox) {
+                selectedTextBox.x = x - dragOffsetX;
+                selectedTextBox.y = y - dragOffsetY;
+                renderTextBoxes();
+                return;
+            }
+            
+            // 检查鼠标是否在文本框上
+            const hoveredTextBox = getTextBoxAt(x, y);
+            if (hoveredTextBox) {
+                canvas.style.cursor = 'move';
+            } else {
+                // 根据当前工具设置光标
+                switch(currentTool) {
+                    case 'draw':
+                    case 'brush':
+                    case 'eraser':
+                    case 'shape':
+                        canvas.style.cursor = 'crosshair';
+                        break;
+                    case 'text':
+                        canvas.style.cursor = 'text';
+                        break;
+                    case 'zoom':
+                        canvas.style.cursor = 'zoom-in';
+                        break;
+                    default:
+                        canvas.style.cursor = 'default';
+                }
+            }
+            
+            if (isDrawing) {
+                if (currentTool === 'draw' || currentTool === 'brush' || currentTool === 'eraser') {
+                    console.log('Drawing at:', x, y, 'Tool:', currentTool);
+                    
+                    // 每次移动都重新设置画笔属性，确保在图片上也能正常绘制
+                    ctx.strokeStyle = currentTool === 'eraser' ? '#ffffff' : currentColor;
+                    ctx.lineWidth = brushSize;
+                    ctx.globalAlpha = brushOpacity;
+                    ctx.lineCap = 'round';
+                    ctx.lineJoin = 'round';
+                    ctx.globalCompositeOperation = currentTool === 'eraser' ? 'destination-out' : 'source-over';
+                    
+                    ctx.lineTo(x, y);
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.moveTo(x, y);
+                }
+            }
+        });
+
+        canvas.addEventListener('mouseup', function(e) {
+            if (isDragging) {
+                isDragging = false;
+                return;
+            }
+            
+            if (isDrawing) {
+                console.log('Mouse up, stopping drawing');
+                isDrawing = false;
+                
+                if (currentTool === 'shape') {
+                    // 绘制形状前重新设置属性
+                    ctx.strokeStyle = currentColor;
+                    ctx.lineWidth = shapeSize;
+                    ctx.globalAlpha = brushOpacity;
+                    ctx.globalCompositeOperation = 'source-over';
+                    
+                    const rect = canvas.getBoundingClientRect();
+                    const endX = e.clientX - rect.left;
+                    const endY = e.clientY - rect.top;
+                    
+                    // 绘制矩形
+                    ctx.strokeRect(
+                        Math.min(startX, endX),
+                        Math.min(startY, endY),
+                        Math.abs(endX - startX),
+                        Math.abs(endY - startY)
+                    );
+                } else if (currentTool === 'zoom') {
+                    // 缩放工具：简单实现放大功能
+                    const rect = canvas.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+                    
+                    // 这里可以实现更复杂的缩放逻辑
+                    console.log('Zoom at:', x, y);
+                }
+            }
+        });
+
+        // 截图按钮事件
+        document.getElementById('captureScreen').addEventListener('click', captureScreen);
+
+        // 打开图片按钮事件
+        document.getElementById('openImage').addEventListener('click', openImage);
+
+        // 保存图片按钮事件
+        document.getElementById('saveImage').addEventListener('click', saveImage);
+
+        // 初始化
+        initCanvas();
+        status.textContent = '就绪';
+    </script>
+</body>
+</html>

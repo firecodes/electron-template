@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>axios三方库演示</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: sans-serif;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: #f5f5f5;
+        }
+        
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #333;
+        }
+        
+        .demo-section {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        h2 {
+            margin-bottom: 15px;
+            color: #1a73e8;
+            font-size: 18px;
+        }
+        
+        .demo-content {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .input-group label {
+            font-weight: bold;
+            color: #555;
+        }
+        
+        .input-group input,
+        .input-group textarea,
+        .input-group select {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .input-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        
+        button {
+            padding: 10px 20px;
+            background-color: #1a73e8;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.2s;
+        }
+        
+        button:hover {
+            background-color: #1557b0;
+        }
+        
+        .result {
+            background-color: #e8f5e9;
+            border: 1px solid #c8e6c9;
+            border-radius: 4px;
+            padding: 15px;
+            margin-top: 10px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .error {
+            background-color: #ffebee;
+            border: 1px solid #ffcdd2;
+            color: #c62828;
+        }
+        
+        .description {
+            color: #666;
+            margin-bottom: 10px;
+            font-style: italic;
+        }
+        
+        .request-url {
+            font-weight: bold;
+            color: #1a73e8;
+        }
+        
+        .http-method {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        
+        .method-get {
+            background-color: #d1f5e0;
+            color: #006400;
+        }
+        
+        .method-post {
+            background-color: #e3f2fd;
+            color: #1565c0;
+        }
+        
+        .method-put {
+            background-color: #fff8e1;
+            color: #ff6f00;
+        }
+        
+        .method-delete {
+            background-color: #ffebee;
+            color: #c62828;
+        }
+    </style>
+</head>
+<body>
+    <h1>🚀 axios 三方库功能演示</h1>
+    
+    <div class="demo-section">
+        <h2>1. GET 请求 - 获取数据</h2>
+        <div class="description">发送GET请求获取用户列表数据</div>
+        <div class="demo-content">
+            <div class="input-group">
+                <label>请求URL：</label>
+                <input type="text" id="getUrl" value="https://jsonplaceholder.typicode.com/users" readonly>
+            </div>
+            <button id="getBtn">发送GET请求</button>
+            <div class="result" id="getResult">点击按钮发送请求...</div>
+        </div>
+    </div>
+    
+    <div class="demo-section">
+        <h2>2. POST 请求 - 提交数据</h2>
+        <div class="description">发送POST请求创建新用户</div>
+        <div class="demo-content">
+            <div class="input-group">
+                <label>请求URL：</label>
+                <input type="text" id="postUrl" value="https://jsonplaceholder.typicode.com/users" readonly>
+            </div>
+            <div class="input-group">
+                <label>请求数据（JSON）：</label>
+                <textarea id="postData">{
+  "name": "张三",
+  "email": "zhangsan@example.com",
+  "username": "zhangsan"
+}</textarea>
+            </div>
+            <button id="postBtn">发送POST请求</button>
+            <div class="result" id="postResult">点击按钮发送请求...</div>
+        </div>
+    </div>
+    
+    <div class="demo-section">
+        <h2>3. PUT 请求 - 更新数据</h2>
+        <div class="description">发送PUT请求更新用户信息</div>
+        <div class="demo-content">
+            <div class="input-group">
+                <label>请求URL：</label>
+                <input type="text" id="putUrl" value="https://jsonplaceholder.typicode.com/users/1" readonly>
+            </div>
+            <div class="input-group">
+                <label>更新数据（JSON）：</label>
+                <textarea id="putData">{
+  "name": "李四",
+  "email": "lisi@example.com",
+  "username": "lisi"
+}</textarea>
+            </div>
+            <button id="putBtn">发送PUT请求</button>
+            <div class="result" id="putResult">点击按钮发送请求...</div>
+        </div>
+    </div>
+    
+    <div class="demo-section">
+        <h2>4. DELETE 请求 - 删除数据</h2>
+        <div class="description">发送DELETE请求删除用户</div>
+        <div class="demo-content">
+            <div class="input-group">
+                <label>请求URL：</label>
+                <input type="text" id="deleteUrl" value="https://jsonplaceholder.typicode.com/users/1" readonly>
+            </div>
+            <button id="deleteBtn">发送DELETE请求</button>
+            <div class="result" id="deleteResult">点击按钮发送请求...</div>
+        </div>
+    </div>
+    
+    <div class="demo-section">
+        <h2>5. 并发请求 - 同时发送多个请求</h2>
+        <div class="description">使用axios.all同时发送多个GET请求</div>
+        <div class="demo-content">
+            <div class="input-group">
+                <label>请求URL列表：</label>
+                <textarea id="concurrentUrls" readonly>
+https://jsonplaceholder.typicode.com/users
+https://jsonplaceholder.typicode.com/posts
+https://jsonplaceholder.typicode.com/comments</textarea>
+            </div>
+            <button id="concurrentBtn">发送并发请求</button>
+            <div class="result" id="concurrentResult">点击按钮发送请求...</div>
+        </div>
+    </div>
+    
+    <div class="demo-section">
+        <h2>6. 错误处理 - 处理请求错误</h2>
+        <div class="description">演示如何处理请求错误（404错误）</div>
+        <div class="demo-content">
+            <div class="input-group">
+                <label>错误请求URL：</label>
+                <input type="text" id="errorUrl" value="https://jsonplaceholder.typicode.com/this-api-does-not-exist" readonly>
+            </div>
+            <button id="errorBtn">发送错误请求</button>
+            <div class="result" id="errorResult">点击按钮发送请求...</div>
+        </div>
+    </div>
+    
+    <div class="demo-section">
+        <h2>7. 超时设置 - 设置请求超时</h2>
+        <div class="description">演示如何设置请求超时时间</div>
+        <div class="demo-content">
+            <div class="input-group">
+                <label>请求URL（会延迟响应）：</label>
+                <input type="text" id="timeoutUrl" value="https://httpbin.org/delay/5" readonly>
+            </div>
+            <div class="input-group">
+                <label>超时时间（毫秒）：</label>
+                <input type="number" id="timeoutMs" value="2000" min="1000" max="10000">
+            </div>
+            <button id="timeoutBtn">发送超时请求</button>
+            <div class="result" id="timeoutResult">点击按钮发送请求...</div>
+        </div>
+    </div>
+    
+    <div class="demo-section">
+        <h2>8. 自定义请求头 - 添加请求头信息</h2>
+        <div class="description">演示如何在请求中添加自定义头信息</div>
+        <div class="demo-content">
+            <div class="input-group">
+                <label>请求URL：</label>
+                <input type="text" id="headersUrl" value="https://jsonplaceholder.typicode.com/users/1" readonly>
+            </div>
+            <div class="input-group">
+                <label>自定义请求头：</label>
+                <textarea id="headersData">{
+  "Authorization": "Bearer token123",
+  "Content-Type": "application/json",
+  "X-Custom-Header": "custom-value"
+}</textarea>
+            </div>
+            <button id="headersBtn">发送带请求头的请求</button>
+            <div class="result" id="headersResult">点击按钮发送请求...</div>
+        </div>
+    </div>
+
+    <script src="node_modules/axios/dist/axios.min.js"></script>
+    <script>
+        // 1. GET 请求演示
+        const getBtn = document.getElementById('getBtn');
+        const getUrl = document.getElementById('getUrl');
+        const getResult = document.getElementById('getResult');
+        
+        getBtn.addEventListener('click', async () => {
+            try {
+                getResult.textContent = '请求发送中...';
+                const response = await axios.get(getUrl.value);
+                getResult.innerHTML = `<div class="http-method method-get">GET</div><div class="request-url">${getUrl.value}</div>\n状态码：${response.status}\n响应数据：\n${JSON.stringify(response.data, null, 2)}`;
+                getResult.classList.remove('error');
+            } catch (error) {
+                getResult.textContent = `请求失败：${error.message}`;
+                getResult.classList.add('error');
+            }
+        });
+        
+        // 2. POST 请求演示
+        const postBtn = document.getElementById('postBtn');
+        const postUrl = document.getElementById('postUrl');
+        const postData = document.getElementById('postData');
+        const postResult = document.getElementById('postResult');
+        
+        postBtn.addEventListener('click', async () => {
+            try {
+                postResult.textContent = '请求发送中...';
+                const data = JSON.parse(postData.value);
+                const response = await axios.post(postUrl.value, data);
+                postResult.innerHTML = `<div class="http-method method-post">POST</div><div class="request-url">${postUrl.value}</div>\n状态码：${response.status}\n请求数据：\n${JSON.stringify(data, null, 2)}\n响应数据：\n${JSON.stringify(response.data, null, 2)}`;
+                postResult.classList.remove('error');
+            } catch (error) {
+                postResult.textContent = `请求失败：${error.message}`;
+                postResult.classList.add('error');
+            }
+        });
+        
+        // 3. PUT 请求演示
+        const putBtn = document.getElementById('putBtn');
+        const putUrl = document.getElementById('putUrl');
+        const putData = document.getElementById('putData');
+        const putResult = document.getElementById('putResult');
+        
+        putBtn.addEventListener('click', async () => {
+            try {
+                putResult.textContent = '请求发送中...';
+                const data = JSON.parse(putData.value);
+                const response = await axios.put(putUrl.value, data);
+                putResult.innerHTML = `<div class="http-method method-put">PUT</div><div class="request-url">${putUrl.value}</div>\n状态码：${response.status}\n请求数据：\n${JSON.stringify(data, null, 2)}\n响应数据：\n${JSON.stringify(response.data, null, 2)}`;
+                putResult.classList.remove('error');
+            } catch (error) {
+                putResult.textContent = `请求失败：${error.message}`;
+                putResult.classList.add('error');
+            }
+        });
+        
+        // 4. DELETE 请求演示
+        const deleteBtn = document.getElementById('deleteBtn');
+        const deleteUrl = document.getElementById('deleteUrl');
+        const deleteResult = document.getElementById('deleteResult');
+        
+        deleteBtn.addEventListener('click', async () => {
+            try {
+                deleteResult.textContent = '请求发送中...';
+                const response = await axios.delete(deleteUrl.value);
+                deleteResult.innerHTML = `<div class="http-method method-delete">DELETE</div><div class="request-url">${deleteUrl.value}</div>\n状态码：${response.status}\n响应数据：\n${JSON.stringify(response.data, null, 2)}`;
+                deleteResult.classList.remove('error');
+            } catch (error) {
+                deleteResult.textContent = `请求失败：${error.message}`;
+                deleteResult.classList.add('error');
+            }
+        });
+        
+        // 5. 并发请求演示
+        const concurrentBtn = document.getElementById('concurrentBtn');
+        const concurrentUrls = document.getElementById('concurrentUrls');
+        const concurrentResult = document.getElementById('concurrentResult');
+        
+        concurrentBtn.addEventListener('click', async () => {
+            try {
+                concurrentResult.textContent = '请求发送中...';
+                const urls = concurrentUrls.value.trim().split('\n').filter(url => url.trim());
+                const requests = urls.map(url => axios.get(url.trim()));
+                const responses = await axios.all(requests);
+                
+                let resultText = '所有请求成功！\n\n';
+                responses.forEach((response, index) => {
+                    resultText += `${index + 1}. ${urls[index]}\n状态码：${response.status}\n数据条数：${response.data.length}\n\n`;
+                });
+                
+                concurrentResult.textContent = resultText;
+                concurrentResult.classList.remove('error');
+            } catch (error) {
+                concurrentResult.textContent = `请求失败：${error.message}`;
+                concurrentResult.classList.add('error');
+            }
+        });
+        
+        // 6. 错误处理演示
+        const errorBtn = document.getElementById('errorBtn');
+        const errorUrl = document.getElementById('errorUrl');
+        const errorResult = document.getElementById('errorResult');
+        
+        errorBtn.addEventListener('click', async () => {
+            try {
+                errorResult.textContent = '请求发送中...';
+                const response = await axios.get(errorUrl.value);
+                errorResult.innerHTML = `<div class="http-method method-get">GET</div><div class="request-url">${errorUrl.value}</div>\n状态码：${response.status}`;
+                errorResult.classList.remove('error');
+            } catch (error) {
+                if (error.response) {
+                    // 请求已发送，服务器返回了错误状态码
+                    errorResult.innerHTML = `<div class="http-method method-get">GET</div><div class="request-url">${errorUrl.value}</div>\n错误状态码：${error.response.status}\n错误数据：\n${JSON.stringify(error.response.data, null, 2)}`;
+                } else if (error.request) {
+                    // 请求已发送，但没有收到响应
+                    errorResult.textContent = `请求失败：没有收到响应 - ${error.message}`;
+                } else {
+                    // 请求配置出错
+                    errorResult.textContent = `请求失败：${error.message}`;
+                }
+                errorResult.classList.add('error');
+            }
+        });
+        
+        // 7. 超时设置演示
+        const timeoutBtn = document.getElementById('timeoutBtn');
+        const timeoutUrl = document.getElementById('timeoutUrl');
+        const timeoutMs = document.getElementById('timeoutMs');
+        const timeoutResult = document.getElementById('timeoutResult');
+        
+        timeoutBtn.addEventListener('click', async () => {
+            try {
+                timeoutResult.textContent = '请求发送中...';
+                const response = await axios.get(timeoutUrl.value, {
+                    timeout: parseInt(timeoutMs.value)
+                });
+                timeoutResult.innerHTML = `<div class="http-method method-get">GET</div><div class="request-url">${timeoutUrl.value}</div>\n状态码：${response.status}\n响应数据：\n${JSON.stringify(response.data, null, 2)}`;
+                timeoutResult.classList.remove('error');
+            } catch (error) {
+                if (error.code === 'ECONNABORTED') {
+                    timeoutResult.textContent = `请求失败：超时（${timeoutMs.value}ms） - ${error.message}`;
+                } else {
+                    timeoutResult.textContent = `请求失败：${error.message}`;
+                }
+                timeoutResult.classList.add('error');
+            }
+        });
+        
+        // 8. 自定义请求头演示
+        const headersBtn = document.getElementById('headersBtn');
+        const headersUrl = document.getElementById('headersUrl');
+        const headersData = document.getElementById('headersData');
+        const headersResult = document.getElementById('headersResult');
+        
+        headersBtn.addEventListener('click', async () => {
+            try {
+                headersResult.textContent = '请求发送中...';
+                const headers = JSON.parse(headersData.value);
+                const response = await axios.get(headersUrl.value, {
+                    headers: headers
+                });
+                headersResult.innerHTML = `<div class="http-method method-get">GET</div><div class="request-url">${headersUrl.value}</div>\n状态码：${response.status}\n请求头：\n${JSON.stringify(headers, null, 2)}\n响应数据：\n${JSON.stringify(response.data, null, 2)}`;
+                headersResult.classList.remove('error');
+            } catch (error) {
+                headersResult.textContent = `请求失败：${error.message}`;
+                headersResult.classList.add('error');
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>系统通知工具</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+    
+    .container {
+      max-width: 650px;
+      margin: 0 auto;
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 16px;
+      padding: 30px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    }
+    
+    .header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    
+    .header h1 {
+      font-size: 28px;
+      color: #333;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    
+    .header-icon {
+      font-size: 32px;
+    }
+    
+    .header p {
+      color: #666;
+      font-size: 14px;
+    }
+    
+    .card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 20px;
+      border: 1px solid #e0e0e0;
+      transition: box-shadow 0.3s;
+    }
+    
+    .card:hover {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+    
+    .card-title {
+      font-size: 18px;
+      color: #333;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .card-title .icon {
+      font-size: 20px;
+    }
+    
+    .form-group {
+      margin-bottom: 16px;
+    }
+    
+    .form-group label {
+      display: block;
+      font-size: 14px;
+      color: #555;
+      margin-bottom: 8px;
+      font-weight: 500;
+    }
+    
+    .form-input {
+      width: 100%;
+      padding: 12px 16px;
+      font-size: 14px;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      transition: border-color 0.3s, box-shadow 0.3s;
+    }
+    
+    .form-input:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+    
+    .form-textarea {
+      width: 100%;
+      padding: 12px 16px;
+      font-size: 14px;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      resize: vertical;
+      min-height: 80px;
+      font-family: inherit;
+      transition: border-color 0.3s, box-shadow 0.3s;
+    }
+    
+    .form-textarea:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+    
+    .btn {
+      padding: 12px 24px;
+      font-size: 14px;
+      font-weight: 600;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .btn-primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+    }
+    
+    .btn-secondary {
+      background: #e9ecef;
+      color: #495057;
+    }
+    
+    .btn-secondary:hover {
+      background: #dee2e6;
+    }
+    
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none !important;
+    }
+    
+    .action-buttons {
+      display: flex;
+      gap: 12px;
+      margin-top: 20px;
+    }
+    
+    .history-list {
+      max-height: 200px;
+      overflow-y: auto;
+    }
+    
+    .history-item {
+      padding: 12px;
+      background: #f8f9fa;
+      border-radius: 8px;
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .history-item:last-child {
+      margin-bottom: 0;
+    }
+    
+    .history-content {
+      flex: 1;
+    }
+    
+    .history-title {
+      font-weight: 600;
+      color: #333;
+      font-size: 14px;
+      margin-bottom: 4px;
+    }
+    
+    .history-body {
+      color: #666;
+      font-size: 13px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      max-width: 400px;
+    }
+    
+    .history-time {
+      font-size: 12px;
+      color: #999;
+      margin-left: 10px;
+    }
+    
+    .empty-state {
+      text-align: center;
+      padding: 40px;
+      color: #999;
+    }
+    
+    .empty-state-icon {
+      font-size: 48px;
+      margin-bottom: 12px;
+    }
+    
+    .tips {
+      margin-top: 20px;
+      padding: 15px;
+      background: #e3f2fd;
+      border-radius: 8px;
+      border-left: 4px solid #2196f3;
+    }
+    
+    .tips h3 {
+      font-size: 14px;
+      color: #1976d2;
+      margin-bottom: 8px;
+    }
+    
+    .tips ul {
+      margin-left: 18px;
+      color: #555;
+      font-size: 13px;
+      line-height: 1.8;
+    }
+    
+    .toast {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: #333;
+      color: white;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-size: 14px;
+      z-index: 1001;
+      opacity: 0;
+      transition: all 0.3s ease;
+    }
+    
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+    
+    .toast.success {
+      background: #4caf50;
+    }
+    
+    .toast.error {
+      background: #f44336;
+    }
+    
+    .preset-buttons {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+    
+    .preset-btn {
+      padding: 6px 12px;
+      font-size: 12px;
+      background: #f0f0f0;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .preset-btn:hover {
+      background: #e0e0e0;
+      border-color: #667eea;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>
+        <span class="header-icon">🔔</span>
+        系统通知工具
+      </h1>
+      <p>发送和管理系统通知消息</p>
+    </div>
+    
+    <div class="card">
+      <h2 class="card-title">
+        <span class="icon">✏️</span>
+        发送通知
+      </h2>
+      
+      <div class="preset-buttons">
+        <button class="preset-btn" onclick="setPreset('欢迎', '欢迎使用系统通知工具！')">欢迎</button>
+        <button class="preset-btn" onclick="setPreset('提醒', '您有一条新消息待查看')">提醒</button>
+        <button class="preset-btn" onclick="setPreset('成功', '操作已成功完成')">成功</button>
+        <button class="preset-btn" onclick="setPreset('警告', '请注意系统资源使用情况')">警告</button>
+      </div>
+      
+      <div class="form-group">
+        <label for="notificationTitle">通知标题</label>
+        <input type="text" id="notificationTitle" class="form-input" placeholder="请输入通知标题">
+      </div>
+      
+      <div class="form-group">
+        <label for="notificationBody">通知内容</label>
+        <textarea id="notificationBody" class="form-textarea" placeholder="请输入通知内容"></textarea>
+      </div>
+      
+      <div class="action-buttons">
+        <button id="sendNotificationBtn" class="btn btn-primary">
+          <span>📤</span>
+          发送通知
+        </button>
+        <button id="clearBtn" class="btn btn-secondary">
+          <span>🔄</span>
+          清空
+        </button>
+      </div>
+    </div>
+    
+    <div class="card">
+      <h2 class="card-title">
+        <span class="icon">📜</span>
+        通知历史
+      </h2>
+      <div id="historyList" class="history-list">
+        <div class="empty-state">
+          <div class="empty-state-icon">📭</div>
+          <p>暂无通知记录</p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="tips">
+      <h3>使用提示</h3>
+      <ul>
+        <li>填写通知标题和内容后点击"发送通知"按钮</li>
+        <li>可以使用快捷预设按钮快速填充常用通知内容</li>
+        <li>发送的通知将显示在系统通知栏中</li>
+        <li>通知历史会保存本次会话中发送的所有通知</li>
+      </ul>
+    </div>
+  </div>
+  
+  <div id="toast" class="toast"></div>
+
+  <script>
+    //created by AI
+    // 系统通知工具 - 渲染进程脚本
+    // 功能：发送系统通知、管理通知历史、使用预设模板
+    //created by AI//
+    
+    const { ipcRenderer } = require('electron');
+    
+    // DOM 元素
+    const notificationTitle = document.getElementById('notificationTitle');
+    const notificationBody = document.getElementById('notificationBody');
+    const sendNotificationBtn = document.getElementById('sendNotificationBtn');
+    const clearBtn = document.getElementById('clearBtn');
+    const historyList = document.getElementById('historyList');
+    const toast = document.getElementById('toast');
+    
+    // 通知历史数组
+    let notificationHistory = [];
+    
+    // 显示提示消息
+    function showToast(message, type = 'success') {
+      toast.textContent = message;
+      toast.className = 'toast ' + type;
+      toast.classList.add('show');
+      
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3000);
+    }
+    
+    // 设置预设内容
+    function setPreset(title, body) {
+      notificationTitle.value = title;
+      notificationBody.value = body;
+    }
+    
+    // 添加通知到历史
+    function addToHistory(title, body) {
+      const notification = {
+        title: title,
+        body: body,
+        time: new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+      };
+      
+      notificationHistory.unshift(notification);
+      
+      // 限制历史记录数量
+      if (notificationHistory.length > 10) {
+        notificationHistory = notificationHistory.slice(0, 10);
+      }
+      
+      renderHistory();
+    }
+    
+    // 渲染历史列表
+    function renderHistory() {
+      if (notificationHistory.length === 0) {
+        historyList.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-icon">📭</div>
+            <p>暂无通知记录</p>
+          </div>
+        `;
+        return;
+      }
+      
+      historyList.innerHTML = notificationHistory.map(item => `
+        <div class="history-item">
+          <div class="history-content">
+            <div class="history-title">${escapeHtml(item.title)}</div>
+            <div class="history-body">${escapeHtml(item.body)}</div>
+          </div>
+          <div class="history-time">${item.time}</div>
+        </div>
+      `).join('');
+    }
+    
+    // HTML 转义函数
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+    
+    // 发送通知按钮事件
+    sendNotificationBtn.addEventListener('click', async () => {
+      const title = notificationTitle.value.trim();
+      const body = notificationBody.value.trim();
+      
+      if (!title) {
+        showToast('请输入通知标题', 'error');
+        notificationTitle.focus();
+        return;
+      }
+      
+      if (!body) {
+        showToast('请输入通知内容', 'error');
+        notificationBody.focus();
+        return;
+      }
+      
+      try {
+        sendNotificationBtn.disabled = true;
+        sendNotificationBtn.innerHTML = '<span>⏳</span> 发送中...';
+        
+        const result = await ipcRenderer.invoke('show-system-notification', {
+          title: title,
+          body: body
+        });
+        
+        if (result.success) {
+          showToast('通知发送成功！');
+          addToHistory(title, body);
+        } else {
+          showToast('通知发送失败: ' + result.error, 'error');
+        }
+      } catch (error) {
+        console.error('发送通知失败:', error);
+        showToast('发送通知失败: ' + error.message, 'error');
+      } finally {
+        sendNotificationBtn.disabled = false;
+        sendNotificationBtn.innerHTML = '<span>📤</span> 发送通知';
+      }
+    });
+    
+    // 清空按钮事件
+    clearBtn.addEventListener('click', () => {
+      notificationTitle.value = '';
+      notificationBody.value = '';
+      notificationTitle.focus();
+      showToast('已清空输入内容');
+    });
+    
+    // 页面加载完成
+    console.log('系统通知工具已加载');
+    notificationTitle.focus();
+  </script>
+</body>
+</html>

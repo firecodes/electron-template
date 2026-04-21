@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>moment三方库演示</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: sans-serif;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: #f5f5f5;
+        }
+        
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #333;
+        }
+        
+        .demo-section {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        h2 {
+            margin-bottom: 15px;
+            color: #1a73e8;
+            font-size: 18px;
+        }
+        
+        .demo-content {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .input-group label {
+            font-weight: bold;
+            color: #555;
+        }
+        
+        .input-group input,
+        .input-group textarea {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .input-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        
+        button {
+            padding: 10px 20px;
+            background-color: #1a73e8;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.2s;
+        }
+        
+        button:hover {
+            background-color: #1557b0;
+        }
+        
+        .result {
+            background-color: #e8f5e9;
+            border: 1px solid #c8e6c9;
+            border-radius: 4px;
+            padding: 15px;
+            margin-top: 10px;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+        
+        .error {
+            background-color: #ffebee;
+            border: 1px solid #ffcdd2;
+            color: #c62828;
+        }
+        
+        .description {
+            color: #666;
+            margin-bottom: 10px;
+            font-style: italic;
+        }
+        
+        .current-time {
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            margin: 10px 0;
+            color: #1a73e8;
+        }
+    </style>
+</head>
+<body>
+    <h1>⏰ moment 三方库功能演示</h1>
+    
+    <div class="demo-section">
+        <h2>1. 获取当前时间</h2>
+        <div class="description">获取并格式化当前日期和时间</div>
+        <div class="demo-content">
+            <button id="nowBtn">获取当前时间</button>
+            <div class="result" id="nowResult">点击按钮获取当前时间...</div>
+            <div class="current-time" id="currentTimeDisplay"></div>
+        </div>
+    </div>
+    
+    <div class="demo-section">
+        <h2>2. 解析日期字符串</h2>
+        <div class="description">将各种格式的日期字符串解析为日期对象</div>
+        <div class="demo-content">
+            <div class="input-group">
+                <label>日期字符串：</label>
+                <input type="text" id="parseInput" placeholder="例如：2024-01-01, 2024/01/01, 2024年1月1日">
+            </div>
+            <div class="input-group">
+                <label>格式（可选）：</label>
+                <input type="text" id="parseFormat" placeholder="例如：YYYY-MM-DD, YYYY/MM/DD">
+            </div>
+            <button id="parseBtn">解析日期</button>
+            <div class="result" id="parseResult">等待输入...</div>
+        </div>
+    </div>
+    
+    <div class="demo-section">
+        <h2>3. 格式化日期输出</h2>
+        <div class="description">将日期格式化为各种字符串格式</div>
+        <div class="demo-content">
+            <div class="input-group">
+                <label>日期：</label>
+                <input type="date" id="formatDateInput" value="2024-01-01">
+            </div>
+            <div class="input-group">
+                <label>时间：</label>
+                <input type="time" id="formatTimeInput" value="12:00">
+            </div>
+            <button id="formatBtn">格式化日期</button>
+            <div class="result" id="formatResult">点击按钮查看结果...</div>
+        </div>
+    </div>
+    
+    <div class="demo-section">
+        <h2>4. 计算时间差</h2>
+        <div class="description">计算两个日期之间的时间差</div>
+        <div class="demo-content">
+            <div class="input-group">
+                <label>开始日期：</label>
+                <input type="date" id="diffStartDate" value="2024-01-01">
+            </div>
+            <div class="input-group">
+                <label>结束日期：</label>
+                <input type="date" id="diffEndDate" value="2024-12-31">
+            </div>
+            <button id="diffBtn">计算时间差</button>
+            <div class="result" id="diffResult">点击按钮查看结果...</div>
+        </div>
+    </div>
+    
+    <div class="demo-section">
+        <h2>5. 添加/减去时间</h2>
+        <div class="description">在日期上添加或减去指定的时间单位</div>
+        <div class="demo-content">
+            <div class="input-group">
+                <label>基础日期：</label>
+                <input type="date" id="addDateInput" value="2024-01-01">
+            </div>
+            <div class="input-group">
+                <label>添加数值：</label>
+                <input type="number" id="addValue" value="1" min="-100" max="100">
+            </div>
+            <div class="input-group">
+                <label>时间单位：</label>
+                <select id="addUnit">
+                    <option value="days">天</option>
+                    <option value="weeks">周</option>
+                    <option value="months">月</option>
+                    <option value="years">年</option>
+                    <option value="hours">小时</option>
+                    <option value="minutes">分钟</option>
+                    <option value="seconds">秒</option>
+                </select>
+            </div>
+            <button id="addBtn">添加时间</button>
+            <button id="subtractBtn">减去时间</button>
+            <div class="result" id="addSubtractResult">点击按钮查看结果...</div>
+        </div>
+    </div>
+    
+    <div class="demo-section">
+        <h2>6. 获取日期的各个部分</h2>
+        <div class="description">获取日期的年、月、日、时、分、秒等部分</div>
+        <div class="demo-content">
+            <div class="input-group">
+                <label>日期：</label>
+                <input type="date" id="partsDateInput" value="2024-06-15">
+            </div>
+            <button id="partsBtn">获取日期部分</button>
+            <div class="result" id="partsResult">点击按钮查看结果...</div>
+        </div>
+    </div>
+    
+    <div class="demo-section">
+        <h2>7. 检查日期是否有效</h2>
+        <div class="description">验证日期是否有效</div>
+        <div class="demo-content">
+            <div class="input-group">
+                <label>日期字符串：</label>
+                <input type="text" id="validInput" placeholder="例如：2024-02-30（无效）, 2024-02-29（有效）">
+            </div>
+            <button id="validBtn">检查有效性</button>
+            <div class="result" id="validResult">等待输入...</div>
+        </div>
+    </div>
+    
+    <div class="demo-section">
+        <h2>8. 比较日期</h2>
+        <div class="description">比较两个日期的大小关系</div>
+        <div class="demo-content">
+            <div class="input-group">
+                <label>日期1：</label>
+                <input type="date" id="compareDate1" value="2024-01-01">
+            </div>
+            <div class="input-group">
+                <label>日期2：</label>
+                <input type="date" id="compareDate2" value="2024-12-31">
+            </div>
+            <button id="compareBtn">比较日期</button>
+            <div class="result" id="compareResult">点击按钮查看结果...</div>
+        </div>
+    </div>
+
+    <script src="node_modules/moment/min/moment.min.js"></script>
+    <script src="node_modules/moment/locale/zh-cn.js"></script>
+    <script>
+        // 调试信息
+        console.log('moment.html loaded');
+        console.log('moment library:', typeof moment);
+        
+        // 设置moment为中文
+        moment.locale('zh-cn');
+        console.log('moment locale set to:', moment.locale());
+        
+        // 更新当前时间显示
+        function updateCurrentTime() {
+            const now = moment();
+            document.getElementById('currentTimeDisplay').textContent = `当前时间：${now.format('YYYY年MM月DD日 HH:mm:ss')}`;
+        }
+        
+        // 每秒更新一次当前时间
+        setInterval(updateCurrentTime, 1000);
+        updateCurrentTime();
+        
+        // 1. 获取当前时间
+        const nowBtn = document.getElementById('nowBtn');
+        const nowResult = document.getElementById('nowResult');
+        
+        nowBtn.addEventListener('click', () => {
+            const now = moment();
+            nowResult.innerHTML = `当前时间：${now.format('YYYY-MM-DD HH:mm:ss')}\n` +
+                                  `中文格式：${now.format('YYYY年MM月DD日 HH点mm分ss秒')}\n` +
+                                  `时间戳：${now.valueOf()}\n` +
+                                  `相对时间：${now.fromNow()}`;
+        });
+        
+        // 2. 解析日期字符串
+        const parseBtn = document.getElementById('parseBtn');
+        const parseInput = document.getElementById('parseInput');
+        const parseFormat = document.getElementById('parseFormat');
+        const parseResult = document.getElementById('parseResult');
+        
+        parseBtn.addEventListener('click', () => {
+            const input = parseInput.value;
+            const format = parseFormat.value;
+            
+            if (!input) {
+                parseResult.textContent = '请输入日期字符串';
+                parseResult.classList.add('error');
+                return;
+            }
+            
+            let date;
+            if (format) {
+                date = moment(input, format);
+            } else {
+                date = moment(input);
+            }
+            
+            if (date.isValid()) {
+                parseResult.innerHTML = `解析成功：\n` +
+                                       `原始输入：${input}\n` +
+                                       `使用格式：${format || '自动检测'}\n` +
+                                       `解析结果：${date.format('YYYY-MM-DD HH:mm:ss')}`;
+                parseResult.classList.remove('error');
+            } else {
+                parseResult.textContent = `解析失败：${input} 不是有效的日期格式`;
+                parseResult.classList.add('error');
+            }
+        });
+        
+        // 3. 格式化日期输出
+        const formatBtn = document.getElementById('formatBtn');
+        const formatDateInput = document.getElementById('formatDateInput');
+        const formatTimeInput = document.getElementById('formatTimeInput');
+        const formatResult = document.getElementById('formatResult');
+        
+        formatBtn.addEventListener('click', () => {
+            const dateStr = formatDateInput.value;
+            const timeStr = formatTimeInput.value;
+            const datetimeStr = `${dateStr} ${timeStr}`;
+            
+            const date = moment(datetimeStr);
+            
+            if (date.isValid()) {
+                formatResult.innerHTML = `格式化结果：\n` +
+                                        `标准格式：${date.format('YYYY-MM-DD HH:mm:ss')}\n` +
+                                        `中文格式：${date.format('YYYY年MM月DD日 HH点mm分ss秒')}\n` +
+                                        `简写格式：${date.format('YYYY/MM/DD')}\n` +
+                                        `时间格式：${date.format('HH:mm:ss')}\n` +
+                                        `ISO格式：${date.format()}\n` +
+                                        `星期几：${date.format('dddd')}\n` +
+                                        `月份：${date.format('MMMM')}`;
+                formatResult.classList.remove('error');
+            } else {
+                formatResult.textContent = '无效的日期或时间';
+                formatResult.classList.add('error');
+            }
+        });
+        
+        // 4. 计算时间差
+        const diffBtn = document.getElementById('diffBtn');
+        const diffStartDate = document.getElementById('diffStartDate');
+        const diffEndDate = document.getElementById('diffEndDate');
+        const diffResult = document.getElementById('diffResult');
+        
+        diffBtn.addEventListener('click', () => {
+            const start = moment(diffStartDate.value);
+            const end = moment(diffEndDate.value);
+            
+            if (start.isValid() && end.isValid()) {
+                const diffYears = end.diff(start, 'years');
+                const diffMonths = end.diff(start, 'months');
+                const diffDays = end.diff(start, 'days');
+                const diffHours = end.diff(start, 'hours');
+                
+                diffResult.innerHTML = `时间差：\n` +
+                                      `${diffYears} 年\n` +
+                                      `${diffMonths} 个月\n` +
+                                      `${diffDays} 天\n` +
+                                      `${diffHours} 小时\n` +
+                                      `相对时间：${start.from(end)}`;
+                diffResult.classList.remove('error');
+            } else {
+                diffResult.textContent = '无效的日期';
+                diffResult.classList.add('error');
+            }
+        });
+        
+        // 5. 添加/减去时间
+        const addBtn = document.getElementById('addBtn');
+        const subtractBtn = document.getElementById('subtractBtn');
+        const addDateInput = document.getElementById('addDateInput');
+        const addValue = document.getElementById('addValue');
+        const addUnit = document.getElementById('addUnit');
+        const addSubtractResult = document.getElementById('addSubtractResult');
+        
+        function modifyDate(add) {
+            const dateStr = addDateInput.value;
+            const value = parseInt(addValue.value);
+            const unit = addUnit.value;
+            
+            if (isNaN(value)) {
+                addSubtractResult.textContent = '请输入有效的数值';
+                addSubtractResult.classList.add('error');
+                return;
+            }
+            
+            const date = moment(dateStr);
+            
+            if (date.isValid()) {
+                let resultDate;
+                if (add) {
+                    resultDate = date.add(value, unit);
+                } else {
+                    resultDate = date.subtract(value, unit);
+                }
+                
+                const action = add ? '添加' : '减去';
+                addSubtractResult.innerHTML = `${action}${value} ${unit}后：\n` +
+                                             `原始日期：${date.format('YYYY-MM-DD')}\n` +
+                                             `结果日期：${resultDate.format('YYYY-MM-DD')}\n` +
+                                             `详细时间：${resultDate.format('YYYY-MM-DD HH:mm:ss')}`;
+                addSubtractResult.classList.remove('error');
+            } else {
+                addSubtractResult.textContent = '无效的日期';
+                addSubtractResult.classList.add('error');
+            }
+        }
+        
+        addBtn.addEventListener('click', () => modifyDate(true));
+        subtractBtn.addEventListener('click', () => modifyDate(false));
+        
+        // 6. 获取日期的各个部分
+        const partsBtn = document.getElementById('partsBtn');
+        const partsDateInput = document.getElementById('partsDateInput');
+        const partsResult = document.getElementById('partsResult');
+        
+        partsBtn.addEventListener('click', () => {
+            const dateStr = partsDateInput.value;
+            const date = moment(dateStr);
+            
+            if (date.isValid()) {
+                partsResult.innerHTML = `日期各部分：\n` +
+                                      `年份：${date.year()}\n` +
+                                      `月份：${date.month() + 1}（${date.format('MMMM')}）\n` +
+                                      `日期：${date.date()}\n` +
+                                      `星期：${date.day()}（${date.format('dddd')}）\n` +
+                                      `一年中的第几天：${date.dayOfYear()}\n` +
+                                      `一年中的第几周：${date.week()}\n` +
+                                      `是否是闰年：${date.isLeapYear() ? '是' : '否'}`;
+                partsResult.classList.remove('error');
+            } else {
+                partsResult.textContent = '无效的日期';
+                partsResult.classList.add('error');
+            }
+        });
+        
+        // 7. 检查日期是否有效
+        const validBtn = document.getElementById('validBtn');
+        const validInput = document.getElementById('validInput');
+        const validResult = document.getElementById('validResult');
+        
+        validBtn.addEventListener('click', () => {
+            const input = validInput.value;
+            
+            if (!input) {
+                validResult.textContent = '请输入日期字符串';
+                validResult.classList.add('error');
+                return;
+            }
+            
+            const date = moment(input);
+            
+            if (date.isValid()) {
+                validResult.innerHTML = `日期有效：\n` +
+                                      `输入：${input}\n` +
+                                      `解析：${date.format('YYYY-MM-DD HH:mm:ss')}`;
+                validResult.classList.remove('error');
+            } else {
+                validResult.innerHTML = `日期无效：\n` +
+                                      `输入：${input}\n` +
+                                      `错误信息：${date.invalidAt()}`;
+                validResult.classList.add('error');
+            }
+        });
+        
+        // 8. 比较日期
+        const compareBtn = document.getElementById('compareBtn');
+        const compareDate1 = document.getElementById('compareDate1');
+        const compareDate2 = document.getElementById('compareDate2');
+        const compareResult = document.getElementById('compareResult');
+        
+        compareBtn.addEventListener('click', () => {
+            const date1 = moment(compareDate1.value);
+            const date2 = moment(compareDate2.value);
+            
+            if (date1.isValid() && date2.isValid()) {
+                let relation;
+                if (date1.isBefore(date2)) {
+                    relation = '早于';
+                } else if (date1.isAfter(date2)) {
+                    relation = '晚于';
+                } else {
+                    relation = '等于';
+                }
+                
+                compareResult.innerHTML = `日期比较：\n` +
+                                        `日期1：${date1.format('YYYY-MM-DD')}\n` +
+                                        `日期2：${date2.format('YYYY-MM-DD')}\n` +
+                                        `关系：日期1 ${relation} 日期2\n` +
+                                        `是否相同：${date1.isSame(date2, 'day') ? '是' : '否'}\n` +
+                                        `相差天数：${Math.abs(date1.diff(date2, 'days'))} 天`;
+                compareResult.classList.remove('error');
+            } else {
+                compareResult.textContent = '无效的日期';
+                compareResult.classList.add('error');
+            }
+        });
+    </script>
+</body>
+</html>

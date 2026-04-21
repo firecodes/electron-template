@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IP地址信息</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 450px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 20px;
+            margin-bottom: 5px;
+        }
+        
+        .header .hostname {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 20px;
+        }
+        
+        .section {
+            margin-bottom: 20px;
+        }
+        
+        .section-title {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .section-title::before {
+            content: '';
+            display: inline-block;
+            width: 4px;
+            height: 14px;
+            background: #667eea;
+            margin-right: 8px;
+            border-radius: 2px;
+        }
+        
+        .ip-card {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .ip-card:last-child {
+            margin-bottom: 0;
+        }
+        
+        .ip-card .interface-name {
+            font-size: 12px;
+            color: #888;
+            margin-bottom: 5px;
+        }
+        
+        .ip-card .ip-address {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            font-family: 'Monaco', 'Menlo', monospace;
+        }
+        
+        .ip-card .ip-details {
+            font-size: 12px;
+            color: #666;
+            margin-top: 8px;
+        }
+        
+        .ip-card .ip-details span {
+            display: inline-block;
+            margin-right: 15px;
+        }
+        
+        .public-ip-section {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            border-radius: 8px;
+            padding: 15px;
+            color: white;
+        }
+        
+        .public-ip-section .label {
+            font-size: 12px;
+            opacity: 0.9;
+            margin-bottom: 5px;
+        }
+        
+        .public-ip-section .ip {
+            font-size: 24px;
+            font-weight: bold;
+            font-family: 'Monaco', 'Menlo', monospace;
+        }
+        
+        .public-ip-section .loading {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+        
+        .public-ip-section .error {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+        
+        .refresh-btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .refresh-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        .refresh-btn:active {
+            transform: translateY(0);
+        }
+        
+        .refresh-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .status-bar {
+            text-align: center;
+            padding: 10px;
+            font-size: 12px;
+            color: #888;
+            border-top: 1px solid #eee;
+        }
+        
+        .loading-spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>IP地址信息</h1>
+            <div class="hostname" id="hostname">正在获取...</div>
+        </div>
+        
+        <div class="content">
+            <div class="section">
+                <div class="section-title">公网IP地址</div>
+                <div class="public-ip-section" id="publicIPSection">
+                    <div class="label">互联网出口IP</div>
+                    <div class="loading" id="publicIPLoading">
+                        <span class="loading-spinner"></span>
+                        正在获取公网IP...
+                    </div>
+                    <div class="ip" id="publicIP" style="display: none;"></div>
+                    <div class="error" id="publicIPError" style="display: none;"></div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <div class="section-title">本地IP地址</div>
+                <div id="localIPList">
+                    <div class="loading" style="text-align: center; padding: 20px; color: #888;">
+                        <span class="loading-spinner"></span>
+                        正在获取本地IP...
+                    </div>
+                </div>
+            </div>
+            
+            <button class="refresh-btn" id="refreshBtn" onclick="refreshIPInfo()">
+                刷新IP信息
+            </button>
+        </div>
+        
+        <div class="status-bar" id="statusBar">
+            平台: <span id="platform">--</span>
+        </div>
+    </div>
+
+    <script>
+        //created by AI
+        // IP地址获取功能 - 通过Electron IPC获取IP地址信息
+        
+        const { ipcRenderer } = require('electron');
+        
+        let isLoading = false;
+        
+        async function getIPInfo() {
+            if (isLoading) return;
+            isLoading = true;
+            
+            const refreshBtn = document.getElementById('refreshBtn');
+            const hostnameEl = document.getElementById('hostname');
+            const publicIPLoading = document.getElementById('publicIPLoading');
+            const publicIPEl = document.getElementById('publicIP');
+            const publicIPError = document.getElementById('publicIPError');
+            const localIPList = document.getElementById('localIPList');
+            const platformEl = document.getElementById('platform');
+            
+            refreshBtn.disabled = true;
+            refreshBtn.textContent = '正在获取...';
+            
+            hostnameEl.textContent = '正在获取...';
+            publicIPLoading.style.display = 'block';
+            publicIPEl.style.display = 'none';
+            publicIPError.style.display = 'none';
+            localIPList.innerHTML = '<div class="loading" style="text-align: center; padding: 20px; color: #888;"><span class="loading-spinner"></span>正在获取本地IP...</div>';
+            
+            try {
+                const result = await ipcRenderer.invoke('get-ip-addresses');
+                
+                if (result.success) {
+                    hostnameEl.textContent = '主机名: ' + result.hostname;
+                    platformEl.textContent = result.platform;
+                    
+                    if (result.publicIP) {
+                        publicIPLoading.style.display = 'none';
+                        publicIPEl.textContent = result.publicIP;
+                        publicIPEl.style.display = 'block';
+                    } else {
+                        publicIPLoading.style.display = 'none';
+                        publicIPError.textContent = '无法获取公网IP（可能无网络连接）';
+                        publicIPError.style.display = 'block';
+                    }
+                    
+                    if (result.ipAddresses && result.ipAddresses.length > 0) {
+                        localIPList.innerHTML = result.ipAddresses.map(ip => `
+                            <div class="ip-card">
+                                <div class="interface-name">${ip.interface}</div>
+                                <div class="ip-address">${ip.address}</div>
+                                <div class="ip-details">
+                                    <span>子网掩码: ${ip.netmask}</span>
+                                    ${ip.mac ? `<span>MAC: ${ip.mac}</span>` : ''}
+                                </div>
+                            </div>
+                        `).join('');
+                    } else {
+                        localIPList.innerHTML = '<div style="text-align: center; padding: 20px; color: #888;">未找到有效的IP地址</div>';
+                    }
+                } else {
+                    hostnameEl.textContent = '获取失败';
+                    publicIPLoading.style.display = 'none';
+                    publicIPError.textContent = result.error || '获取IP信息失败';
+                    publicIPError.style.display = 'block';
+                    localIPList.innerHTML = '<div style="text-align: center; padding: 20px; color: #f44336;">' + (result.error || '获取IP信息失败') + '</div>';
+                }
+            } catch (e) {
+                console.error('获取IP信息失败:', e);
+                hostnameEl.textContent = '获取失败';
+                publicIPLoading.style.display = 'none';
+                publicIPError.textContent = e.message || '获取IP信息失败';
+                publicIPError.style.display = 'block';
+                localIPList.innerHTML = '<div style="text-align: center; padding: 20px; color: #f44336;">' + (e.message || '获取IP信息失败') + '</div>';
+            } finally {
+                isLoading = false;
+                refreshBtn.disabled = false;
+                refreshBtn.textContent = '刷新IP信息';
+            }
+        }
+        
+        function refreshIPInfo() {
+            getIPInfo();
+        }
+        
+        getIPInfo();
+        //created by AI//
+    </script>
+</body>
+</html>

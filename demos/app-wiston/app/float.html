@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8" />
+  <title>hmelectronRD Skill</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-size: 12px;
+      line-height: 1.5;
+      background: #1a1a2e;
+      color: #eee;
+      overflow-y: auto;
+      height: 100vh;
+    }
+    .container {
+      padding: 10px;
+    }
+    h1 {
+      font-size: 14px;
+      color: #00d4ff;
+      border-bottom: 1px solid #333;
+      padding-bottom: 8px;
+      margin-bottom: 10px;
+    }
+    h2 {
+      font-size: 13px;
+      color: #ffd700;
+      margin-top: 12px;
+      margin-bottom: 6px;
+    }
+    h3 {
+      font-size: 12px;
+      color: #98fb98;
+      margin-top: 8px;
+      margin-bottom: 4px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 6px 0;
+      font-size: 10px;
+    }
+    th, td {
+      border: 1px solid #444;
+      padding: 3px 4px;
+      text-align: left;
+    }
+    th {
+      background: #2a2a4e;
+      color: #00d4ff;
+    }
+    code {
+      background: #2a2a4e;
+      padding: 1px 3px;
+      border-radius: 2px;
+      font-size: 10px;
+      color: #ff6b6b;
+    }
+    pre {
+      background: #0d0d1a;
+      padding: 6px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 9px;
+      margin: 6px 0;
+    }
+    pre code {
+      background: none;
+      padding: 0;
+      color: #98fb98;
+    }
+    p {
+      margin: 4px 0;
+    }
+    ul {
+      margin: 4px 0;
+      padding-left: 16px;
+    }
+    li {
+      margin: 2px 0;
+    }
+    .section {
+      margin-bottom: 10px;
+      padding-bottom: 8px;
+      border-bottom: 1px dashed #333;
+    }
+    .highlight {
+      color: #ffd700;
+    }
+    .warning {
+      color: #ff6b6b;
+    }
+    .success {
+      color: #98fb98;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>HarmonyOS Electron 开发技能</h1>
+    
+    <div class="section">
+      <h2>1. 窗口类型</h2>
+      <table>
+        <tr><th>类型</th><th>windowInfo.type</th><th>适用场景</th></tr>
+        <tr><td>主窗</td><td>mainWindow</td><td>应用主窗口</td></tr>
+        <tr><td>子窗</td><td>subWindow</td><td>模态对话框</td></tr>
+        <tr><td>悬浮窗</td><td>floatWindow</td><td>视频通话/屏幕共享</td></tr>
+      </table>
+    </div>
+
+    <div class="section">
+      <h2>2. 窗口特性对比</h2>
+      <table>
+        <tr><th>特性</th><th>主窗</th><th>子窗</th><th>悬浮窗</th></tr>
+        <tr><td>可拖拽位置</td><td>是</td><td>否</td><td>否</td></tr>
+        <tr><td>可改变大小</td><td>是</td><td>否</td><td>否</td></tr>
+        <tr><td>有三键</td><td>是</td><td>否</td><td>否</td></tr>
+        <tr><td>任务栏显示</td><td>是</td><td>否</td><td>否</td></tr>
+        <tr><td>始终置顶</td><td>否</td><td>否</td><td>是</td></tr>
+        <tr><td>支持透明</td><td>否</td><td>是</td><td>是</td></tr>
+      </table>
+    </div>
+
+    <div class="section">
+      <h2>3. 创建悬浮窗示例</h2>
+      <pre><code>const floatWindow = new BrowserWindow({
+  windowInfo: {
+    type: 'floatWindow'
+  },
+  width: 400,
+  height: 300,
+  parent: mainWindow,
+  webPreferences: {
+    nodeIntegration: true,
+    contextIsolation: false
+  }
+});</code></pre>
+    </div>
+
+    <div class="section">
+      <h2>4. webPreferences 配置</h2>
+      <p class="warning">重要：鸿蒙平台必须配置webPreferences</p>
+      <pre><code>webPreferences: {
+  contextIsolation: true,
+  nodeIntegration: false,
+  webSecurity: true
+}</code></pre>
+    </div>
+
+    <div class="section">
+      <h2>5. IPC 通信</h2>
+      <h3>主进程</h3>
+      <pre><code>ipcMain.on('open-float', (event) => {
+  createFloatWindow();
+});</code></pre>
+      <h3>渲染进程</h3>
+      <pre><code>ipcRenderer.send('open-float');</code></pre>
+    </div>
+
+    <div class="section">
+      <h2>6. 常见问题</h2>
+      <ul>
+        <li><span class="warning">启动画面卡住</span>: 检查ready-to-show事件</li>
+        <li><span class="warning">子窗口无响应</span>: 检查IPC处理函数</li>
+        <li><span class="warning">窗口无法调整大小</span>: 添加webPreferences配置</li>
+      </ul>
+    </div>
+
+    <div class="section">
+      <h2>7. 最佳实践</h2>
+      <ul>
+        <li class="success">始终配置webPreferences</li>
+        <li class="success">明确设置窗口属性</li>
+        <li class="success">使用contextIsolation提高安全性</li>
+        <li class="success">添加日志记录调试</li>
+      </ul>
+    </div>
+
+    <div class="section">
+      <h2>8. 自定义标题栏</h2>
+      <p>使用 <code>-webkit-app-region: drag</code> 实现拖拽区域</p>
+      <pre><code>.titlebar {
+  -webkit-app-region: drag;
+}
+.titlebar-controls {
+  -webkit-app-region: no-drag;
+}</code></pre>
+    </div>
+
+    <div class="section">
+      <h2>9. 配置传递链路</h2>
+      <pre><code>Electron主进程
+    ↓
+libadapter.so (适配层)
+    ↓
+WebAbility.ets
+    ↓
+鸿蒙窗口管理器</code></pre>
+    </div>
+
+    <div class="section">
+      <h2>10. 构建部署</h2>
+      <pre><code># 编译
+hvigorw assembleApp
+
+# 部署运行
+powershell -File run.ps1</code></pre>
+    </div>
+
+    <p style="text-align: center; color: #666; margin-top: 10px;">
+      版本: 2.0.0 | 更新: 2026-02-28
+    </p>
+  </div>
+</body>
+</html>

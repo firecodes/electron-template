@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8" />
+  <title>打印预览</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei', sans-serif;
+      background: #f5f5f5;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .toolbar {
+      background: #1a73e8;
+      color: white;
+      padding: 10px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .toolbar h1 {
+      font-size: 18px;
+      font-weight: 500;
+    }
+    
+    .toolbar-buttons {
+      display: flex;
+      gap: 10px;
+    }
+    
+    .toolbar button {
+      background: rgba(255,255,255,0.2);
+      border: 1px solid rgba(255,255,255,0.3);
+      color: white;
+      padding: 8px 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.2s;
+    }
+    
+    .toolbar button:hover {
+      background: rgba(255,255,255,0.3);
+    }
+    
+    .toolbar button.primary {
+      background: #fff;
+      color: #1a73e8;
+      border-color: #fff;
+    }
+    
+    .toolbar button.primary:hover {
+      background: #e8f0fe;
+    }
+    
+    .main-container {
+      flex: 1;
+      display: flex;
+      overflow: hidden;
+    }
+    
+    .sidebar {
+      width: 280px;
+      background: white;
+      border-right: 1px solid #ddd;
+      padding: 20px;
+      overflow-y: auto;
+    }
+    
+    .sidebar h3 {
+      color: #333;
+      margin-bottom: 15px;
+      font-size: 16px;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 10px;
+    }
+    
+    .form-group {
+      margin-bottom: 20px;
+    }
+    
+    .form-group label {
+      display: block;
+      color: #555;
+      font-size: 13px;
+      margin-bottom: 8px;
+    }
+    
+    .form-group select,
+    .form-group input {
+      width: 100%;
+      padding: 8px 12px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+    
+    .form-group select:focus,
+    .form-group input:focus {
+      outline: none;
+      border-color: #1a73e8;
+    }
+    
+    .checkbox-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .checkbox-group input[type="checkbox"] {
+      width: auto;
+    }
+    
+    .checkbox-group label {
+      margin: 0;
+      cursor: pointer;
+    }
+    
+    .btn-select-file {
+      width: 100%;
+      background: #1a73e8;
+      color: white;
+      border: none;
+      padding: 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      margin-bottom: 20px;
+    }
+    
+    .btn-select-file:hover {
+      background: #1557b0;
+    }
+    
+    .preview-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      background: #e0e0e0;
+      padding: 20px;
+      overflow: auto;
+    }
+    
+    .preview-placeholder {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: #666;
+    }
+    
+    .preview-placeholder .icon {
+      font-size: 64px;
+      margin-bottom: 20px;
+    }
+    
+    .preview-placeholder h2 {
+      margin-bottom: 10px;
+      color: #333;
+    }
+    
+    .preview-paper {
+      background: white;
+      width: 210mm;
+      min-height: 297mm;
+      margin: 0 auto;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      padding: 20mm;
+      display: none;
+    }
+    
+    .preview-paper.active {
+      display: block;
+    }
+    
+    .preview-paper.landscape {
+      width: 297mm;
+      min-height: 210mm;
+    }
+    
+    .file-content {
+      font-family: 'Consolas', 'Monaco', monospace;
+      font-size: 12pt;
+      line-height: 1.6;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      color: #000;
+    }
+    
+    .file-info-bar {
+      background: white;
+      padding: 10px 20px;
+      border-bottom: 1px solid #ddd;
+      display: none;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13px;
+      color: #666;
+    }
+    
+    .file-info-bar.active {
+      display: flex;
+    }
+    
+    .print-settings {
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 1px solid #eee;
+    }
+    
+    @media print {
+      .toolbar,
+      .sidebar,
+      .file-info-bar,
+      .preview-placeholder {
+        display: none !important;
+      }
+      
+      body {
+        background: white;
+      }
+      
+      .preview-area {
+        background: white;
+        padding: 0;
+      }
+      
+      .preview-paper {
+        box-shadow: none;
+        margin: 0;
+        width: 100%;
+        min-height: auto;
+        padding: 0;
+      }
+      
+      .preview-paper.active {
+        display: block;
+      }
+    }
+    
+    .page-info {
+      text-align: center;
+      padding: 10px;
+      color: #666;
+      font-size: 12px;
+    }
+  </style>
+</head>
+<body>
+  <div class="toolbar">
+    <h1>打印预览</h1>
+    <div class="toolbar-buttons">
+      <button id="selectFileBtn">选择文件</button>
+      <button id="printBtn" class="primary">打印</button>
+    </div>
+  </div>
+  
+  <div class="file-info-bar" id="fileInfoBar">
+    <span id="fileName">文件名</span>
+    <span id="fileSize">大小: 0 KB</span>
+  </div>
+  
+  <div class="main-container">
+    <div class="sidebar">
+      <h3>文件选择</h3>
+      <button class="btn-select-file" id="selectFileSidebar">选择TXT文件</button>
+      
+      <div class="print-settings">
+        <h3>打印设置</h3>
+        
+        <div class="form-group">
+          <label>纸张大小</label>
+          <select id="paperSize">
+            <option value="A4">A4</option>
+            <option value="A3">A3</option>
+            <option value="A5">A5</option>
+            <option value="Letter">Letter</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label>页面方向</label>
+          <select id="orientation">
+            <option value="portrait">纵向</option>
+            <option value="landscape">横向</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label>字体大小</label>
+          <select id="fontSize">
+            <option value="10pt">10pt (小)</option>
+            <option value="12pt" selected>12pt (标准)</option>
+            <option value="14pt">14pt (大)</option>
+            <option value="16pt">16pt (特大)</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label>边距</label>
+          <select id="margin">
+            <option value="normal">标准</option>
+            <option value="narrow">窄</option>
+            <option value="wide">宽</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <div class="checkbox-group">
+            <input type="checkbox" id="showLineNumber" />
+            <label for="showLineNumber">显示行号</label>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <div class="checkbox-group">
+            <input type="checkbox" id="printBackground" checked />
+            <label for="printBackground">打印背景色</label>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="preview-area" id="previewArea">
+      <div class="preview-placeholder" id="placeholder">
+        <div class="icon">📄</div>
+        <h2>请选择要打印的TXT文件</h2>
+        <p>支持 TXT 文本文件格式</p>
+      </div>
+      
+      <div class="preview-paper" id="previewPaper">
+        <div class="file-content" id="fileContent"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const { ipcRenderer } = require('electron');
+    
+    const selectFileBtn = document.getElementById('selectFileBtn');
+    const selectFileSidebar = document.getElementById('selectFileSidebar');
+    const printBtn = document.getElementById('printBtn');
+    const fileInfoBar = document.getElementById('fileInfoBar');
+    const fileName = document.getElementById('fileName');
+    const fileSize = document.getElementById('fileSize');
+    const placeholder = document.getElementById('placeholder');
+    const previewPaper = document.getElementById('previewPaper');
+    const fileContent = document.getElementById('fileContent');
+    const paperSize = document.getElementById('paperSize');
+    const orientation = document.getElementById('orientation');
+    const fontSize = document.getElementById('fontSize');
+    const margin = document.getElementById('margin');
+    const showLineNumber = document.getElementById('showLineNumber');
+    const printBackground = document.getElementById('printBackground');
+    
+    let currentContent = '';
+    let currentFileName = '';
+    
+    // 选择文件
+    async function selectFile() {
+      console.log('选择文件...');
+      
+      try {
+        const result = await ipcRenderer.invoke('select-print-file');
+        console.log('文件选择结果:', result);
+        
+        if (result.canceled) {
+          return;
+        }
+        
+        currentContent = result.content;
+        currentFileName = result.fileName;
+        
+        // 更新文件信息
+        fileName.textContent = result.fileName;
+        fileSize.textContent = `大小: ${result.fileSize} KB`;
+        fileInfoBar.classList.add('active');
+        
+        // 显示预览
+        displayContent();
+        
+      } catch (error) {
+        console.error('选择文件失败:', error);
+        alert('选择文件失败: ' + error.message);
+      }
+    }
+    
+    // 显示内容
+    function displayContent() {
+      placeholder.style.display = 'none';
+      previewPaper.classList.add('active');
+      
+      let content = escapeHtml(currentContent);
+      
+      // 添加行号
+      if (showLineNumber.checked) {
+        const lines = content.split('\n');
+        content = lines.map((line, index) => {
+          return `<span style="color: #999; margin-right: 10px;">${String(index + 1).padStart(4, ' ')}</span>${line}`;
+        }).join('\n');
+      }
+      
+      fileContent.innerHTML = content;
+      
+      // 应用设置
+      applySettings();
+    }
+    
+    // 应用打印设置
+    function applySettings() {
+      // 字体大小
+      fileContent.style.fontSize = fontSize.value;
+      
+      // 页面方向
+      if (orientation.value === 'landscape') {
+        previewPaper.classList.add('landscape');
+      } else {
+        previewPaper.classList.remove('landscape');
+      }
+      
+      // 边距
+      const margins = {
+        'normal': '20mm',
+        'narrow': '10mm',
+        'wide': '30mm'
+      };
+      previewPaper.style.padding = margins[margin.value];
+      
+      // 纸张大小
+      const sizes = {
+        'A4': { width: '210mm', height: '297mm' },
+        'A3': { width: '297mm', height: '420mm' },
+        'A5': { width: '148mm', height: '210mm' },
+        'Letter': { width: '216mm', height: '279mm' }
+      };
+      
+      const size = sizes[paperSize.value];
+      if (orientation.value === 'landscape') {
+        previewPaper.style.width = size.height;
+        previewPaper.style.minHeight = size.width;
+      } else {
+        previewPaper.style.width = size.width;
+        previewPaper.style.minHeight = size.height;
+      }
+    }
+    
+    // HTML转义
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+    
+    // 打印功能
+    function printContent() {
+      if (!currentContent) {
+        alert('请先选择要打印的文件');
+        return;
+      }
+      
+      console.log('开始打印...');
+      
+      // 发送打印请求到主进程
+      ipcRenderer.send('print-document');
+    }
+    
+    // 事件绑定
+    selectFileBtn.addEventListener('click', selectFile);
+    selectFileSidebar.addEventListener('click', selectFile);
+    printBtn.addEventListener('click', printContent);
+    
+    // 设置变更时更新预览
+    paperSize.addEventListener('change', applySettings);
+    orientation.addEventListener('change', applySettings);
+    fontSize.addEventListener('change', applySettings);
+    margin.addEventListener('change', applySettings);
+    showLineNumber.addEventListener('change', displayContent);
+    
+    console.log('打印预览页面加载完成');
+  </script>
+</body>
+</html>

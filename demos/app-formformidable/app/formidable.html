@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>formidable三方库演示 - 表单文件上传</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: sans-serif;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: #f5f5f5;
+        }
+        
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #333;
+        }
+        
+        .demo-section {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        h2 {
+            margin-bottom: 15px;
+            color: #1a73e8;
+            font-size: 18px;
+        }
+        
+        .demo-content {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .input-group label {
+            font-weight: bold;
+            color: #555;
+        }
+        
+        .input-group input,
+        .input-group textarea {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .input-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        
+        button {
+            padding: 10px 20px;
+            background-color: #1a73e8;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.2s;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        
+        button:hover {
+            background-color: #1557b0;
+        }
+        
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        
+        .result {
+            background-color: #e8f5e9;
+            border: 1px solid #c8e6c9;
+            border-radius: 4px;
+            padding: 15px;
+            margin-top: 10px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .error {
+            background-color: #ffebee;
+            border: 1px solid #ffcdd2;
+            color: #c62828;
+        }
+        
+        .description {
+            color: #666;
+            margin-bottom: 10px;
+            font-style: italic;
+        }
+        
+        .file-info {
+            background-color: #e3f2fd;
+            border: 1px solid #bbdefb;
+            border-radius: 4px;
+            padding: 15px;
+            margin-top: 10px;
+        }
+        
+        .file-info p {
+            margin: 5px 0;
+        }
+        
+        .preview-container {
+            margin-top: 15px;
+            text-align: center;
+        }
+        
+        .preview-container img {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 4px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .upload-area {
+            border: 2px dashed #1a73e8;
+            border-radius: 8px;
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background-color: #f8f9fa;
+        }
+        
+        .upload-area:hover {
+            background-color: #e3f2fd;
+            border-color: #1557b0;
+        }
+        
+        .upload-area.dragover {
+            background-color: #bbdefb;
+            border-color: #0d47a1;
+        }
+        
+        .server-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: #ccc;
+        }
+        
+        .status-indicator.running {
+            background-color: #4caf50;
+        }
+        
+        .status-indicator.stopped {
+            background-color: #f44336;
+        }
+        
+        .api-section {
+            border-left: 3px solid #1a73e8;
+            padding-left: 15px;
+            margin: 15px 0;
+        }
+        
+        .api-section h3 {
+            color: #333;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+        
+        .method-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 3px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-right: 5px;
+        }
+        
+        .method-get { background-color: #61affe; color: white; }
+        .method-post { background-color: #49cc90; color: white; }
+        
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background-color: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+        
+        .progress-bar-fill {
+            height: 100%;
+            background-color: #4caf50;
+            transition: width 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Formidable 三方库功能演示</h1>
+    
+    <div class="demo-section">
+        <h2>1. Formidable 库介绍</h2>
+        <div class="description">
+            Formidable 是一个 Node.js 模块，用于解析表单数据，特别是文件上传。
+            它支持 multipart/form-data 表单，可以处理文件上传和普通表单字段。
+        </div>
+        <div class="demo-content">
+            <div class="result" id="introResult">Formidable 主要功能：
+- 解析 multipart/form-data 表单
+- 处理文件上传（单文件、多文件）
+- 解析普通表单字段
+- 支持文件大小限制
+- 支持文件类型过滤
+- 提供上传进度事件
+
+使用场景：
+- 图片上传
+- 文档上传
+- 头像上传
+- 批量文件上传</div>
+        </div>
+    </div>
+    
+    <div class="demo-section">
+        <h2>2. 创建文件上传服务器</h2>
+        <div class="description">启动一个 Express 服务器，使用 Formidable 处理文件上传请求</div>
+        <div class="demo-content">
+            <div class="input-group">
+                <label>服务器端口：</label>
+                <input type="number" id="serverPort" value="3001" placeholder="输入端口号">
+            </div>
+            <div class="server-status">
+                <div class="status-indicator" id="serverStatus"></div>
+                <span id="serverStatusText">服务器未启动</span>
+            </div>
+            <div>
+                <button id="startServerBtn">启动服务器</button>
+                <button id="stopServerBtn" disabled>停止服务器</button>
+            </div>
+            <div class="result" id="serverResult">点击按钮启动文件上传服务器...</div>
+        </div>
+    </div>
+    
+    <div class="demo-section">
+        <h2>3. 文件上传测试</h2>
+        <div class="description">选择文件并上传到服务器，测试 Formidable 的文件解析功能</div>
+        <div class="demo-content">
+            <div class="upload-area" id="uploadArea">
+                <p>📁 点击选择文件或拖拽文件到此处</p>
+                <p style="color: #666; font-size: 12px;">支持图片、文档等文件类型</p>
+                <input type="file" id="fileInput" style="display: none;">
+            </div>
+            <div class="file-info" id="fileInfo" style="display: none;">
+                <p><strong>文件名：</strong><span id="fileName"></span></p>
+                <p><strong>文件大小：</strong><span id="fileSize"></span></p>
+                <p><strong>文件类型：</strong><span id="fileType"></span></p>
+            </div>
+            <div class="preview-container" id="previewContainer" style="display: none;">
+                <img id="imagePreview" src="" alt="预览">
+            </div>
+            <div class="progress-bar" id="progressBar" style="display: none;">
+                <div class="progress-bar-fill" id="progressFill" style="width: 0%;">0%</div>
+            </div>
+            <div>
+                <button id="uploadFileBtn" disabled>上传文件</button>
+                <button id="clearFileBtn">清除选择</button>
+            </div>
+            <div class="result" id="uploadResult">请先启动服务器，然后选择文件上传...</div>
+        </div>
+    </div>
+    
+    <div class="demo-section">
+        <h2>4. 表单字段上传测试</h2>
+        <div class="description">测试 Formidable 解析普通表单字段的功能</div>
+        <div class="demo-content">
+            <div class="input-group">
+                <label>用户名：</label>
+                <input type="text" id="userName" placeholder="输入用户名" value="张三">
+            </div>
+            <div class="input-group">
+                <label>邮箱：</label>
+                <input type="email" id="userEmail" placeholder="输入邮箱" value="zhangsan@example.com">
+            </div>
+            <div class="input-group">
+                <label>备注：</label>
+                <textarea id="userRemark" placeholder="输入备注">这是一个测试备注</textarea>
+            </div>
+            <div>
+                <button id="submitFormBtn" disabled>提交表单</button>
+            </div>
+            <div class="result" id="formResult">请先启动服务器，然后提交表单...</div>
+        </div>
+    </div>
+    
+    <div class="demo-section">
+        <h2>5. 图片上传测试</h2>
+        <div class="description">专门测试图片文件的上传功能</div>
+        <div class="demo-content">
+            <div class="input-group">
+                <label>选择图片：</label>
+                <input type="file" id="imageInput" accept="image/*">
+            </div>
+            <div class="preview-container" id="imagePreviewContainer" style="display: none;">
+                <img id="selectedImagePreview" src="" alt="预览">
+            </div>
+            <div>
+                <button id="uploadImageBtn" disabled>上传图片</button>
+            </div>
+            <div class="result" id="imageResult">请先启动服务器，然后选择图片上传...</div>
+        </div>
+    </div>
+    
+    <div class="demo-section">
+        <h2>6. API 接口说明</h2>
+        <div class="description">服务器提供的 API 接口</div>
+        <div class="demo-content">
+            <div class="api-section">
+                <h3><span class="method-badge method-post">POST</span> /upload - 文件上传</h3>
+                <p>上传单个文件，返回文件信息</p>
+            </div>
+            <div class="api-section">
+                <h3><span class="method-badge method-post">POST</span> /upload-form - 表单提交</h3>
+                <p>提交表单字段，返回解析后的字段数据</p>
+            </div>
+            <div class="api-section">
+                <h3><span class="method-badge method-post">POST</span> /upload-image - 图片上传</h3>
+                <p>专门处理图片上传，支持预览</p>
+            </div>
+            <div class="api-section">
+                <h3><span class="method-badge method-get">GET</span> /files - 获取已上传文件列表</h3>
+                <p>获取服务器上已上传的文件列表</p>
+                <button id="getFilesBtn" disabled style="margin-top: 10px;">获取文件列表</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        //created by AI
+        // Formidable 三方库功能演示
+        // 实现表单文件上传和参数上传功能
+        const { ipcRenderer } = require('electron');
+        const http = require('http');
+        const path = require('path');
+        
+        let server = null;
+        let serverPort = 3001;
+        let selectedFile = null;
+        let selectedImage = null;
+        let uploadedFiles = [];
+        
+        // DOM 元素
+        const serverPortInput = document.getElementById('serverPort');
+        const startServerBtn = document.getElementById('startServerBtn');
+        const stopServerBtn = document.getElementById('stopServerBtn');
+        const serverStatus = document.getElementById('serverStatus');
+        const serverStatusText = document.getElementById('serverStatusText');
+        const serverResult = document.getElementById('serverResult');
+        
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const fileInfo = document.getElementById('fileInfo');
+        const fileName = document.getElementById('fileName');
+        const fileSize = document.getElementById('fileSize');
+        const fileType = document.getElementById('fileType');
+        const previewContainer = document.getElementById('previewContainer');
+        const imagePreview = document.getElementById('imagePreview');
+        const progressBar = document.getElementById('progressBar');
+        const progressFill = document.getElementById('progressFill');
+        const uploadFileBtn = document.getElementById('uploadFileBtn');
+        const clearFileBtn = document.getElementById('clearFileBtn');
+        const uploadResult = document.getElementById('uploadResult');
+        
+        const submitFormBtn = document.getElementById('submitFormBtn');
+        const formResult = document.getElementById('formResult');
+        
+        const imageInput = document.getElementById('imageInput');
+        const imagePreviewContainer = document.getElementById('imagePreviewContainer');
+        const selectedImagePreview = document.getElementById('selectedImagePreview');
+        const uploadImageBtn = document.getElementById('uploadImageBtn');
+        const imageResult = document.getElementById('imageResult');
+        
+        const getFilesBtn = document.getElementById('getFilesBtn');
+        
+        // 更新服务器状态
+        function updateServerStatus(isRunning) {
+            if (isRunning) {
+                serverStatus.classList.remove('stopped');
+                serverStatus.classList.add('running');
+                serverStatusText.textContent = `服务器运行中 (端口: ${serverPort})`;
+                startServerBtn.disabled = true;
+                stopServerBtn.disabled = false;
+                uploadFileBtn.disabled = !selectedFile;
+                submitFormBtn.disabled = false;
+                uploadImageBtn.disabled = !selectedImage;
+                getFilesBtn.disabled = false;
+            } else {
+                serverStatus.classList.remove('running');
+                serverStatus.classList.add('stopped');
+                serverStatusText.textContent = '服务器未启动';
+                startServerBtn.disabled = false;
+                stopServerBtn.disabled = true;
+                uploadFileBtn.disabled = true;
+                submitFormBtn.disabled = true;
+                uploadImageBtn.disabled = true;
+                getFilesBtn.disabled = true;
+            }
+        }
+        
+        // 发送 HTTP 请求
+        function makeRequest(method, path, data, file) {
+            return new Promise((resolve, reject) => {
+                const boundary = '----FormBoundary' + Date.now();
+                const options = {
+                    hostname: 'localhost',
+                    port: serverPort,
+                    path: path,
+                    method: method,
+                    headers: {
+                        'Content-Type': 'multipart/form-data; boundary=' + boundary
+                    }
+                };
+                
+                const req = http.request(options, (res) => {
+                    let responseData = '';
+                    res.on('data', (chunk) => {
+                        responseData += chunk;
+                    });
+                    res.on('end', () => {
+                        try {
+                            resolve({
+                                statusCode: res.statusCode,
+                                headers: res.headers,
+                                body: JSON.parse(responseData)
+                            });
+                        } catch (e) {
+                            resolve({
+                                statusCode: res.statusCode,
+                                headers: res.headers,
+                                body: responseData
+                            });
+                        }
+                    });
+                });
+                
+                req.on('error', (e) => {
+                    reject(e);
+                });
+                
+                // 构建 multipart/form-data 请求体
+                let body = '';
+                
+                // 添加普通字段
+                if (data) {
+                    for (const [key, value] of Object.entries(data)) {
+                        body += '--' + boundary + '\r\n';
+                        body += 'Content-Disposition: form-data; name="' + key + '"\r\n\r\n';
+                        body += value + '\r\n';
+                    }
+                }
+                
+                // 添加文件
+                if (file) {
+                    body += '--' + boundary + '\r\n';
+                    body += 'Content-Disposition: form-data; name="file"; filename="' + file.name + '"\r\n';
+                    body += 'Content-Type: ' + file.type + '\r\n\r\n';
+                }
+                
+                if (file) {
+                    // 将字符串部分写入请求
+                    req.write(body);
+                    // 写入文件数据
+                    req.write(file.data);
+                    // 结束请求
+                    req.write('\r\n--' + boundary + '--\r\n');
+                } else {
+                    body += '--' + boundary + '--\r\n';
+                    req.write(body);
+                }
+                
+                req.end();
+            });
+        }
+        
+        // 启动服务器
+        startServerBtn.addEventListener('click', () => {
+            serverPort = parseInt(serverPortInput.value) || 3001;
+            
+            try {
+                const express = require('express');
+                const formidable = require('formidable');
+                const app = express();
+                
+                // CORS 支持
+                app.use((req, res, next) => {
+                    res.header('Access-Control-Allow-Origin', '*');
+                    res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+                    res.header('Access-Control-Allow-Headers', 'Content-Type');
+                    next();
+                });
+                
+                // 首页
+                app.get('/', (req, res) => {
+                    res.json({
+                        message: 'Formidable 文件上传服务器运行正常',
+                        timestamp: new Date().toISOString(),
+                        endpoints: [
+                            'POST /upload - 文件上传',
+                            'POST /upload-form - 表单提交',
+                            'POST /upload-image - 图片上传',
+                            'GET /files - 获取文件列表'
+                        ]
+                    });
+                });
+                
+                // 文件上传接口
+                app.post('/upload', (req, res) => {
+                    const form = formidable({
+                        multiples: true,
+                        keepExtensions: true,
+                        maxFileSize: 10 * 1024 * 1024, // 10MB
+                    });
+                    
+                    form.parse(req, (err, fields, files) => {
+                        if (err) {
+                            console.error('Formidable parse error:', err);
+                            res.status(500).json({
+                                success: false,
+                                error: err.message
+                            });
+                            return;
+                        }
+                        
+                        const fileInfo = files.file ? files.file[0] : files.file;
+                        if (fileInfo) {
+                            const uploadedFile = {
+                                name: fileInfo.originalFilename,
+                                size: fileInfo.size,
+                                type: fileInfo.mimetype,
+                                path: fileInfo.filepath,
+                                uploadTime: new Date().toISOString()
+                            };
+                            uploadedFiles.push(uploadedFile);
+                            
+                            res.json({
+                                success: true,
+                                message: '文件上传成功',
+                                file: uploadedFile,
+                                fields: fields
+                            });
+                        } else {
+                            res.status(400).json({
+                                success: false,
+                                message: '未找到上传的文件'
+                            });
+                        }
+                    });
+                });
+                
+                // 表单提交接口
+                app.post('/upload-form', (req, res) => {
+                    const form = formidable({
+                        multiples: true
+                    });
+                    
+                    form.parse(req, (err, fields, files) => {
+                        if (err) {
+                            console.error('Formidable parse error:', err);
+                            res.status(500).json({
+                                success: false,
+                                error: err.message
+                            });
+                            return;
+                        }
+                        
+                        res.json({
+                            success: true,
+                            message: '表单解析成功',
+                            fields: fields,
+                            filesCount: Object.keys(files).length,
+                            timestamp: new Date().toISOString()
+                        });
+                    });
+                });
+                
+                // 图片上传接口
+                app.post('/upload-image', (req, res) => {
+                    const form = formidable({
+                        multiples: false,
+                        keepExtensions: true,
+                        maxFileSize: 5 * 1024 * 1024, // 5MB
+                        filter: function({name, originalFilename, mimetype}) {
+                            // 只接受图片
+                            return mimetype && mimetype.includes('image');
+                        }
+                    });
+                    
+                    form.parse(req, (err, fields, files) => {
+                        if (err) {
+                            console.error('Formidable parse error:', err);
+                            res.status(500).json({
+                                success: false,
+                                error: err.message
+                            });
+                            return;
+                        }
+                        
+                        const fileInfo = files.file ? files.file[0] : files.file;
+                        if (fileInfo) {
+                            const uploadedFile = {
+                                name: fileInfo.originalFilename,
+                                size: fileInfo.size,
+                                type: fileInfo.mimetype,
+                                path: fileInfo.filepath,
+                                uploadTime: new Date().toISOString()
+                            };
+                            uploadedFiles.push(uploadedFile);
+                            
+                            res.json({
+                                success: true,
+                                message: '图片上传成功',
+                                file: uploadedFile
+                            });
+                        } else {
+                            res.status(400).json({
+                                success: false,
+                                message: '未找到上传的图片或图片格式不支持'
+                            });
+                        }
+                    });
+                });
+                
+                // 获取文件列表
+                app.get('/files', (req, res) => {
+                    res.json({
+                        success: true,
+                        count: uploadedFiles.length,
+                        files: uploadedFiles
+                    });
+                });
+                
+                server = app.listen(serverPort, () => {
+                    updateServerStatus(true);
+                    serverResult.textContent = `Formidable 文件上传服务器已启动!\n\n访问地址: http://localhost:${serverPort}\n\n可用接口:\n- POST /upload - 文件上传\n- POST /upload-form - 表单提交\n- POST /upload-image - 图片上传\n- GET /files - 获取文件列表\n\nFormidable 配置:\n- 最大文件大小: 10MB\n- 支持多文件上传\n- 保留文件扩展名`;
+                    serverResult.classList.remove('error');
+                });
+                
+                server.on('error', (e) => {
+                    if (e.code === 'EADDRINUSE') {
+                        serverResult.textContent = `端口 ${serverPort} 已被占用，请尝试其他端口`;
+                        serverResult.classList.add('error');
+                    } else {
+                        serverResult.textContent = `服务器启动失败: ${e.message}`;
+                        serverResult.classList.add('error');
+                    }
+                    updateServerStatus(false);
+                });
+                
+            } catch (error) {
+                serverResult.textContent = `加载模块失败: ${error.message}\n\n请确保已安装 express 和 formidable: npm install express formidable`;
+                serverResult.classList.add('error');
+            }
+        });
+        
+        // 停止服务器
+        stopServerBtn.addEventListener('click', () => {
+            if (server) {
+                server.close(() => {
+                    server = null;
+                    updateServerStatus(false);
+                    serverResult.textContent = '服务器已停止';
+                    serverResult.classList.remove('error');
+                });
+            }
+        });
+        
+        // 文件选择区域点击
+        uploadArea.addEventListener('click', () => {
+            fileInput.click();
+        });
+        
+        // 拖拽上传
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+        
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+        
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleFileSelect(files[0]);
+            }
+        });
+        
+        // 文件选择
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                handleFileSelect(e.target.files[0]);
+            }
+        });
+        
+        // 处理文件选择
+        async function handleFileSelect(file) {
+            selectedFile = file;
+            fileName.textContent = file.name;
+            fileSize.textContent = (file.size / 1024).toFixed(2) + ' KB';
+            fileType.textContent = file.type || '未知';
+            fileInfo.style.display = 'block';
+            
+            // 如果是图片，显示预览
+            if (file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    imagePreview.src = e.target.result;
+                    previewContainer.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            } else {
+                previewContainer.style.display = 'none';
+            }
+            
+            uploadFileBtn.disabled = !server;
+        }
+        
+        // 清除文件选择
+        clearFileBtn.addEventListener('click', () => {
+            selectedFile = null;
+            fileInput.value = '';
+            fileInfo.style.display = 'none';
+            previewContainer.style.display = 'none';
+            progressBar.style.display = 'none';
+            uploadFileBtn.disabled = true;
+            uploadResult.textContent = '已清除选择的文件';
+        });
+        
+        // 上传文件
+        uploadFileBtn.addEventListener('click', async () => {
+            if (!selectedFile || !server) return;
+            
+            progressBar.style.display = 'block';
+            progressFill.style.width = '0%';
+            progressFill.textContent = '0%';
+            
+            try {
+                // 读取文件
+                const reader = new FileReader();
+                reader.onload = async (e) => {
+                    try {
+                        const fileData = Buffer.from(e.target.result);
+                        
+                        progressFill.style.width = '50%';
+                        progressFill.textContent = '50%';
+                        
+                        const result = await makeRequest('POST', '/upload', {}, {
+                            name: selectedFile.name,
+                            type: selectedFile.type,
+                            data: fileData
+                        });
+                        
+                        progressFill.style.width = '100%';
+                        progressFill.textContent = '100%';
+                        
+                        uploadResult.textContent = `文件上传成功!\n\n状态码: ${result.statusCode}\n\n响应:\n${JSON.stringify(result.body, null, 2)}`;
+                        uploadResult.classList.remove('error');
+                    } catch (error) {
+                        uploadResult.textContent = `上传失败: ${error.message}`;
+                        uploadResult.classList.add('error');
+                        progressBar.style.display = 'none';
+                    }
+                };
+                reader.readAsArrayBuffer(selectedFile);
+            } catch (error) {
+                uploadResult.textContent = `上传失败: ${error.message}`;
+                uploadResult.classList.add('error');
+                progressBar.style.display = 'none';
+            }
+        });
+        
+        // 提交表单
+        submitFormBtn.addEventListener('click', async () => {
+            if (!server) return;
+            
+            const formData = {
+                username: document.getElementById('userName').value,
+                email: document.getElementById('userEmail').value,
+                remark: document.getElementById('userRemark').value
+            };
+            
+            try {
+                const result = await makeRequest('POST', '/upload-form', formData);
+                formResult.textContent = `表单提交成功!\n\n状态码: ${result.statusCode}\n\n提交的数据:\n${JSON.stringify(formData, null, 2)}\n\n响应:\n${JSON.stringify(result.body, null, 2)}`;
+                formResult.classList.remove('error');
+            } catch (error) {
+                formResult.textContent = `提交失败: ${error.message}`;
+                formResult.classList.add('error');
+            }
+        });
+        
+        // 图片选择
+        imageInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                selectedImage = e.target.files[0];
+                
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    selectedImagePreview.src = e.target.result;
+                    imagePreviewContainer.style.display = 'block';
+                };
+                reader.readAsDataURL(selectedImage);
+                
+                uploadImageBtn.disabled = !server;
+            }
+        });
+        
+        // 上传图片
+        uploadImageBtn.addEventListener('click', async () => {
+            if (!selectedImage || !server) return;
+            
+            try {
+                const reader = new FileReader();
+                reader.onload = async (e) => {
+                    try {
+                        const fileData = Buffer.from(e.target.result);
+                        const result = await makeRequest('POST', '/upload-image', {}, {
+                            name: selectedImage.name,
+                            type: selectedImage.type,
+                            data: fileData
+                        });
+                        
+                        imageResult.textContent = `图片上传成功!\n\n状态码: ${result.statusCode}\n\n响应:\n${JSON.stringify(result.body, null, 2)}`;
+                        imageResult.classList.remove('error');
+                    } catch (error) {
+                        imageResult.textContent = `上传失败: ${error.message}`;
+                        imageResult.classList.add('error');
+                    }
+                };
+                reader.readAsArrayBuffer(selectedImage);
+            } catch (error) {
+                imageResult.textContent = `上传失败: ${error.message}`;
+                imageResult.classList.add('error');
+            }
+        });
+        
+        // 获取文件列表
+        getFilesBtn.addEventListener('click', async () => {
+            if (!server) return;
+            
+            try {
+                const options = {
+                    hostname: 'localhost',
+                    port: serverPort,
+                    path: '/files',
+                    method: 'GET'
+                };
+                
+                const req = http.request(options, (res) => {
+                    let data = '';
+                    res.on('data', (chunk) => { data += chunk; });
+                    res.on('end', () => {
+                        try {
+                            const result = JSON.parse(data);
+                            serverResult.textContent = `已上传文件列表:\n\n${JSON.stringify(result, null, 2)}`;
+                            serverResult.classList.remove('error');
+                        } catch (e) {
+                            serverResult.textContent = `解析响应失败: ${e.message}`;
+                            serverResult.classList.add('error');
+                        }
+                    });
+                });
+                
+                req.on('error', (e) => {
+                    serverResult.textContent = `请求失败: ${e.message}`;
+                    serverResult.classList.add('error');
+                });
+                
+                req.end();
+            } catch (error) {
+                serverResult.textContent = `获取文件列表失败: ${error.message}`;
+                serverResult.classList.add('error');
+            }
+        });
+        //created by AI//
+    </script>
+</body>
+</html>

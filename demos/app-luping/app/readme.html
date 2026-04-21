@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>关于 - Harmony PC 开发者社区</title>
+    <link rel="stylesheet" href="readme.css">
+</head>
+<body>
+    <div class="readme-container">
+        <header class="readme-header">
+            <img src="electron_white.png" alt="Logo" class="readme-logo">
+            <h1 class="readme-title">Harmony PC 开发者社区</h1>
+            <p class="readme-subtitle">基于 Electron 框架的 HarmonyOS 应用</p>
+        </header>
+
+        <main class="readme-content">
+            <section class="readme-section">
+                <h2>📋 项目简介</h2>
+                <p>这是一个基于 HarmonyOS Electron 框架开发的桌面应用，为开发者提供一个社区交流平台。</p>
+                <p><strong>AI 提示词</strong>：这是一个鸿蒙版本的electron框架开发的应用工程，请在主頁面上用electron實現一個類似這個截圖的界面</p>
+            </section>
+
+            <section class="readme-section">
+                <h2>🚀 技术架构</h2>
+                <ul class="feature-list">
+                    <li><strong>Electron 框架</strong>：提供跨平台桌面应用支持</li>
+                    <li><strong>HarmonyOS</strong>：华为鸿蒙操作系统</li>
+                    <li><strong>Web 技术</strong>：HTML5 + CSS3 + JavaScript</li>
+                    <li><strong>双模块设计</strong>：electron 主模块 + web_engine 引擎模块</li>
+                </ul>
+            </section>
+
+            <section class="readme-section">
+                <h2>✨ 主要功能</h2>
+                <ul class="feature-list">
+                    <li>社区首页浏览</li>
+                    <li>文章列表查看</li>
+                    <li>搜索功能</li>
+                    <li>专栏精选</li>
+                    <li>社区信息展示</li>
+                </ul>
+            </section>
+
+            <section class="readme-section">
+                <h2>📁 项目结构</h2>
+                <div class="code-block">
+                    <pre>ohos_hap347/
+├── electron/          # Electron 主应用模块
+│   ├── src/main/ets/  # ETS 代码
+│   │   ├── entryability/  # 入口能力
+│   │   ├── pages/         # 页面
+│   │   └── process/       # 进程管理
+│   └── build/        # 构建输出
+├── web_engine/        # Web 引擎模块
+│   ├── src/main/ets/  # ETS 适配器代码
+│   │   ├── ability/       # 能力实现
+│   │   ├── adapter/       # 平台适配器
+│   │   └── components/    # 组件
+│   ├── src/main/resources/resfile/resources/app/  # Web 应用资源
+│   │   ├── main.js        # Electron 主进程
+│   │   ├── index.html     # 主页面
+│   │   ├── readme.html    # 关于页面
+│   │   ├── styles.css     # 主页面样式
+│   │   ├── readme.css     # 关于页面样式
+│   │   └── package.json   # 应用配置
+│   └── build/        # 构建输出
+├── AppScope/          # 应用全局配置
+│   └── resources/    # 全局资源
+├── docs/              # 项目文档
+├── hvigor/            # 构建配置
+└── oh_modules/        # 依赖模块</pre>
+                </div>
+            </section>
+
+            <section class="readme-section">
+                <h2>🛠️ 开发说明</h2>
+                <p>本项目使用 DevEco Studio 进行开发，遵循 HarmonyOS 应用开发规范。</p>
+            </section>
+
+            <section class="readme-section">
+                <h2>📄 许可证</h2>
+                <p>Copyright (c) 2024 Huawei Device Co., Ltd. All rights reserved.</p>
+                <p>Use of this source code is governed by a BSD-style license.</p>
+            </section>
+        </main>
+
+        <footer class="readme-footer">
+            <p>版本: 1.0.0</p>
+            <p>© 2024 Harmony PC 开发者社区</p>
+        </footer>
+    </div>
+</body>
+</html>

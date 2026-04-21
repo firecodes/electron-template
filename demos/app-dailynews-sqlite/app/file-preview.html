@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8" />
+  <title>文件预览</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei', sans-serif;
+      background: #f5f5f5;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .toolbar {
+      background: #1a73e8;
+      color: white;
+      padding: 10px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .toolbar h1 {
+      font-size: 18px;
+      font-weight: 500;
+    }
+    
+    .toolbar button {
+      background: rgba(255,255,255,0.2);
+      border: 1px solid rgba(255,255,255,0.3);
+      color: white;
+      padding: 8px 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.2s;
+    }
+    
+    .toolbar button:hover {
+      background: rgba(255,255,255,0.3);
+    }
+    
+    .content-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding: 20px;
+      overflow: hidden;
+    }
+    
+    .upload-section {
+      background: white;
+      border-radius: 8px;
+      padding: 40px;
+      text-align: center;
+      border: 2px dashed #ddd;
+      margin-bottom: 20px;
+    }
+    
+    .upload-section h2 {
+      color: #333;
+      margin-bottom: 15px;
+    }
+    
+    .upload-section p {
+      color: #666;
+      margin-bottom: 20px;
+    }
+    
+    .upload-btn {
+      background: #1a73e8;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.2s;
+    }
+    
+    .upload-btn:hover {
+      background: #1557b0;
+    }
+    
+    .preview-section {
+      flex: 1;
+      background: white;
+      border-radius: 8px;
+      overflow: hidden;
+      display: none;
+      flex-direction: column;
+    }
+    
+    .preview-section.active {
+      display: flex;
+    }
+    
+    .preview-header {
+      padding: 15px 20px;
+      border-bottom: 1px solid #eee;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .preview-header h3 {
+      color: #333;
+      font-size: 16px;
+    }
+    
+    .preview-header .file-info {
+      color: #666;
+      font-size: 12px;
+    }
+    
+    .preview-content {
+      flex: 1;
+      overflow: auto;
+      padding: 20px;
+    }
+    
+    .pdf-viewer {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+    
+    .text-viewer {
+      background: #fafafa;
+      padding: 20px;
+      border-radius: 4px;
+      font-family: 'Consolas', 'Monaco', monospace;
+      font-size: 14px;
+      line-height: 1.6;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      color: #333;
+    }
+    
+    .error-message {
+      color: #d32f2f;
+      text-align: center;
+      padding: 40px;
+    }
+    
+    .file-icon {
+      font-size: 48px;
+      margin-bottom: 10px;
+    }
+    
+    .supported-formats {
+      margin-top: 15px;
+      font-size: 12px;
+      color: #999;
+    }
+    
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: #666;
+    }
+    
+    .loading-spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #1a73e8;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 15px;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <div class="toolbar">
+    <h1>文件上传预览</h1>
+    <button id="selectFileBtn">选择文件</button>
+  </div>
+  
+  <div class="content-area">
+    <div id="uploadSection" class="upload-section">
+      <div class="file-icon">📄</div>
+      <h2>上传文件预览</h2>
+      <p>支持 TXT 文件格式</p>
+      <button class="upload-btn" id="uploadBtn">点击选择文件</button>
+      <p class="supported-formats">支持格式: TXT</p>
+    </div>
+    
+    <div id="previewSection" class="preview-section">
+      <div class="preview-header">
+        <div>
+          <h3 id="fileName">文件名</h3>
+          <span class="file-info" id="fileInfo">文件信息</span>
+        </div>
+        <button id="newFileBtn">选择新文件</button>
+      </div>
+      <div class="preview-content" id="previewContent">
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const { ipcRenderer } = require('electron');
+    
+    const uploadSection = document.getElementById('uploadSection');
+    const previewSection = document.getElementById('previewSection');
+    const uploadBtn = document.getElementById('uploadBtn');
+    const selectFileBtn = document.getElementById('selectFileBtn');
+    const newFileBtn = document.getElementById('newFileBtn');
+    const fileName = document.getElementById('fileName');
+    const fileInfo = document.getElementById('fileInfo');
+    const previewContent = document.getElementById('previewContent');
+    
+    // 选择文件按钮 - 通过IPC调用主进程
+    async function selectFile() {
+      console.log('请求选择文件...');
+      
+      // 显示加载状态
+      uploadSection.innerHTML = `
+        <div class="loading">
+          <div class="loading-spinner"></div>
+          <p>正在读取文件...</p>
+        </div>
+      `;
+      
+      try {
+        // 调用主进程选择文件
+        const result = await ipcRenderer.invoke('select-preview-file');
+        console.log('文件选择结果:', result);
+        
+        if (result.canceled) {
+          // 用户取消或出错，恢复上传界面
+          resetUploadSection();
+          if (result.error) {
+            showError(result.error);
+          }
+          return;
+        }
+        
+        // 处理文件数据
+        handleFileData(result);
+      } catch (error) {
+        console.error('选择文件失败:', error);
+        resetUploadSection();
+        showError('选择文件失败: ' + error.message);
+      }
+    }
+    
+    // 重置上传区域
+    function resetUploadSection() {
+      uploadSection.innerHTML = `
+        <div class="file-icon">📄</div>
+        <h2>上传文件预览</h2>
+        <p>支持 PDF 和 TXT 文件格式</p>
+        <button class="upload-btn" id="uploadBtn">点击选择文件</button>
+        <p class="supported-formats">支持格式: PDF, TXT</p>
+      `;
+      
+      // 重新绑定事件
+      document.getElementById('uploadBtn').addEventListener('click', selectFile);
+    }
+    
+    // 处理文件数据
+    function handleFileData(data) {
+      console.log('处理文件数据:', data.fileName, data.fileType, data.fileSize);
+      
+      // 更新文件信息
+      fileName.textContent = data.fileName;
+      fileInfo.textContent = `大小: ${data.fileSize} KB | 格式: ${data.fileType.toUpperCase()}`;
+      
+      // 显示TXT内容
+      previewTXT(data.content);
+      
+      // 显示预览区域
+      uploadSection.style.display = 'none';
+      previewSection.classList.add('active');
+    }
+    
+    // 预览TXT
+    function previewTXT(textContent) {
+      console.log('预览TXT文件');
+      
+      previewContent.innerHTML = `
+        <div class="text-viewer">${escapeHtml(textContent)}</div>
+      `;
+    }
+    
+    // HTML转义
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+    
+    // 显示错误
+    function showError(message) {
+      previewContent.innerHTML = `
+        <div class="error-message">
+          <h3>❌ 错误</h3>
+          <p>${message}</p>
+        </div>
+      `;
+      uploadSection.style.display = 'none';
+      previewSection.classList.add('active');
+    }
+    
+    // 绑定事件
+    uploadBtn.addEventListener('click', selectFile);
+    selectFileBtn.addEventListener('click', selectFile);
+    newFileBtn.addEventListener('click', selectFile);
+    
+    console.log('文件预览页面加载完成');
+  </script>
+</body>
+</html>

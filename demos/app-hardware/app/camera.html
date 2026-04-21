@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8" />
+  <title>摄像头调用测试</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei', sans-serif;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+      min-height: 100vh;
+      color: #fff;
+      padding: 20px;
+    }
+    
+    .camera-container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    
+    .header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    
+    .header h1 {
+      font-size: 24px;
+      color: #4ecca3;
+      text-shadow: 0 0 10px rgba(78, 204, 163, 0.5);
+      margin-bottom: 10px;
+    }
+    
+    .header p {
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 14px;
+    }
+    
+    .video-section {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    
+    .video-wrapper {
+      position: relative;
+      width: 100%;
+      background: #000;
+      border-radius: 8px;
+      overflow: hidden;
+      aspect-ratio: 16/9;
+    }
+    
+    #cameraVideo {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    
+    .video-overlay {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      background: rgba(0, 0, 0, 0.6);
+      border-radius: 20px;
+      font-size: 12px;
+    }
+    
+    .recording-indicator {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #666;
+    }
+    
+    .recording-indicator.active {
+      background: #e74c3c;
+      animation: pulse 1s infinite;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+    
+    .timer-display {
+      font-family: 'Courier New', monospace;
+      font-size: 14px;
+      color: #4ecca3;
+    }
+    
+    .no-camera {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      color: rgba(255, 255, 255, 0.5);
+    }
+    
+    .no-camera svg {
+      width: 64px;
+      height: 64px;
+      margin-bottom: 15px;
+      opacity: 0.5;
+    }
+    
+    .controls {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    
+    .control-btn {
+      padding: 12px 30px;
+      font-size: 14px;
+      cursor: pointer;
+      border: none;
+      border-radius: 25px;
+      transition: all 0.3s ease;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .control-btn:disabled {
+      background: #666;
+      cursor: not-allowed;
+      opacity: 0.5;
+    }
+    
+    .start-btn {
+      background: linear-gradient(135deg, #4ecca3 0%, #2ecc71 100%);
+      color: #1a1a2e;
+    }
+    
+    .start-btn:hover:not(:disabled) {
+      transform: scale(1.05);
+      box-shadow: 0 0 20px rgba(78, 204, 163, 0.5);
+    }
+    
+    .capture-btn {
+      background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+      color: white;
+    }
+    
+    .capture-btn:hover:not(:disabled) {
+      transform: scale(1.05);
+      box-shadow: 0 0 20px rgba(52, 152, 219, 0.5);
+    }
+    
+    .record-btn {
+      background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+      color: white;
+    }
+    
+    .record-btn:hover:not(:disabled) {
+      transform: scale(1.05);
+      box-shadow: 0 0 20px rgba(231, 76, 60, 0.5);
+    }
+    
+    .stop-btn {
+      background: linear-gradient(135deg, #f39c12 0%, #d68910 100%);
+      color: #1a1a2e;
+    }
+    
+    .stop-btn:hover:not(:disabled) {
+      transform: scale(1.05);
+      box-shadow: 0 0 20px rgba(243, 156, 18, 0.5);
+    }
+    
+    .gallery-section {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 20px;
+    }
+    
+    .gallery-section h2 {
+      font-size: 18px;
+      margin-bottom: 15px;
+      color: #4ecca3;
+    }
+    
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 15px;
+    }
+    
+    .gallery-item {
+      position: relative;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 8px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .gallery-item:hover {
+      transform: scale(1.05);
+      border: 2px solid #4ecca3;
+    }
+    
+    .gallery-item img,
+    .gallery-item video {
+      width: 100%;
+      aspect-ratio: 16/9;
+      object-fit: cover;
+    }
+    
+    .gallery-item-overlay {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 8px;
+      background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .gallery-item-type {
+      font-size: 10px;
+      padding: 2px 6px;
+      border-radius: 10px;
+      background: rgba(78, 204, 163, 0.3);
+    }
+    
+    .gallery-item-actions {
+      display: flex;
+      gap: 5px;
+    }
+    
+    .gallery-item-actions button {
+      background: rgba(255, 255, 255, 0.2);
+      border: none;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 12px;
+    }
+    
+    .gallery-item-actions button:hover {
+      background: rgba(255, 255, 255, 0.4);
+    }
+    
+    .empty-gallery {
+      text-align: center;
+      padding: 40px;
+      color: rgba(255, 255, 255, 0.5);
+    }
+    
+    .debug-panel {
+      background: rgba(0, 0, 0, 0.8);
+      border-radius: 8px;
+      padding: 15px;
+      margin-top: 20px;
+      font-family: monospace;
+      font-size: 12px;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+    
+    .debug-panel h3 {
+      color: #4ecca3;
+      margin-bottom: 10px;
+    }
+    
+    .debug-log {
+      color: #aaa;
+      margin: 5px 0;
+      word-break: break-all;
+    }
+    
+    .debug-log.success {
+      color: #4ecca3;
+    }
+    
+    .debug-log.error {
+      color: #e74c3c;
+    }
+    
+    .debug-log.info {
+      color: #3498db;
+    }
+    
+    .message {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 15px 30px;
+      border-radius: 8px;
+      font-size: 14px;
+      z-index: 1000;
+      display: none;
+    }
+    
+    .message.success {
+      background: #2ecc71;
+      color: white;
+    }
+    
+    .message.error {
+      background: #e74c3c;
+      color: white;
+    }
+    
+    .message.warning {
+      background: #f39c12;
+      color: #1a1a2e;
+    }
+    
+    .message.show {
+      display: block;
+      animation: slideDown 0.3s ease;
+    }
+    
+    @keyframes slideDown {
+      from { top: -50px; opacity: 0; }
+      to { top: 20px; opacity: 1; }
+    }
+    
+    .permission-dialog {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+    
+    .permission-dialog-content {
+      background: #1a1a2e;
+      border-radius: 12px;
+      padding: 30px;
+      max-width: 400px;
+      text-align: center;
+    }
+    
+    .permission-dialog-content h2 {
+      color: #4ecca3;
+      margin-bottom: 15px;
+    }
+    
+    .permission-dialog-content p {
+      color: rgba(255, 255, 255, 0.7);
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+    
+    .permission-dialog-content button {
+      padding: 12px 30px;
+      border: none;
+      border-radius: 25px;
+      cursor: pointer;
+      font-weight: bold;
+      margin: 5px;
+    }
+    
+    .permission-dialog-content .primary-btn {
+      background: linear-gradient(135deg, #4ecca3 0%, #2ecc71 100%);
+      color: #1a1a2e;
+    }
+    
+    .permission-dialog-content .secondary-btn {
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+    }
+    
+    .preview-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.9);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+    
+    .preview-modal.active {
+      display: flex;
+    }
+    
+    .preview-modal-content {
+      max-width: 90%;
+      max-height: 90%;
+    }
+    
+    .preview-modal-content img,
+    .preview-modal-content video {
+      max-width: 100%;
+      max-height: 80vh;
+      border-radius: 8px;
+    }
+    
+    .preview-modal-close {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: rgba(255, 255, 255, 0.2);
+      border: none;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      cursor: pointer;
+      color: white;
+      font-size: 20px;
+    }
+    
+    .preview-modal-close:hover {
+      background: rgba(255, 255, 255, 0.4);
+    }
+  </style>
+</head>
+<body>
+  <div class="camera-container">
+    <div class="header">
+      <h1>摄像头调用测试</h1>
+      <p>支持实时预览、拍照和视频录制功能，下面生成的图片视频可保存</p>
+    </div>
+    
+    <div class="video-section">
+      <div class="video-wrapper">
+        <video id="cameraVideo" autoplay playsinline muted></video>
+        <div class="video-overlay">
+          <div id="recordingIndicator" class="recording-indicator"></div>
+          <span id="timerDisplay" class="timer-display">00:00:00</span>
+        </div>
+        <div id="noCameraMessage" class="no-camera">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/>
+          </svg>
+          <p>摄像头未启动</p>
+          <p style="font-size: 12px; margin-top: 5px;">点击下方"启动摄像头"按钮开始</p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="controls">
+      <button id="startBtn" class="control-btn start-btn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/>
+        </svg>
+        启动摄像头
+      </button>
+      <button id="captureBtn" class="control-btn capture-btn" disabled>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+          <circle cx="12" cy="12" r="3.2"/>
+          <path d="M9 2L7.17 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2h-3.17L15 2H9zm3 15c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z"/>
+        </svg>
+        拍照
+      </button>
+      <button id="recordBtn" class="control-btn record-btn" disabled>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+          <circle cx="12" cy="12" r="10"/>
+        </svg>
+        开始录制
+      </button>
+      <button id="stopBtn" class="control-btn stop-btn" disabled>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+          <rect x="4" y="4" width="16" height="16" rx="2"/>
+        </svg>
+        停止录制
+      </button>
+    </div>
+    
+    <div class="gallery-section">
+      <h2>已捕获的媒体文件</h2>
+      <div id="galleryGrid" class="gallery-grid">
+        <div class="empty-gallery">
+          <p>暂无捕获的媒体文件</p>
+          <p style="font-size: 12px; margin-top: 5px;">拍照或录制后文件将显示在这里</p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="debug-panel">
+      <h3>调试信息</h3>
+      <div id="debugLog"></div>
+    </div>
+  </div>
+  
+  <div id="permissionDialog" class="permission-dialog" style="display: none;">
+    <div class="permission-dialog-content">
+      <h2>摄像头权限申请</h2>
+      <p>此功能需要使用摄像头权限才能正常工作。请点击"授予权限"按钮，在系统弹出的对话框中允许摄像头访问。</p>
+      <div>
+        <button id="grantPermissionBtn" class="primary-btn">授予权限</button>
+        <button id="cancelPermissionBtn" class="secondary-btn">取消</button>
+      </div>
+    </div>
+  </div>
+  
+  <div id="previewModal" class="preview-modal">
+    <button id="closePreviewBtn" class="preview-modal-close">X</button>
+    <div class="preview-modal-content">
+      <img id="previewImage" style="display: none;">
+      <video id="previewVideo" controls style="display: none;"></video>
+    </div>
+  </div>
+  
+  <div id="message" class="message"></div>
+  
+  <canvas id="captureCanvas" style="display: none;"></canvas>
+
+  <script>
+    const { ipcRenderer } = require('electron');
+    
+    //created by AI
+    // 调试日志函数 - 在页面上显示调试信息
+    var debugLogEl = document.getElementById('debugLog');
+    
+    function debugLog(message, type) {
+      type = type || 'info';
+      var logEntry = document.createElement('div');
+      logEntry.className = 'debug-log ' + type;
+      logEntry.textContent = '[' + new Date().toLocaleTimeString() + '] ' + message;
+      debugLogEl.appendChild(logEntry);
+      debugLogEl.scrollTop = debugLogEl.scrollHeight;
+      console.log(message);
+    }
+    
+    function debugLogClear() {
+      debugLogEl.innerHTML = '';
+    }
+    
+    // 摄像头权限请求 - 通过 IPC 调用主进程的 systemPreferences.requestSystemPermission
+    function requestHarmonyOSCameraPermission() {
+      return new Promise(function(resolve) {
+        debugLog('=== 通过 IPC 请求摄像头权限 ===', 'info');
+        
+        ipcRenderer.invoke('request-camera-permission').then(function(result) {
+          debugLog('权限请求原始结果: ' + JSON.stringify(result), 'info');
+          
+          if (result.error) {
+            debugLog('权限请求错误: ' + result.error, 'error');
+            resolve(false);
+            return;
+          }
+          
+          debugLog('权限状态: ' + result.status, result.granted ? 'success' : 'error');
+          
+          // 只有 'granted' 才算成功
+          resolve(result.granted);
+        }).catch(function(error) {
+          debugLog('权限请求出错: ' + error.message, 'error');
+          resolve(false);
+        });
+      });
+    }
+    
+    // 打开权限设置页面
+    function openPermissionSettings() {
+      ipcRenderer.invoke('open-permission-settings');
+    }
+    //created by AI//
+    
+    let cameraStream = null;
+    let mediaRecorder = null;
+    let recordedChunks = [];
+    let recordingStartTime = null;
+    let timerInterval = null;
+    let mediaFiles = [];
+    
+    const cameraVideo = document.getElementById('cameraVideo');
+    const startBtn = document.getElementById('startBtn');
+    const captureBtn = document.getElementById('captureBtn');
+    const recordBtn = document.getElementById('recordBtn');
+    const stopBtn = document.getElementById('stopBtn');
+    const recordingIndicator = document.getElementById('recordingIndicator');
+    const timerDisplay = document.getElementById('timerDisplay');
+    const noCameraMessage = document.getElementById('noCameraMessage');
+    const galleryGrid = document.getElementById('galleryGrid');
+    const permissionDialog = document.getElementById('permissionDialog');
+    const grantPermissionBtn = document.getElementById('grantPermissionBtn');
+    const cancelPermissionBtn = document.getElementById('cancelPermissionBtn');
+    const previewModal = document.getElementById('previewModal');
+    const previewImage = document.getElementById('previewImage');
+    const previewVideo = document.getElementById('previewVideo');
+    const closePreviewBtn = document.getElementById('closePreviewBtn');
+    const captureCanvas = document.getElementById('captureCanvas');
+    const messageEl = document.getElementById('message');
+    
+    function showMessage(text, type) {
+      messageEl.textContent = text;
+      messageEl.className = 'message ' + type + ' show';
+      
+      setTimeout(function() {
+        messageEl.classList.remove('show');
+      }, 3000);
+    }
+    
+    function formatTime(ms) {
+      const totalSeconds = Math.floor(ms / 1000);
+      const hours = Math.floor(totalSeconds / 3600);
+      const minutes = Math.floor((totalSeconds % 3600) / 60);
+      const seconds = totalSeconds % 60;
+      
+      return [hours, minutes, seconds]
+        .map(function(v) { return v.toString().padStart(2, '0'); })
+        .join(':');
+    }
+    
+    function startTimer() {
+      recordingStartTime = Date.now();
+      timerInterval = setInterval(function() {
+        const elapsed = Date.now() - recordingStartTime;
+        timerDisplay.textContent = formatTime(elapsed);
+      }, 1000);
+    }
+    
+    function stopTimer() {
+      if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+      }
+      timerDisplay.textContent = '00:00:00';
+    }
+    
+    function updateGallery() {
+      if (mediaFiles.length === 0) {
+        galleryGrid.innerHTML = '<div class="empty-gallery"><p>暂无捕获的媒体文件</p><p style="font-size: 12px; margin-top: 5px;">拍照或录制后文件将显示在这里</p></div>';
+        return;
+      }
+      
+      galleryGrid.innerHTML = '';
+      
+      mediaFiles.forEach(function(file, index) {
+        const item = document.createElement('div');
+        item.className = 'gallery-item';
+        
+        if (file.type === 'image') {
+          const img = document.createElement('img');
+          img.src = file.url;
+          item.appendChild(img);
+        } else {
+          const video = document.createElement('video');
+          video.src = file.url;
+          video.muted = true;
+          item.appendChild(video);
+        }
+        
+        const overlay = document.createElement('div');
+        overlay.className = 'gallery-item-overlay';
+        
+        const typeLabel = document.createElement('span');
+        typeLabel.className = 'gallery-item-type';
+        typeLabel.textContent = file.type === 'image' ? '照片' : '视频';
+        overlay.appendChild(typeLabel);
+        
+        const actions = document.createElement('div');
+        actions.className = 'gallery-item-actions';
+        
+        const previewBtn = document.createElement('button');
+        previewBtn.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>';
+        previewBtn.title = '预览';
+        previewBtn.onclick = function() { previewMedia(file); };
+        actions.appendChild(previewBtn);
+        
+        const saveBtn = document.createElement('button');
+        saveBtn.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M19 12v7H5v-7H3v7c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-7h-2zm-6 .67l2.59-2.58L17 11.5l-5 5-5-5 1.41-1.41L11 12.67V3h2z"/></svg>';
+        saveBtn.title = '保存';
+        saveBtn.onclick = function() { saveMedia(file); };
+        actions.appendChild(saveBtn);
+        
+        overlay.appendChild(actions);
+        item.appendChild(overlay);
+        
+        galleryGrid.appendChild(item);
+      });
+    }
+    
+    function previewMedia(file) {
+      if (file.type === 'image') {
+        previewImage.src = file.url;
+        previewImage.style.display = 'block';
+        previewVideo.style.display = 'none';
+      } else {
+        previewVideo.src = file.url;
+        previewVideo.style.display = 'block';
+        previewImage.style.display = 'none';
+      }
+      previewModal.classList.add('active');
+    }
+    
+    async function saveMedia(file) {
+      try {
+        const buffer = await file.blob.arrayBuffer();
+        const ext = file.type === 'image' ? 'png' : 'webm';
+        const defaultName = file.type === 'image' 
+          ? 'camera-photo-' + Date.now() + '.png'
+          : 'camera-video-' + Date.now() + '.webm';
+        
+        const result = await ipcRenderer.invoke('save-camera-media', {
+          defaultName: defaultName,
+          type: file.type
+        });
+        
+        if (result && !result.canceled && result.filePath) {
+          await ipcRenderer.invoke('write-camera-file', {
+            filePath: result.filePath,
+            buffer: buffer
+          });
+          
+          showMessage('文件已保存到: ' + result.filePath, 'success');
+        }
+      } catch (error) {
+        console.error('Failed to save media:', error);
+        showMessage('保存失败: ' + error.message, 'error');
+      }
+    }
+    
+    //created by AI
+    // 启动摄像头 - 先请求权限再启动
+    async function startCamera() {
+      debugLogClear();
+      debugLog('开始启动摄像头...', 'info');
+      showMessage('正在请求摄像头权限...', 'warning');
+      
+      // 先通过 IPC 请求鸿蒙权限
+      debugLog('请求摄像头权限...', 'info');
+      var permissionGranted = await requestHarmonyOSCameraPermission();
+      debugLog('权限结果: ' + (permissionGranted ? '已授权' : '未授权'), permissionGranted ? 'success' : 'error');
+      
+      if (!permissionGranted) {
+        showMessage('摄像头权限被拒绝，请在系统设置中允许访问', 'error');
+        debugLog('权限被拒绝，可以前往系统设置开启', 'error');
+        // 可以选择打开设置页面
+        // openPermissionSettings();
+        return;
+      }
+      
+      debugLog('调用 getUserMedia...', 'info');
+      try {
+        cameraStream = await navigator.mediaDevices.getUserMedia({
+          video: {
+            width: { ideal: 1280 },
+            height: { ideal: 720 },
+            facingMode: 'user'
+          },
+          audio: false
+        });
+        
+        debugLog('getUserMedia 成功', 'success');
+        cameraVideo.srcObject = cameraStream;
+        noCameraMessage.style.display = 'none';
+        cameraVideo.style.display = 'block';
+        
+        startBtn.textContent = '关闭摄像头';
+        startBtn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M21 6.5l-4 4V7c0-.55-.45-1-1-1H9.82L21 17.18V6.5zM3.27 2L2 3.27 4.73 6H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.21 0 .39-.08.54-.18L19.73 21 21 19.73 3.27 2z"/></svg>关闭摄像头';
+        captureBtn.disabled = false;
+        recordBtn.disabled = false;
+        
+        showMessage('摄像头已启动', 'success');
+        debugLog('摄像头启动完成', 'success');
+        
+      } catch (error) {
+        debugLog('启动摄像头失败: ' + error.name + ' - ' + error.message, 'error');
+        console.error('Failed to start camera:', error);
+        
+        if (error.name === 'NotAllowedError') {
+          showMessage('摄像头权限被拒绝，请在系统设置中允许访问', 'error');
+        } else if (error.name === 'NotFoundError') {
+          showMessage('未找到摄像头设备', 'error');
+        } else if (error.name === 'AbortError') {
+          showMessage('摄像头启动超时，请检查设备是否正常', 'error');
+        } else {
+          showMessage('启动摄像头失败: ' + error.message, 'error');
+        }
+      }
+    }
+    //created by AI//
+    
+    function stopCamera() {
+      if (cameraStream) {
+        cameraStream.getTracks().forEach(function(track) { track.stop(); });
+        cameraStream = null;
+      }
+      
+      cameraVideo.srcObject = null;
+      noCameraMessage.style.display = 'flex';
+      cameraVideo.style.display = 'none';
+      
+      startBtn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/></svg>启动摄像头';
+      captureBtn.disabled = true;
+      recordBtn.disabled = true;
+      stopBtn.disabled = true;
+      
+      if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+        mediaRecorder.stop();
+        stopTimer();
+        recordingIndicator.classList.remove('active');
+      }
+      
+      showMessage('摄像头已关闭', 'success');
+    }
+    
+    function capturePhoto() {
+      if (!cameraStream) {
+        showMessage('请先启动摄像头', 'error');
+        return;
+      }
+      
+      const videoTrack = cameraStream.getVideoTracks()[0];
+      const settings = videoTrack.getSettings();
+      
+      captureCanvas.width = settings.width || 1280;
+      captureCanvas.height = settings.height || 720;
+      
+      const ctx = captureCanvas.getContext('2d');
+      ctx.drawImage(cameraVideo, 0, 0, captureCanvas.width, captureCanvas.height);
+      
+      captureCanvas.toBlob(function(blob) {
+        const url = URL.createObjectURL(blob);
+        mediaFiles.unshift({
+          type: 'image',
+          url: url,
+          blob: blob,
+          timestamp: Date.now()
+        });
+        
+        updateGallery();
+        showMessage('照片已捕获', 'success');
+      }, 'image/png');
+    }
+    
+    function startRecording() {
+      if (!cameraStream) {
+        showMessage('请先启动摄像头', 'error');
+        return;
+      }
+      
+      try {
+        recordedChunks = [];
+        
+        mediaRecorder = new MediaRecorder(cameraStream, {
+          mimeType: 'video/webm;codecs=vp9,opus'
+        });
+        
+        mediaRecorder.ondataavailable = function(event) {
+          if (event.data.size > 0) {
+            recordedChunks.push(event.data);
+          }
+        };
+        
+        mediaRecorder.onstop = function() {
+          const blob = new Blob(recordedChunks, { type: 'video/webm' });
+          const url = URL.createObjectURL(blob);
+          
+          mediaFiles.unshift({
+            type: 'video',
+            url: url,
+            blob: blob,
+            timestamp: Date.now()
+          });
+          
+          updateGallery();
+          showMessage('视频录制完成', 'success');
+        };
+        
+        mediaRecorder.start(1000);
+        
+        startTimer();
+        recordingIndicator.classList.add('active');
+        
+        recordBtn.disabled = true;
+        stopBtn.disabled = false;
+        captureBtn.disabled = true;
+        
+        showMessage('录制已开始', 'success');
+        
+      } catch (error) {
+        console.error('Failed to start recording:', error);
+        showMessage('录制失败: ' + error.message, 'error');
+      }
+    }
+    
+    function stopRecording() {
+      if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+        mediaRecorder.stop();
+        stopTimer();
+        recordingIndicator.classList.remove('active');
+        
+        recordBtn.disabled = false;
+        stopBtn.disabled = true;
+        captureBtn.disabled = false;
+        
+        showMessage('录制已停止', 'success');
+      }
+    }
+    
+    startBtn.addEventListener('click', function() {
+      if (cameraStream) {
+        stopCamera();
+      } else {
+        startCamera();
+      }
+    });
+    
+    captureBtn.addEventListener('click', capturePhoto);
+    recordBtn.addEventListener('click', startRecording);
+    stopBtn.addEventListener('click', stopRecording);
+    
+    closePreviewBtn.addEventListener('click', function() {
+      previewModal.classList.remove('active');
+      previewVideo.pause();
+    });
+    
+    previewModal.addEventListener('click', function(e) {
+      if (e.target === previewModal) {
+        previewModal.classList.remove('active');
+        previewVideo.pause();
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>硬件信息</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+    
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 16px;
+      padding: 30px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    }
+    
+    .header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    
+    .header h1 {
+      font-size: 28px;
+      color: #333;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    
+    .header-icon {
+      font-size: 32px;
+    }
+    
+    .header p {
+      color: #666;
+      font-size: 14px;
+    }
+    
+    .card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 20px;
+      border: 1px solid #e0e0e0;
+      transition: box-shadow 0.3s;
+    }
+    
+    .card:hover {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+    
+    .card-title {
+      font-size: 18px;
+      color: #333;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 600;
+    }
+    
+    .card-title .icon {
+      font-size: 20px;
+    }
+    
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+    
+    .info-item {
+      padding: 12px 16px;
+      background: #f8f9fa;
+      border-radius: 8px;
+      border-left: 4px solid #667eea;
+    }
+    
+    .info-item.full-width {
+      grid-column: 1 / -1;
+    }
+    
+    .info-label {
+      font-size: 12px;
+      color: #666;
+      margin-bottom: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    .info-value {
+      font-size: 16px;
+      color: #333;
+      font-weight: 600;
+      word-break: break-all;
+    }
+    
+    .btn {
+      padding: 12px 24px;
+      font-size: 14px;
+      font-weight: 600;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .btn-primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+    }
+    
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none !important;
+    }
+    
+    .action-buttons {
+      display: flex;
+      gap: 12px;
+      margin-top: 20px;
+      justify-content: center;
+    }
+    
+    .error-message {
+      background: #f8d7da;
+      color: #721c24;
+      padding: 16px;
+      border-radius: 8px;
+      margin: 20px 0;
+      text-align: center;
+    }
+    
+    .hidden {
+      display: none;
+    }
+    
+    .tips {
+      margin-top: 20px;
+      padding: 15px;
+      background: #e3f2fd;
+      border-radius: 8px;
+      border-left: 4px solid #2196f3;
+    }
+    
+    .tips h3 {
+      font-size: 14px;
+      color: #1976d2;
+      margin-bottom: 8px;
+    }
+    
+    .tips ul {
+      margin-left: 18px;
+      color: #555;
+      font-size: 13px;
+      line-height: 1.8;
+    }
+    
+    .toast {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: #333;
+      color: white;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-size: 14px;
+      z-index: 1001;
+      opacity: 0;
+      transition: all 0.3s ease;
+    }
+    
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+    
+    .toast.success {
+      background: #4caf50;
+    }
+    
+    .toast.error {
+      background: #f44336;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>
+        <span class="header-icon">💻</span>
+        硬件信息
+      </h1>
+      <p>查看设备型号、系统版本及硬件配置</p>
+    </div>
+    
+    <div id="errorSection" class="error-message hidden">
+      <p id="errorText"></p>
+    </div>
+    
+    <div class="card">
+      <h2 class="card-title">
+        <span class="icon">📱</span>
+        基础设备信息
+      </h2>
+      <div class="info-grid">
+        <div class="info-item">
+          <div class="info-label">设备型号</div>
+          <div class="info-value" id="deviceModel">--</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">设备类型</div>
+          <div class="info-value" id="deviceType">--</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">系统版本</div>
+          <div class="info-value" id="osVersion">--</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">厂商信息</div>
+          <div class="info-value" id="manufacturer">--</div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="card">
+      <h2 class="card-title">
+        <span class="icon">💾</span>
+        存储信息
+      </h2>
+      <div class="info-grid">
+        <div class="info-item">
+          <div class="info-label">总内存</div>
+          <div class="info-value" id="totalMemory">--</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">空闲内存</div>
+          <div class="info-value" id="freeMemory">--</div>
+        </div>
+        <div class="info-item full-width">
+          <div class="info-label">硬盘容量</div>
+          <div class="info-value" id="diskInfo">--</div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="card">
+      <h2 class="card-title">
+        <span class="icon">🖥️</span>
+        系统信息
+      </h2>
+      <div class="info-grid">
+        <div class="info-item">
+          <div class="info-label">平台</div>
+          <div class="info-value" id="platform">--</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">架构</div>
+          <div class="info-value" id="arch">--</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">CPU 核心数</div>
+          <div class="info-value" id="cpuCount">--</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">主机名</div>
+          <div class="info-value" id="hostname">--</div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="action-buttons">
+      <button id="refreshBtn" class="btn btn-primary">
+        <span>🔄</span>
+        刷新信息
+      </button>
+    </div>
+    
+    <div class="tips">
+      <h3>使用提示</h3>
+      <ul>
+        <li>基础设备信息包括设备型号、系统版本、设备类型和厂商信息</li>
+        <li>存储信息展示总内存、空闲内存和硬盘容量</li>
+        <li>系统信息展示当前运行环境的平台、架构和硬件配置</li>
+        <li>点击"刷新信息"按钮可重新获取最新的设备信息</li>
+      </ul>
+    </div>
+  </div>
+  
+  <div id="toast" class="toast"></div>
+
+  <script>
+    //created by AI
+    // 硬件信息工具 - 渲染进程脚本
+    // 功能：获取并显示设备型号、系统版本、存储信息和硬件配置
+    //created by AI//
+    
+    const { ipcRenderer } = require('electron');
+    
+    // DOM 元素
+    const errorSection = document.getElementById('errorSection');
+    const errorText = document.getElementById('errorText');
+    const refreshBtn = document.getElementById('refreshBtn');
+    const toast = document.getElementById('toast');
+    
+    // 显示提示消息
+    function showToast(message, type = 'success') {
+      toast.textContent = message;
+      toast.className = 'toast ' + type;
+      toast.classList.add('show');
+      
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3000);
+    }
+    
+    // 格式化存储大小
+    function formatBytes(bytes) {
+      if (bytes === 0) return '0 B';
+      const k = 1024;
+      const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
+      const i = Math.floor(Math.log(bytes) / Math.log(k));
+      return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+    
+    // 加载设备信息
+    async function loadDeviceInfo() {
+      try {
+        const result = await ipcRenderer.invoke('get-device-info');
+        
+        if (result.success) {
+          const info = result.data;
+          
+          // 基础设备信息
+          document.getElementById('deviceModel').textContent = info.deviceModel || '未知';
+          document.getElementById('deviceType').textContent = info.deviceType || '未知';
+          document.getElementById('osVersion').textContent = info.osVersion || '未知';
+          document.getElementById('manufacturer').textContent = info.manufacturer || '未知';
+          
+          // 存储信息
+          document.getElementById('totalMemory').textContent = info.totalMemory ? formatBytes(info.totalMemory) : '未知';
+          document.getElementById('freeMemory').textContent = info.freeMemory ? formatBytes(info.freeMemory) : '未知';
+          document.getElementById('diskInfo').textContent = info.diskInfo || '未知';
+          
+          // 系统信息
+          document.getElementById('platform').textContent = info.platform || '未知';
+          document.getElementById('arch').textContent = info.arch || '未知';
+          document.getElementById('cpuCount').textContent = info.cpuCount ? info.cpuCount + ' 核' : '未知';
+          document.getElementById('hostname').textContent = info.hostname || '未知';
+          
+          errorSection.classList.add('hidden');
+        } else {
+          throw new Error(result.error || '获取设备信息失败');
+        }
+      } catch (error) {
+        console.error('获取设备信息失败:', error);
+        errorText.textContent = '获取设备信息失败: ' + error.message;
+        errorSection.classList.remove('hidden');
+      }
+    }
+    
+    // 刷新按钮事件
+    refreshBtn.addEventListener('click', async () => {
+      refreshBtn.disabled = true;
+      refreshBtn.innerHTML = '<span>⏳</span> 刷新中...';
+      
+      await loadDeviceInfo();
+      
+      refreshBtn.disabled = false;
+      refreshBtn.innerHTML = '<span>🔄</span> 刷新信息';
+      showToast('设备信息已刷新');
+    });
+    
+    // 页面加载完成后获取设备信息
+    console.log('硬件信息工具已加载');
+    loadDeviceInfo();
+  </script>
+</body>
+</html>

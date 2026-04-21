@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>express三方库演示</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: sans-serif;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: #f5f5f5;
+        }
+        
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #333;
+        }
+        
+        .demo-section {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        h2 {
+            margin-bottom: 15px;
+            color: #1a73e8;
+            font-size: 18px;
+        }
+        
+        .demo-content {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .input-group label {
+            font-weight: bold;
+            color: #555;
+        }
+        
+        .input-group input,
+        .input-group textarea {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .input-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        
+        button {
+            padding: 10px 20px;
+            background-color: #1a73e8;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.2s;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        
+        button:hover {
+            background-color: #1557b0;
+        }
+        
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        
+        .result {
+            background-color: #e8f5e9;
+            border: 1px solid #c8e6c9;
+            border-radius: 4px;
+            padding: 15px;
+            margin-top: 10px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .error {
+            background-color: #ffebee;
+            border: 1px solid #ffcdd2;
+            color: #c62828;
+        }
+        
+        .description {
+            color: #666;
+            margin-bottom: 10px;
+            font-style: italic;
+        }
+        
+        .server-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: #ccc;
+        }
+        
+        .status-indicator.running {
+            background-color: #4caf50;
+        }
+        
+        .status-indicator.stopped {
+            background-color: #f44336;
+        }
+        
+        .api-section {
+            border-left: 3px solid #1a73e8;
+            padding-left: 15px;
+            margin: 15px 0;
+        }
+        
+        .api-section h3 {
+            color: #333;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+        
+        .method-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 3px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-right: 5px;
+        }
+        
+        .method-get { background-color: #61affe; color: white; }
+        .method-post { background-color: #49cc90; color: white; }
+        .method-put { background-color: #fca130; color: white; }
+        .method-delete { background-color: #f93e3e; color: white; }
+    </style>
+</head>
+<body>
+    <h1>Express 三方库功能演示</h1>
+    
+    <div class="demo-section">
+        <h2>1. 创建基础 HTTP 服务器</h2>
+        <div class="description">Express 是一个简洁而灵活的 Node.js Web 应用框架，提供了一系列强大特性帮助你创建各种 Web 应用</div>
+        <div class="demo-content">
+            <div class="input-group">
+                <label>服务器端口：</label>
+                <input type="number" id="serverPort" value="3000" placeholder="输入端口号">
+            </div>
+            <div class="server-status">
+                <div class="status-indicator" id="serverStatus"></div>
+                <span id="serverStatusText">服务器未启动</span>
+            </div>
+            <div>
+                <button id="startServerBtn">启动服务器</button>
+                <button id="stopServerBtn" disabled>停止服务器</button>
+            </div>
+            <div class="result" id="serverResult">点击按钮启动服务器...</div>
+        </div>
+    </div>
+    
+    <div class="demo-section">
+        <h2>2. 路由处理演示</h2>
+        <div class="description">Express 提供了强大的路由功能，支持 GET、POST、PUT、DELETE 等 HTTP 方法</div>
+        <div class="demo-content">
+            <div class="api-section">
+                <h3><span class="method-badge method-get">GET</span> /api/hello - 获取问候消息</h3>
+                <button id="testGetBtn" disabled>测试 GET 请求</button>
+            </div>
+            <div class="api-section">
+                <h3><span class="method-badge method-post">POST</span> /api/data - 提交数据</h3>
+                <div class="input-group">
+                    <label>请求数据 (JSON)：</label>
+                    <textarea id="postData" placeholder='{"name": "张三", "age": 25}'>{"name": "张三", "age": 25}</textarea>
+                </div>
+                <button id="testPostBtn" disabled>测试 POST 请求</button>
+            </div>
+            <div class="api-section">
+                <h3><span class="method-badge method-put">PUT</span> /api/data/:id - 更新数据</h3>
+                <div class="input-group">
+                    <label>数据 ID：</label>
+                    <input type="text" id="putId" value="1" placeholder="输入数据ID">
+                </div>
+                <button id="testPutBtn" disabled>测试 PUT 请求</button>
+            </div>
+            <div class="api-section">
+                <h3><span class="method-badge method-delete">DELETE</span> /api/data/:id - 删除数据</h3>
+                <div class="input-group">
+                    <label>数据 ID：</label>
+                    <input type="text" id="deleteId" value="1" placeholder="输入数据ID">
+                </div>
+                <button id="testDeleteBtn" disabled>测试 DELETE 请求</button>
+            </div>
+            <div class="result" id="routeResult">请先启动服务器...</div>
+        </div>
+    </div>
+    
+    <div class="demo-section">
+        <h2>3. 中间件演示</h2>
+        <div class="description">Express 中间件是在请求和响应周期中执行的函数，可以访问请求对象、响应对象和下一个中间件</div>
+        <div class="demo-content">
+            <div class="api-section">
+                <h3><span class="method-badge method-get">GET</span> /api/time - 带时间戳中间件的请求</h3>
+                <button id="testMiddlewareBtn" disabled>测试中间件</button>
+            </div>
+            <div class="result" id="middlewareResult">请先启动服务器...</div>
+        </div>
+    </div>
+    
+    <div class="demo-section">
+        <h2>4. 静态文件服务</h2>
+        <div class="description">Express 可以方便地提供静态文件服务，如 HTML、CSS、JavaScript 文件等</div>
+        <div class="demo-content">
+            <div class="api-section">
+                <h3><span class="method-badge method-get">GET</span> /static/info - 获取静态文件信息</h3>
+                <button id="testStaticBtn" disabled>测试静态文件服务</button>
+            </div>
+            <div class="result" id="staticResult">请先启动服务器...</div>
+        </div>
+    </div>
+    
+    <div class="demo-section">
+        <h2>5. 错误处理演示</h2>
+        <div class="description">Express 提供了统一的错误处理机制，可以捕获和处理应用中的错误</div>
+        <div class="demo-content">
+            <div class="api-section">
+                <h3><span class="method-badge method-get">GET</span> /api/error - 触发错误处理</h3>
+                <button id="testErrorBtn" disabled>测试错误处理</button>
+            </div>
+            <div class="result" id="errorResult">请先启动服务器...</div>
+        </div>
+    </div>
+
+    <script>
+        const { ipcRenderer } = require('electron');
+        const http = require('http');
+        
+        let server = null;
+        let serverPort = 3000;
+        
+        const serverPortInput = document.getElementById('serverPort');
+        const startServerBtn = document.getElementById('startServerBtn');
+        const stopServerBtn = document.getElementById('stopServerBtn');
+        const serverStatus = document.getElementById('serverStatus');
+        const serverStatusText = document.getElementById('serverStatusText');
+        const serverResult = document.getElementById('serverResult');
+        
+        const testGetBtn = document.getElementById('testGetBtn');
+        const testPostBtn = document.getElementById('testPostBtn');
+        const testPutBtn = document.getElementById('testPutBtn');
+        const testDeleteBtn = document.getElementById('testDeleteBtn');
+        const routeResult = document.getElementById('routeResult');
+        
+        const testMiddlewareBtn = document.getElementById('testMiddlewareBtn');
+        const middlewareResult = document.getElementById('middlewareResult');
+        
+        const testStaticBtn = document.getElementById('testStaticBtn');
+        const staticResult = document.getElementById('staticResult');
+        
+        const testErrorBtn = document.getElementById('testErrorBtn');
+        const errorResult = document.getElementById('errorResult');
+        
+        function updateServerStatus(isRunning) {
+            if (isRunning) {
+                serverStatus.classList.remove('stopped');
+                serverStatus.classList.add('running');
+                serverStatusText.textContent = `服务器运行中 (端口: ${serverPort})`;
+                startServerBtn.disabled = true;
+                stopServerBtn.disabled = false;
+                testGetBtn.disabled = false;
+                testPostBtn.disabled = false;
+                testPutBtn.disabled = false;
+                testDeleteBtn.disabled = false;
+                testMiddlewareBtn.disabled = false;
+                testStaticBtn.disabled = false;
+                testErrorBtn.disabled = false;
+            } else {
+                serverStatus.classList.remove('running');
+                serverStatus.classList.add('stopped');
+                serverStatusText.textContent = '服务器未启动';
+                startServerBtn.disabled = false;
+                stopServerBtn.disabled = true;
+                testGetBtn.disabled = true;
+                testPostBtn.disabled = true;
+                testPutBtn.disabled = true;
+                testDeleteBtn.disabled = true;
+                testMiddlewareBtn.disabled = true;
+                testStaticBtn.disabled = true;
+                testErrorBtn.disabled = true;
+            }
+        }
+        
+        function makeRequest(method, path, data) {
+            return new Promise((resolve, reject) => {
+                const options = {
+                    hostname: 'localhost',
+                    port: serverPort,
+                    path: path,
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                };
+                
+                const req = http.request(options, (res) => {
+                    let responseData = '';
+                    res.on('data', (chunk) => {
+                        responseData += chunk;
+                    });
+                    res.on('end', () => {
+                        try {
+                            resolve({
+                                statusCode: res.statusCode,
+                                headers: res.headers,
+                                body: JSON.parse(responseData)
+                            });
+                        } catch (e) {
+                            resolve({
+                                statusCode: res.statusCode,
+                                headers: res.headers,
+                                body: responseData
+                            });
+                        }
+                    });
+                });
+                
+                req.on('error', (e) => {
+                    reject(e);
+                });
+                
+                if (data) {
+                    req.write(JSON.stringify(data));
+                }
+                req.end();
+            });
+        }
+        
+        startServerBtn.addEventListener('click', () => {
+            serverPort = parseInt(serverPortInput.value) || 3000;
+            
+            try {
+                const express = require('express');
+                const app = express();
+                
+                app.use(express.json());
+                
+                app.use((req, res, next) => {
+                    console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
+                    next();
+                });
+                
+                app.get('/', (req, res) => {
+                    res.json({
+                        message: 'Express 服务器运行正常',
+                        timestamp: new Date().toISOString(),
+                        endpoints: [
+                            'GET /api/hello',
+                            'POST /api/data',
+                            'PUT /api/data/:id',
+                            'DELETE /api/data/:id',
+                            'GET /api/time',
+                            'GET /static/info',
+                            'GET /api/error'
+                        ]
+                    });
+                });
+                
+                app.get('/api/hello', (req, res) => {
+                    res.json({
+                        message: '你好，欢迎使用 Express!',
+                        query: req.query,
+                        timestamp: new Date().toISOString()
+                    });
+                });
+                
+                let dataStore = {
+                    1: { id: 1, name: '示例数据', createdAt: new Date().toISOString() }
+                };
+                
+                app.post('/api/data', (req, res) => {
+                    const newId = Object.keys(dataStore).length + 1;
+                    const newData = {
+                        id: newId,
+                        ...req.body,
+                        createdAt: new Date().toISOString()
+                    };
+                    dataStore[newId] = newData;
+                    res.status(201).json({
+                        success: true,
+                        message: '数据创建成功',
+                        data: newData
+                    });
+                });
+                
+                app.put('/api/data/:id', (req, res) => {
+                    const id = req.params.id;
+                    if (dataStore[id]) {
+                        dataStore[id] = {
+                            ...dataStore[id],
+                            ...req.body,
+                            updatedAt: new Date().toISOString()
+                        };
+                        res.json({
+                            success: true,
+                            message: '数据更新成功',
+                            data: dataStore[id]
+                        });
+                    } else {
+                        res.status(404).json({
+                            success: false,
+                            message: '数据不存在'
+                        });
+                    }
+                });
+                
+                app.delete('/api/data/:id', (req, res) => {
+                    const id = req.params.id;
+                    if (dataStore[id]) {
+                        const deletedData = dataStore[id];
+                        delete dataStore[id];
+                        res.json({
+                            success: true,
+                            message: '数据删除成功',
+                            deletedData: deletedData
+                        });
+                    } else {
+                        res.status(404).json({
+                            success: false,
+                            message: '数据不存在'
+                        });
+                    }
+                });
+                
+                app.get('/api/time', (req, res) => {
+                    res.json({
+                        timestamp: Date.now(),
+                        iso: new Date().toISOString(),
+                        locale: new Date().toLocaleString('zh-CN'),
+                        requestTime: req.requestTime
+                    });
+                });
+                
+                app.get('/static/info', (req, res) => {
+                    res.json({
+                        message: '静态文件服务演示',
+                        staticPath: '/static',
+                        availableFiles: [
+                            '这是一个模拟的静态文件服务响应',
+                            '在实际应用中，这里可以提供 HTML、CSS、JS 等静态文件'
+                        ],
+                        timestamp: new Date().toISOString()
+                    });
+                });
+                
+                app.get('/api/error', (req, res, next) => {
+                    const error = new Error('这是一个模拟的服务器错误');
+                    error.status = 500;
+                    next(error);
+                });
+                
+                app.use((err, req, res, next) => {
+                    console.error('错误处理中间件捕获到错误:', err.message);
+                    res.status(err.status || 500).json({
+                        success: false,
+                        error: {
+                            message: err.message,
+                            status: err.status || 500,
+                            timestamp: new Date().toISOString()
+                        }
+                    });
+                });
+                
+                server = app.listen(serverPort, () => {
+                    updateServerStatus(true);
+                    serverResult.textContent = `Express 服务器已启动!\n\n访问地址: http://localhost:${serverPort}\n\n可用路由:\n- GET /api/hello - 获取问候消息\n- POST /api/data - 创建数据\n- PUT /api/data/:id - 更新数据\n- DELETE /api/data/:id - 删除数据\n- GET /api/time - 获取服务器时间\n- GET /static/info - 静态文件服务演示\n- GET /api/error - 错误处理演示`;
+                    serverResult.classList.remove('error');
+                });
+                
+                server.on('error', (e) => {
+                    if (e.code === 'EADDRINUSE') {
+                        serverResult.textContent = `端口 ${serverPort} 已被占用，请尝试其他端口`;
+                        serverResult.classList.add('error');
+                    } else {
+                        serverResult.textContent = `服务器启动失败: ${e.message}`;
+                        serverResult.classList.add('error');
+                    }
+                    updateServerStatus(false);
+                });
+                
+            } catch (error) {
+                serverResult.textContent = `加载 Express 模块失败: ${error.message}\n\n请确保已安装 express: npm install express`;
+                serverResult.classList.add('error');
+            }
+        });
+        
+        stopServerBtn.addEventListener('click', () => {
+            if (server) {
+                server.close(() => {
+                    server = null;
+                    updateServerStatus(false);
+                    serverResult.textContent = '服务器已停止';
+                    serverResult.classList.remove('error');
+                });
+            }
+        });
+        
+        testGetBtn.addEventListener('click', async () => {
+            try {
+                const result = await makeRequest('GET', '/api/hello?name=Express用户');
+                routeResult.textContent = `GET /api/hello 响应:\n\n状态码: ${result.statusCode}\n\n响应体:\n${JSON.stringify(result.body, null, 2)}`;
+                routeResult.classList.remove('error');
+            } catch (error) {
+                routeResult.textContent = `请求失败: ${error.message}`;
+                routeResult.classList.add('error');
+            }
+        });
+        
+        testPostBtn.addEventListener('click', async () => {
+            try {
+                const postData = JSON.parse(document.getElementById('postData').value);
+                const result = await makeRequest('POST', '/api/data', postData);
+                routeResult.textContent = `POST /api/data 响应:\n\n状态码: ${result.statusCode}\n\n请求数据:\n${JSON.stringify(postData, null, 2)}\n\n响应体:\n${JSON.stringify(result.body, null, 2)}`;
+                routeResult.classList.remove('error');
+            } catch (error) {
+                routeResult.textContent = `请求失败: ${error.message}`;
+                routeResult.classList.add('error');
+            }
+        });
+        
+        testPutBtn.addEventListener('click', async () => {
+            try {
+                const putId = document.getElementById('putId').value;
+                const result = await makeRequest('PUT', `/api/data/${putId}`, { name: '更新后的名称', updated: true });
+                routeResult.textContent = `PUT /api/data/${putId} 响应:\n\n状态码: ${result.statusCode}\n\n响应体:\n${JSON.stringify(result.body, null, 2)}`;
+                routeResult.classList.remove('error');
+            } catch (error) {
+                routeResult.textContent = `请求失败: ${error.message}`;
+                routeResult.classList.add('error');
+            }
+        });
+        
+        testDeleteBtn.addEventListener('click', async () => {
+            try {
+                const deleteId = document.getElementById('deleteId').value;
+                const result = await makeRequest('DELETE', `/api/data/${deleteId}`);
+                routeResult.textContent = `DELETE /api/data/${deleteId} 响应:\n\n状态码: ${result.statusCode}\n\n响应体:\n${JSON.stringify(result.body, null, 2)}`;
+                routeResult.classList.remove('error');
+            } catch (error) {
+                routeResult.textContent = `请求失败: ${error.message}`;
+                routeResult.classList.add('error');
+            }
+        });
+        
+        testMiddlewareBtn.addEventListener('click', async () => {
+            try {
+                const result = await makeRequest('GET', '/api/time');
+                middlewareResult.textContent = `GET /api/time 响应:\n\n状态码: ${result.statusCode}\n\n响应体:\n${JSON.stringify(result.body, null, 2)}\n\n说明: 此请求经过了日志中间件处理，服务器控制台会输出请求日志`;
+                middlewareResult.classList.remove('error');
+            } catch (error) {
+                middlewareResult.textContent = `请求失败: ${error.message}`;
+                middlewareResult.classList.add('error');
+            }
+        });
+        
+        testStaticBtn.addEventListener('click', async () => {
+            try {
+                const result = await makeRequest('GET', '/static/info');
+                staticResult.textContent = `GET /static/info 响应:\n\n状态码: ${result.statusCode}\n\n响应体:\n${JSON.stringify(result.body, null, 2)}`;
+                staticResult.classList.remove('error');
+            } catch (error) {
+                staticResult.textContent = `请求失败: ${error.message}`;
+                staticResult.classList.add('error');
+            }
+        });
+        
+        testErrorBtn.addEventListener('click', async () => {
+            try {
+                const result = await makeRequest('GET', '/api/error');
+                errorResult.textContent = `GET /api/error 响应:\n\n状态码: ${result.statusCode}\n\n响应体:\n${JSON.stringify(result.body, null, 2)}\n\n说明: 此请求触发了错误处理中间件，返回了统一的错误响应格式`;
+                errorResult.classList.remove('error');
+            } catch (error) {
+                errorResult.textContent = `请求失败: ${error.message}`;
+                errorResult.classList.add('error');
+            }
+        });
+    </script>
+</body>
+</html>

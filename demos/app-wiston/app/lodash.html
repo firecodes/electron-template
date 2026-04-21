@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>lodash三方库演示</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: sans-serif;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: #f5f5f5;
+        }
+        
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #333;
+        }
+        
+        .demo-section {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        h2 {
+            margin-bottom: 15px;
+            color: #1a73e8;
+            font-size: 18px;
+        }
+        
+        .demo-content {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .input-group label {
+            font-weight: bold;
+            color: #555;
+        }
+        
+        .input-group input,
+        .input-group textarea {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .input-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        
+        button {
+            padding: 10px 20px;
+            background-color: #1a73e8;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.2s;
+        }
+        
+        button:hover {
+            background-color: #1557b0;
+        }
+        
+        .result {
+            background-color: #e8f5e9;
+            border: 1px solid #c8e6c9;
+            border-radius: 4px;
+            padding: 15px;
+            margin-top: 10px;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+        
+        .error {
+            background-color: #ffebee;
+            border: 1px solid #ffcdd2;
+            color: #c62828;
+        }
+        
+        .description {
+            color: #666;
+            margin-bottom: 10px;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <h1>🚀 lodash 三方库功能演示</h1>
+    
+    <div class="demo-section">
+        <h2>1. _.debounce - 防抖函数</h2>
+        <div class="description">防止频繁触发函数，常用于输入框实时搜索等场景</div>
+        <div class="demo-content">
+            <div class="input-group">
+                <label>输入内容（防抖300ms）：</label>
+                <input type="text" id="debounceInput" placeholder="输入一些内容...">
+            </div>
+            <div class="result" id="debounceResult">等待输入...</div>
+        </div>
+    </div>
+    
+    <div class="demo-section">
+        <h2>2. _.throttle - 节流函数</h2>
+        <div class="description">限制函数在一定时间内只能触发一次，常用于滚动事件等场景</div>
+        <div class="demo-content">
+            <button id="throttleBtn">快速点击我（节流1秒）</button>
+            <div class="result" id="throttleResult">点击次数：0</div>
+        </div>
+    </div>
+    
+    <div class="demo-section">
+        <h2>3. _.cloneDeep - 深拷贝</h2>
+        <div class="description">创建对象的深拷贝，包括嵌套对象</div>
+        <div class="demo-content">
+            <button id="cloneBtn">执行深拷贝</button>
+            <div class="result" id="cloneResult">点击按钮查看结果...</div>
+        </div>
+    </div>
+    
+    <div class="demo-section">
+        <h2>4. _.uniq - 数组去重</h2>
+        <div class="description">移除数组中的重复元素</div>
+        <div class="demo-content">
+            <div class="input-group">
+                <label>输入数组（用逗号分隔）：</label>
+                <input type="text" id="uniqInput" placeholder="例如：1,2,3,2,1,4,5,4">
+            </div>
+            <button id="uniqBtn">执行去重</button>
+            <div class="result" id="uniqResult">等待输入...</div>
+        </div>
+    </div>
+    
+    <div class="demo-section">
+        <h2>5. _.sortBy - 数组排序</h2>
+        <div class="description">根据指定属性对对象数组进行排序</div>
+        <div class="demo-content">
+            <button id="sortBtn">执行排序</button>
+            <div class="result" id="sortResult">点击按钮查看结果...</div>
+        </div>
+    </div>
+    
+    <div class="demo-section">
+        <h2>6. _.groupBy - 数组分组</h2>
+        <div class="description">根据指定条件对数组进行分组</div>
+        <div class="demo-content">
+            <button id="groupBtn">执行分组</button>
+            <div class="result" id="groupResult">点击按钮查看结果...</div>
+        </div>
+    </div>
+    
+    <div class="demo-section">
+        <h2>7. _.get - 安全获取嵌套属性</h2>
+        <div class="description">安全地获取对象的嵌套属性，避免因属性不存在而报错</div>
+        <div class="demo-content">
+            <button id="getBtn">执行安全获取</button>
+            <div class="result" id="getResult">点击按钮查看结果...</div>
+        </div>
+    </div>
+    
+    <div class="demo-section">
+        <h2>8. _.random - 生成随机数</h2>
+        <div class="description">生成指定范围内的随机数</div>
+        <div class="demo-content">
+            <div class="input-group">
+                <label>最小值：</label>
+                <input type="number" id="randomMin" value="1">
+            </div>
+            <div class="input-group">
+                <label>最大值：</label>
+                <input type="number" id="randomMax" value="100">
+            </div>
+            <button id="randomBtn">生成随机数</button>
+            <div class="result" id="randomResult">点击按钮生成...</div>
+        </div>
+    </div>
+
+    <script src="node_modules/lodash/lodash.min.js"></script>
+    <script>
+        // 1. _.debounce 演示
+        const debounceInput = document.getElementById('debounceInput');
+        const debounceResult = document.getElementById('debounceResult');
+        
+        const debouncedSearch = _.debounce((value) => {
+            debounceResult.textContent = `搜索内容：${value}（${new Date().toLocaleTimeString()}）`;
+        }, 300);
+        
+        debounceInput.addEventListener('input', (e) => {
+            debounceResult.textContent = '输入中...';
+            debouncedSearch(e.target.value);
+        });
+        
+        // 2. _.throttle 演示
+        const throttleBtn = document.getElementById('throttleBtn');
+        const throttleResult = document.getElementById('throttleResult');
+        let clickCount = 0;
+        
+        const throttledClick = _.throttle(() => {
+            clickCount++;
+            throttleResult.textContent = `点击次数：${clickCount}`;
+        }, 1000);
+        
+        throttleBtn.addEventListener('click', throttledClick);
+        
+        // 3. _.cloneDeep 演示
+        const cloneBtn = document.getElementById('cloneBtn');
+        const cloneResult = document.getElementById('cloneResult');
+        
+        cloneBtn.addEventListener('click', () => {
+            const original = {
+                name: '张三',
+                age: 30,
+                address: {
+                    city: '北京',
+                    district: '朝阳区'
+                },
+                hobbies: ['篮球', '音乐', '旅行']
+            };
+            
+            const cloned = _.cloneDeep(original);
+            
+            // 修改原对象
+            original.address.city = '上海';
+            original.hobbies.push('阅读');
+            
+            cloneResult.innerHTML = `原对象：${JSON.stringify(original, null, 2)}\n\n深拷贝对象：${JSON.stringify(cloned, null, 2)}`;
+        });
+        
+        // 4. _.uniq 演示
+        const uniqInput = document.getElementById('uniqInput');
+        const uniqBtn = document.getElementById('uniqBtn');
+        const uniqResult = document.getElementById('uniqResult');
+        
+        uniqBtn.addEventListener('click', () => {
+            const inputValue = uniqInput.value;
+            if (!inputValue) {
+                uniqResult.textContent = '请输入数组内容';
+                uniqResult.classList.add('error');
+                return;
+            }
+            
+            const array = inputValue.split(',').map(item => item.trim());
+            const uniqueArray = _.uniq(array);
+            
+            uniqResult.textContent = `去重前：[${array}]\n去重后：[${uniqueArray}]`;
+            uniqResult.classList.remove('error');
+        });
+        
+        // 5. _.sortBy 演示
+        const sortBtn = document.getElementById('sortBtn');
+        const sortResult = document.getElementById('sortResult');
+        
+        sortBtn.addEventListener('click', () => {
+            const users = [
+                { name: '张三', age: 30, salary: 8000 },
+                { name: '李四', age: 25, salary: 12000 },
+                { name: '王五', age: 35, salary: 6000 }
+            ];
+            
+            const sortedByAge = _.sortBy(users, ['age']);
+            const sortedBySalary = _.sortBy(users, ['salary']);
+            
+            sortResult.innerHTML = `原始数据：${JSON.stringify(users, null, 2)}\n\n按年龄排序：${JSON.stringify(sortedByAge, null, 2)}\n\n按薪资排序：${JSON.stringify(sortedBySalary, null, 2)}`;
+        });
+        
+        // 6. _.groupBy 演示
+        const groupBtn = document.getElementById('groupBtn');
+        const groupResult = document.getElementById('groupResult');
+        
+        groupBtn.addEventListener('click', () => {
+            const products = [
+                { name: '苹果', category: '水果', price: 5 },
+                { name: '香蕉', category: '水果', price: 3 },
+                { name: '胡萝卜', category: '蔬菜', price: 2 },
+                { name: '西红柿', category: '蔬菜', price: 4 },
+                { name: '牛奶', category: '饮料', price: 6 }
+            ];
+            
+            const groupedByCategory = _.groupBy(products, 'category');
+            
+            groupResult.innerHTML = `分组结果：\n${JSON.stringify(groupedByCategory, null, 2)}`;
+        });
+        
+        // 7. _.get 演示
+        const getBtn = document.getElementById('getBtn');
+        const getResult = document.getElementById('getResult');
+        
+        getBtn.addEventListener('click', () => {
+            const user = {
+                name: '张三',
+                address: {
+                    city: '北京',
+                    details: {
+                        street: '朝阳区建国路',
+                        zipCode: '100022'
+                    }
+                }
+            };
+            
+            const city = _.get(user, 'address.city');
+            const street = _.get(user, 'address.details.street');
+            const phone = _.get(user, 'contact.phone', '未提供');
+            const deepProp = _.get(user, 'address.details.zipCode.extra', '不存在的属性');
+            
+            getResult.innerHTML = `获取城市：${city}\n获取街道：${street}\n获取电话：${phone}\n获取深层属性：${deepProp}`;
+        });
+        
+        // 8. _.random 演示
+        const randomBtn = document.getElementById('randomBtn');
+        const randomMin = document.getElementById('randomMin');
+        const randomMax = document.getElementById('randomMax');
+        const randomResult = document.getElementById('randomResult');
+        
+        randomBtn.addEventListener('click', () => {
+            const min = parseInt(randomMin.value);
+            const max = parseInt(randomMax.value);
+            
+            if (isNaN(min) || isNaN(max) || min > max) {
+                randomResult.textContent = '请输入有效的最小值和最大值，且最小值小于等于最大值';
+                randomResult.classList.add('error');
+                return;
+            }
+            
+            const randomNumber = _.random(min, max);
+            randomResult.textContent = `生成的随机数：${randomNumber}`;
+            randomResult.classList.remove('error');
+        });
+    </script>
+</body>
+</html>
