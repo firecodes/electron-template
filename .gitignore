@@ -25,6 +25,10 @@ node_modules/
 *.log
 logs/
 
+# Using pnpm and bun
+package-lock.json
+yarn.lock
+
 # Temporary files
 *.tmp
 *.temp
