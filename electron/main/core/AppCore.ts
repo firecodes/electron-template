@@ -40,23 +40,23 @@ export class AppCore {
         console.log('🚀 应用启动中...');
 
         try {
-            // // 1. 应用配置
-            // this.applyConfiguration();
+            // 1. 应用配置
+            this.applyConfiguration();
             this.perfTimer.mark('config');
 
-            // // 2. 初始化核心服务
-            // // 仅注册，不实例化
-            // await this.initializeCoreServices();
-            // this.perfTimer.mark('services');
+            // 2. 初始化核心服务
+            // 仅注册，不实例化
+            await this.initializeCoreServices();
+            this.perfTimer.mark('services');
 
-            // // 3. 注册关键控制器（仅窗口创建必需的）
-            // await this.registerCriticalControllers();
-            // this.perfTimer.mark('critical-controllers');
+            // 3. 注册关键控制器（仅窗口创建必需的）
+            await this.registerCriticalControllers();
+            this.perfTimer.mark('critical-controllers');
 
-            // // 4. 创建主窗口
-            // // 优先显示界面
-            // await this.windowManager.createMainWindow();
-            // this.perfTimer.mark('window');
+            // 4. 创建主窗口
+            // 优先显示界面
+            await this.windowManager.createMainWindow();
+            this.perfTimer.mark('window');
 
             this.isInitialized = true;
 
@@ -64,14 +64,14 @@ export class AppCore {
             console.log('✅ 应用窗口已显示');
             console.log(`📊 启动性能: ${windowTime}ms 1111111`);
 
-            // // 5. 后台注册其余控制器
-            // this.registerNonCriticalControllers().catch(e => console.error('❌ 非关键控制器注册失败:', e));
+            // 5. 后台注册其余控制器
+            this.registerNonCriticalControllers().catch(e => console.error('❌ 非关键控制器注册失败:', e));
 
-            // // 6. 后台初始化重型服务
-            // this.initializeHeavyServices().catch(e => console.error('❌ 后台服务初始化失败:', e));
+            // 6. 后台初始化重型服务
+            this.initializeHeavyServices().catch(e => console.error('❌ 后台服务初始化失败:', e));
 
-            // // 7. 启动自动扫描调度器
-            // this.startAutoScanner().catch(e => console.error('❌ 自动扫描调度器启动失败:', e));
+            // 7. 启动自动扫描调度器
+            this.startAutoScanner().catch(e => console.error('❌ 自动扫描调度器启动失败:', e));
         
         } catch (error) {
             console.error('❌ 应用启动失败:', error);
@@ -228,9 +228,10 @@ export class AppCore {
         // 获取必需的服务（轻量级）
         const networkFileAdapter = await this.serviceContainer.get<any>('networkFileAdapter');
 
-        const boundParseMetadata = (filePath: string) =>
-            parseMetadata(filePath, networkFileAdapter.isNetworkPath(filePath) ? networkFileAdapter : null, {skipCover: true});
-
+        const boundParseMetadata = (filePath: string) =>{
+            return parseMetadata(filePath, networkFileAdapter.isNetworkPath(filePath) ? networkFileAdapter : null, {skipCover: true});
+        }
+           
         // 尝试加载原生音频模块
         let nativeAudioModule: any = null;
         try {

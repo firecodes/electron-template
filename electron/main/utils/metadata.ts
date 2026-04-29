@@ -7,6 +7,7 @@ import * as path from 'path';
 import * as mm from 'music-metadata';
 import {fixStringEncoding} from './string';
 import type {TrackMetadata} from '../types/global';
+import type { TypeNetworkFileAdapter } from '../services/network/NetworkFileAdapter'
 
 /**
  * 同步歌词时间戳
@@ -37,14 +38,6 @@ export interface EmbeddedLyrics {
     synchronized: boolean;
 }
 
-/**
- * 网络文件适配器接口
- */
-interface NetworkFileAdapter {
-    isNetworkPath(filePath: string): boolean;
-
-    readFile(filePath: string): Promise<Buffer>;
-}
 
 /**
  * 元数据解析选项
@@ -338,7 +331,7 @@ export function getMimeTypeFromExtension(filePath: string): string {
  */
 export async function parseMetadata(
     filePath: string,
-    networkFileAdapter: NetworkFileAdapter | null = null,
+    networkFileAdapter: TypeNetworkFileAdapter | null = null,
     options: ParseMetadataOptions = {}
 ): Promise<TrackMetadata> {
     const {skipCover = false, skipLyrics = false} = options;

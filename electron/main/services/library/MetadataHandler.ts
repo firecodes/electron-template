@@ -51,8 +51,13 @@ export class MetadataHandler {
     private executablePath: string;
 
     constructor() {
-        this.scriptPath = path.join(__dirname, '../../metadata_editor.py');
-        this.executablePath = this.getExecutablePath();
+        try {
+            this.scriptPath = path.join(__dirname, '../../metadata_editor.py');
+            fs.promises.access(this.scriptPath);
+            this.executablePath = this.getExecutablePath();
+        } catch (error) {
+            console.warn('⚠️ MetadataHandler 失败:', error);
+        }
     }
 
     private getExecutablePath(): string {

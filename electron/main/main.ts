@@ -24,14 +24,17 @@ app.whenReady().then(async () => {
 
     await application.start();
 
-    win = await application.createMainWindow();
-    app.on('second-instance', () => {
-        if (win) {
-            // Focus on the main window if the user tried to open another
-            if (win.isMinimized()) win.restore()
-            win.focus()
-        }
-    })
+    // win = application.windowManager.mainWindow;
+    // if(!win){
+    //     win = await application.createMainWindow();
+    // }
+    // app.on('second-instance', () => {
+    //     if (win) {
+    //         // Focus on the main window if the user tried to open another
+    //         if (win.isMinimized()) win.restore()
+    //         win.focus()
+    //     }
+    // })
 
     console.log(`app activate start 22222`);
     app.on('activate', async () => {

@@ -112,9 +112,10 @@ export class LibraryCacheManager {
         try {
             const userDataPath = app.getPath('userData');
             this.cacheFilePath = path.join(userDataPath, this.cacheFileName);
-        } catch {
+        } catch (error) {
             this.cacheFilePath = path.join(process.cwd(), this.cacheFileName);
         }
+        console.warn('⚠️ LibraryCacheManager constructor:',  this.cacheFilePath);
     }
 
     generateFileId(filePath: string, stats: FileStat): string {

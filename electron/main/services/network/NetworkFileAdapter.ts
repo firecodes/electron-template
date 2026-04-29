@@ -18,6 +18,14 @@ interface StatResult {
     isFile: () => boolean;
 }
 
+/**
+ * 网络文件适配器接口
+ */
+export interface TypeNetworkFileAdapter {
+    isNetworkPath(filePath: string): boolean;
+    readFile(filePath: string): Promise<Buffer>;
+}
+
 export class NetworkFileAdapter {
     private networkDriveManager: NetworkDriveManager;
     private filePathMappings = new Map<string, PathMapping>();
