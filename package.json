@@ -21,7 +21,7 @@
   "type": "module",
   "scripts": {
     "dev": "chcp 65001 && vite",
-    "build": "vue-tsc --noEmit && vite build && electron-builder",
+    "build": "chcp 65001 && vue-tsc --noEmit && vite build && electron-builder",
     "preview": "vite preview",
     "clean": "rimraf dist"
   },
@@ -32,6 +32,7 @@
     "electron": "^40.1.0",
     "electron-builder": "^26.0.12",
     "rimraf": "^4.1.2",
+    "sass": "^1.58.3",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3",
     "vite": "^6.4.1",
@@ -44,6 +45,7 @@
     "node": ">=20.0.0"
   },
   "dependencies": {
+    "dayjs": "^1.11.7",
     "adm-zip": "^0.5.16",
     "chardet": "^2.1.0",
     "electron-icon-builder": "^2.0.1",

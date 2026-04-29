@@ -3,6 +3,7 @@ import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import electron from 'vite-plugin-electron/simple'
 import pkg from './package.json'
+import * as path from 'path';
 
 // https://vitejs.dev/config/
 export default defineConfig(({ command }) => {
@@ -13,6 +14,31 @@ export default defineConfig(({ command }) => {
   const sourcemap = isServe || !!process.env.VSCODE_DEBUG
 
   return {
+    // 解析配置
+    resolve: {
+      alias: {
+        '@': path.resolve(__dirname, 'src'),
+        '@js': path.resolve(__dirname, 'src/js'),
+        '@core': path.resolve(__dirname, 'src/js/core'),
+        '@services': path.resolve(__dirname, 'src/js/services'),
+        '@utils': path.resolve(__dirname, 'src/js/utils'),
+        '@api': path.resolve(__dirname, 'src/js/api'),
+        // '@pages': path.resolve(__dirname, 'src/js/pages'),
+        // '@components': path.resolve(__dirname, 'src/js/components'),
+        '@extensions': path.resolve(__dirname, 'src/js/extensions'),
+        '@styles': path.resolve(__dirname, 'src/styles'),
+        '@assets': path.resolve(__dirname, 'src/assets'),
+      }
+    },
+    // CSS 配置
+    css: {
+      preprocessorOptions: {
+        scss: {
+          // 可以在这里添加全局 SCSS 变量
+          // additionalData: `@import "@styles/variables.scss";`
+        }
+      }
+    },
     plugins: [
       vue(),
       electron({

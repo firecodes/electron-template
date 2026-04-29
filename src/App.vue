@@ -1,5 +1,16 @@
 <script setup lang="ts">
 import HelloWorld from './components/HelloWorld.vue'
+import MusicBoxAPI from '@api/index';
+console.log("MusicBoxAPI:", MusicBoxAPI)
+
+
+// ============================================
+// 9. 导入主应用
+// ============================================
+import '@core/app';
+
+console.log('✅ MusicBox 应用已通过 Vite 加载完成');
+
 </script>
 
 <template>
