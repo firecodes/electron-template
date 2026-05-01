@@ -23,6 +23,7 @@ export default defineConfig(({ command }) => {
         '@services': path.resolve(__dirname, 'src/js/services'),
         '@utils': path.resolve(__dirname, 'src/js/utils'),
         '@api': path.resolve(__dirname, 'src/js/api'),
+        '@hooks': path.resolve(__dirname, 'src/js/hooks'),
         // '@pages': path.resolve(__dirname, 'src/js/pages'),
         // '@components': path.resolve(__dirname, 'src/js/components'),
         '@extensions': path.resolve(__dirname, 'src/js/extensions'),

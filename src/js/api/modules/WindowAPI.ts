@@ -3,9 +3,9 @@
  * 提供窗口状态管理功能
  */
 
-import {cacheManager} from '@services/CacheManager';
-import {BaseAPI, Validator} from "@api/core";
-import {WindowBounds, WindowSize} from "@api/types";
+import { cacheManager } from '@services/CacheManager';
+import { BaseAPI, Validator } from "@api/core";
+import { WindowBounds, WindowSize } from "@api/types";
 
 /**
  * 窗口尺寸数据
@@ -95,7 +95,7 @@ export class WindowAPI extends BaseAPI {
                 return;
             }
 
-            const {width, height} = savedSize;
+            const { width, height } = savedSize;
             if (this.isValidWindowSize(width, height)) {
                 const result = await this.setSize(width, height);
                 if (!result || !result.success) {

@@ -77,3 +77,20 @@ export default {
 
 - [C/C++ addons, Node.js modules - Pre-Bundling](https://github.com/electron-vite/vite-plugin-electron-renderer#dependency-pre-bundling)
 - [dependencies vs devDependencies](https://github.com/electron-vite/vite-plugin-electron-renderer#dependencies-vs-devdependencies)
+
+
+
+
+window.ipcRenderer.on('main-process-message', (_event, ...args) => {
+  console.log('[Receive Main-process message]:', ...args)
+})
+
+ win = new BrowserWindow({});
+ win?.webContents.send('main-process-message', new Date().toLocaleString())
+
+
+
+
+
+
+

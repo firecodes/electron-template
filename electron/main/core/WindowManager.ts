@@ -2,8 +2,8 @@
  * 窗口管理器
  * 负责创建和管理应用窗口
  */
-
-import {app, BrowserWindow, ipcMain} from 'electron';
+// import { app, BrowserWindow, shell, ipcMain } from 'electron'
+import {app, BrowserWindow, ipcMain, shell} from 'electron';
 import * as path from 'path';
 import * as fs from 'fs';
 

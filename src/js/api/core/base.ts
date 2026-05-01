@@ -3,8 +3,8 @@
  * 所有 API 模块的基类，提供统一的功能和约定
  */
 
-import {Logger} from "@api/core/logger";
-import {ErrorUtils} from "@api/core/errors";
+import { Logger } from "@api/core/logger";
+import { ErrorUtils } from "@api/core/errors";
 
 /**
  * API 基础配置
@@ -46,7 +46,7 @@ export abstract class BaseAPI {
         if (this.config.enableErrorTracking) {
             Logger.error(`[${this.name}] ${message}`, error, ...args);
             if (error) {
-                ErrorUtils.logError(error, {api: this.name});
+                ErrorUtils.logError(error, { api: this.name });
             }
         }
     }
@@ -140,14 +140,14 @@ export abstract class BaseAPI {
      * 获取 API 配置
      */
     getConfig(): Readonly<BaseAPIConfig> {
-        return {...this.config};
+        return { ...this.config };
     }
 
     /**
      * 更新 API 配置
      */
     updateConfig(config: Partial<BaseAPIConfig>): void {
-        this.config = {...this.config, ...config};
+        this.config = { ...this.config, ...config };
     }
 }
 

@@ -1,8 +1,8 @@
 // 窗口控制器
 
 import { ipcMain } from 'electron';
-import {BaseController, Controller, IpcHandle} from '../decorators/IpcHandler';
-import {WindowManager} from '../core/WindowManager';
+import { BaseController, Controller, IpcHandle } from '../decorators/IpcHandler';
+import { WindowManager } from '../core/WindowManager';
 
 @Controller('window')
 export class WindowController extends BaseController {
@@ -83,12 +83,12 @@ export class WindowController extends BaseController {
                 const w = Math.max(400, Math.min(3840, Math.round(width)));
                 const h = Math.max(120, Math.min(2160, Math.round(height)));
                 win.setSize(w, h);
-                return {success: true, width: w, height: h};
+                return { success: true, width: w, height: h };
             } catch (error: any) {
-                return {success: false, error: error.message};
+                return { success: false, error: error.message };
             }
         }
-        return {success: false, error: '窗口不可用或已最大化'};
+        return { success: false, error: '窗口不可用或已最大化' };
     }
 
     @IpcHandle('window:setBounds')
@@ -97,12 +97,12 @@ export class WindowController extends BaseController {
         if (win) {
             try {
                 win.setBounds(bounds);
-                return {success: true};
+                return { success: true };
             } catch (error: any) {
-                return {success: false, error: error.message};
+                return { success: false, error: error.message };
             }
         }
-        return {success: false, error: '窗口不可用'};
+        return { success: false, error: '窗口不可用' };
     }
 
     @IpcHandle('window:getBounds')
@@ -127,12 +127,12 @@ export class WindowController extends BaseController {
         if (win && !win.isMaximized()) {
             try {
                 win.setPosition(Math.round(x), Math.round(y));
-                return {success: true};
+                return { success: true };
             } catch (error: any) {
-                return {success: false, error: error.message};
+                return { success: false, error: error.message };
             }
         }
-        return {success: false, error: '窗口不可用'};
+        return { success: false, error: '窗口不可用' };
     }
 
     @IpcHandle('window:setSkipTaskbar')

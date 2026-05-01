@@ -1,4 +1,4 @@
-import {contextBridge, ipcRenderer} from 'electron';
+import { contextBridge, ipcRenderer } from 'electron';
 
 const OS_ALLOWED = [
     'platform', 'type', 'arch', 'release',
@@ -16,13 +16,13 @@ const osApi: Record<string, (...args: any[]) => Promise<any>> = {};
 const pathApi: Record<string, (...args: any[]) => Promise<any>> = {};
 const fsApi: Record<string, (...args: any[]) => Promise<any>> = {};
 for (const prop of OS_ALLOWED) {
-    osApi[prop] = (...args) => ipcRenderer.invoke('os:call', {prop, args});
+    osApi[prop] = (...args) => ipcRenderer.invoke('os:call', { prop, args });
 }
 for (const prop of PATH_ALLOWED) {
-    pathApi[prop] = (...args) => ipcRenderer.invoke('path:call', {prop, args});
+    pathApi[prop] = (...args) => ipcRenderer.invoke('path:call', { prop, args });
 }
 for (const prop of FS_ALLOWED) {
-    fsApi[prop] = (...args) => ipcRenderer.invoke('fs:call', {prop, args});
+    fsApi[prop] = (...args) => ipcRenderer.invoke('fs:call', { prop, args });
 }
 
 // 暴露安全的IPC方法给渲染进程
