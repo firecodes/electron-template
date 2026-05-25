@@ -1,0 +1,23 @@
+{
+  "name": "electron-ohos-vue3",
+  "version": "1.0.0",
+  "description": "Electron + OpenHarmony + Vue3 应用框架",
+  "main": "main.js",
+  "private": true,
+  "type": "module",  
+  "scripts": {
+    "start": "electron .",
+    "start:zh": "chcp 65001 && electron ."
+  },
+  "keywords": [
+    "electron",
+    "harmonyos",
+    "system-info",
+    "demo"
+  ],
+  "author": "HarmonyPC Team",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^37.2.6"
+  }
+}

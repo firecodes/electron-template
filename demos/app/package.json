@@ -1,0 +1,22 @@
+{
+  "name": "harmonypc-system-info-demo",
+  "version": "1.0.0",
+  "description": "HarmonyOS Electron System Information Demo",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "NODE_ENV=development electron .",
+    "prod": "NODE_ENV=production electron ."
+  },
+  "keywords": [
+    "electron",
+    "harmonyos",
+    "system-info",
+    "demo"
+  ],
+  "author": "HarmonyPC Team",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^34.0.0"
+  }
+}

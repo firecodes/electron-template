@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>日历 - 系统信息查看器</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .calendar-container {
+            padding: 40px;
+        }
+
+        .current-date {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-radius: 10px;
+        }
+
+        .current-date h2 {
+            color: #667eea;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .current-date p {
+            color: #666;
+            font-size: 1.2em;
+        }
+
+        .calendar {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 10px;
+        }
+
+        .calendar-header h3 {
+            font-size: 1.5em;
+        }
+
+        .calendar-nav button {
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid white;
+            color: white;
+            padding: 8px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: all 0.3s;
+        }
+
+        .calendar-nav button:hover {
+            background: rgba(255, 255, 255, 0.4);
+            transform: scale(1.05);
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+        }
+
+        .calendar-day-header {
+            text-align: center;
+            padding: 10px;
+            font-weight: bold;
+            color: #667eea;
+            background: #f5f7fa;
+            border-radius: 5px;
+        }
+
+        .calendar-day {
+            padding: 15px;
+            text-align: center;
+            background: #f9f9f9;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .calendar-day:hover {
+            background: #667eea;
+            color: white;
+            transform: scale(1.05);
+        }
+
+        .calendar-day.today {
+            background: #667eea;
+            color: white;
+            font-weight: bold;
+        }
+
+        .calendar-day.other-month {
+            color: #ccc;
+            background: #f0f0f0;
+        }
+
+        .calendar-day.empty {
+            background: transparent;
+            cursor: default;
+        }
+
+        .calendar-day.empty:hover {
+            background: transparent;
+            transform: none;
+        }
+
+        .calendar-day .lunar {
+            font-size: 0.8em;
+            color: #999;
+            margin-top: 5px;
+        }
+
+        .calendar-day:hover .lunar {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .calendar-day.today .lunar {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        
+          .calendar-selectors {
+              display: flex;
+              justify-content: center;
+              gap: 10px;
+              margin-bottom: 20px;
+              padding: 15px;
+              background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+              border-radius: 10px;
+          }
+          
+          .calendar-selectors select {
+              padding: 8px 15px;
+              font-size: 16px;
+              border: 2px solid #667eea;
+              border-radius: 5px;
+              background: white;
+              color: #333;
+              cursor: pointer;
+              transition: all 0.3s;
+          }
+          
+          .calendar-selectors select:hover {
+              border-color: #764ba2;
+              box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+          }
+          
+          .calendar-selectors select:focus {
+              outline: none;
+              border-color: #764ba2;
+              box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+          }
+          
+          .today-btn {
+              background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+              color: white;
+              border: none;
+              padding: 8px 20px;
+              font-size: 16px;
+              font-weight: bold;
+              border-radius: 5px;
+              cursor: pointer;
+              transition: all 0.3s;
+              white-space: nowrap;
+          }
+          
+          .today-btn:hover {
+              transform: translateY(-2px);
+              box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+          }
+          
+          .today-btn:active {
+              transform: translateY(0);
+          }
+.calendar-legend {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f5f7fa;
+            border-radius: 10px;
+        }
+
+        .legend-item {
+            display: inline-flex;
+            align-items: center;
+            margin-right: 20px;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 3px;
+            margin-right: 8px;
+        }
+
+        .legend-today {
+            background: #667eea;
+        }
+
+        .legend-other {
+            background: #f9f9f9;
+            border: 1px solid #ddd;
+        }
+
+        .footer {
+            background: #f5f5f5;
+            padding: 20px;
+            text-align: center;
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+
+            .container {
+                box-shadow: none;
+                border-radius: 0;
+            }
+
+            .header {
+                background: white;
+                color: #333;
+                border-bottom: 2px solid #667eea;
+            }
+
+            .calendar-nav button {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📅 日历</h1>
+            <p>查看当前日期和日历</p>
+        </div>
+
+        <div class="calendar-container">
+            <div class="current-date">
+                <h2 id="currentDate"></h2>
+                <p id="currentWeekday"></p>
+            </div>
+
+            <div class="calendar">
+                <div class="calendar-header">
+                    <div class="calendar-nav">
+                        <button onclick="previousMonth()">◀ 上月</button>
+                    </div>
+                    <h3 id="monthYear"></h3>
+                    <div class="calendar-nav">
+                        <button onclick="nextMonth()">下月 ▶</button>
+                    </div>
+                </div>
+
+                <div class="calendar-grid">
+                    <div class="calendar-day-header">日</div>
+                    <div class="calendar-day-header">一</div>
+                    <div class="calendar-day-header">二</div>
+                    <div class="calendar-day-header">三</div>
+                    <div class="calendar-day-header">四</div>
+                    <div class="calendar-day-header">五</div>
+                    <div class="calendar-day-header">六</div>
+                </div>
+
+                <div class="calendar-grid" id="calendarDays"></div>
+
+                <div class="calendar-legend">
+                    <div class="legend-item">
+                        <div class="legend-color legend-today"></div>
+                        <span>今天</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color legend-other"></div>
+                        <span>其他日期</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>© 2024 HarmonyPC Electron Team. All rights reserved.</p>
+            <p>基于 Electron for HarmonyOS PC 构建</p>
+        </div>
+    </div>
+
+    <script>
+        let currentDate = new Date();
+        let displayMonth = currentDate.getMonth();
+        let displayYear = currentDate.getFullYear();
+
+        const weekdays = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
+        const months = ['一月', '二月', '三月', '四月', '五月', '六月', 
+                        '七月', '八月', '九月', '十月', '十一月', '十二月'];
+
+        // 初始化
+        function init() {
+            updateCurrentDate();
+            renderCalendar();
+        }
+
+        // 更新当前日期显示
+        function updateCurrentDate() {
+            const dateStr = formatDate(currentDate);
+            const weekdayStr = weekdays[currentDate.getDay()];
+            
+            document.getElementById('currentDate').textContent = dateStr;
+            document.getElementById('currentWeekday').textContent = weekdayStr;
+        }
+
+        // 格式化日期
+        function formatDate(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}年${month}月${day}日`;
+        }
+
+        // 渲染日历
+        function renderCalendar() {
+            const calendarDays = document.getElementById('calendarDays');
+            const monthYear = document.getElementById('monthYear');
+            
+            // 更新月份年份显示
+            monthYear.textContent = `${displayYear}年 ${months[displayMonth]}`;
+            
+            // 清空日历
+            calendarDays.innerHTML = '';
+            
+            // 获取当月第一天和最后一天
+            const firstDay = new Date(displayYear, displayMonth, 1);
+            const lastDay = new Date(displayYear, displayMonth + 1, 0);
+            
+            // 获取当月第一天是星期几
+            const firstDayOfWeek = firstDay.getDay();
+            
+            // 获取上个月的最后一天
+            const prevMonthLastDay = new Date(displayYear, displayMonth, 0);
+            
+            // 填充上个月的日期
+            for (let i = firstDayOfWeek - 1; i >= 0; i--) {
+                const day = prevMonthLastDay.getDate() - i;
+                const dayElement = createDayElement(day, true);
+                calendarDays.appendChild(dayElement);
+            }
+            
+            // 填充当月的日期
+            for (let day = 1; day <= lastDay.getDate(); day++) {
+                const isToday = isSameDay(new Date(displayYear, displayMonth, day), currentDate);
+                const dayElement = createDayElement(day, false, isToday);
+                calendarDays.appendChild(dayElement);
+            }
+            
+            // 填充下个月的日期
+            const totalDays = calendarDays.children.length;
+            const remainingDays = 42 - totalDays; // 6 行 × 7 天 = 42 天
+            
+            for (let day = 1; day <= remainingDays; day++) {
+                const dayElement = createDayElement(day, true);
+                calendarDays.appendChild(dayElement);
+            }
+        }
+
+        // 创建日期元素
+        function createDayElement(day, isOtherMonth, isToday = false) {
+            const dayElement = document.createElement('div');
+            dayElement.className = 'calendar-day';
+            
+            if (isOtherMonth) {
+                dayElement.classList.add('other-month');
+            }
+            
+            if (isToday) {
+                dayElement.classList.add('today');
+            }
+            
+            dayElement.textContent = day;
+            
+            // 添加点击事件
+            if (!isOtherMonth) {
+                dayElement.onclick = function() {
+                    alert(`您选择了：${displayYear}年${displayMonth + 1}月${day}日`);
+                };
+            }
+            
+            return dayElement;
+        }
+
+        // 判断是否是同一天
+        function isSameDay(date1, date2) {
+            return date1.getFullYear() === date2.getFullYear() &&
+                   date1.getMonth() === date2.getMonth() &&
+                   date1.getDate() === date2.getDate();
+        }
+
+        // 上个月
+        function previousMonth() {
+            displayMonth--;
+            if (displayMonth < 0) {
+                displayMonth = 11;
+                displayYear--;
+            }
+            renderCalendar();
+        }
+
+        // 下个月
+        function nextMonth() {
+            displayMonth++;
+            if (displayMonth > 11) {
+                displayMonth = 0;
+                displayYear++;
+            }
+            renderCalendar();
+        }
+
+        // 页面加载时初始化
+        window.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
